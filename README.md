@@ -14,6 +14,9 @@ cd my-deck
 pnpm dlx slide-maker start
 ```
 
+The studio opens in your default browser when it is ready. Use
+`slide-maker start --no-open` when you only want to start the server.
+
 `init` asks which style the deck should wear. Then open Claude Code in the same
 directory and start briefing it.
 

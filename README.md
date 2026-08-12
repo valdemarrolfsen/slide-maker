@@ -77,6 +77,9 @@ slide-maker templates          # list them
 slide-maker use noir           # switch
 ```
 
+While the Studio is running, you can also switch from the template picker next
+to the deck title. The deck reloads with the new design immediately.
+
 | Template | For |
 | --- | --- |
 | `granite` | Working sessions and partner workshops. Warm neutrals, hairline rules, mono labels. |

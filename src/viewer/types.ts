@@ -59,11 +59,11 @@ export interface DeckState {
   slides: Array<Omit<SlideEntry, 'module'>>;
   comments: Comment[];
   styles: StyleInfo[];
+  templates: TemplateInfo[];
 }
 
-/* ── The template library, as `slide-maker browse` sees it ─────── */
-
-export interface LibraryTemplate {
+/** A ready-made slide layout, offered in the studio's Add slide picker. */
+export interface TemplateInfo {
   name: string;
   label: string;
   description: string;
@@ -71,28 +71,7 @@ export interface LibraryTemplate {
   guidance: string;
   /** Filename stem to use when the template lands in a deck. */
   stem: string;
-  origin: 'builtin' | 'local';
-  module: { default?: ComponentType };
-  /** The template's own source, for the copy button. */
-  jsx: string;
-}
-
-export interface LibraryStyle {
-  name: string;
-  label: string;
-  description: string;
-  tags: string[];
-  dark: boolean;
-  guidance: string;
-  origin: 'builtin' | 'local';
-  /** The stylesheet as text, so it can be injected into a preview document. */
-  css: string;
-}
-
-export interface LibraryDeck {
-  dir: string;
-  title: string;
-  style: string;
+  source: 'builtin' | 'local';
 }
 
 export interface DraftComment {

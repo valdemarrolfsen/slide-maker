@@ -49,6 +49,10 @@
   gap: 8px;
   min-width: 0;
 }
+.sm-mark {
+  display: flex;
+  color: var(--ui-muted);
+}
 .sm-deck-title {
   font-size: 13px;
   font-weight: 500;
@@ -57,6 +61,11 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+/* Reads as a path: deck, then the style it is wearing. */
+.sm-crumb {
+  color: var(--ui-border-2);
+  user-select: none;
 }
 /* The native select keeps style switching keyboard-accessible without
    introducing a second popover system into the studio chrome. */
@@ -103,6 +112,43 @@
 .sm-style-select-error {
   border-color: var(--ui-danger);
 }
+
+/* The Add slide picker is the style picker in a different job, so it inherits
+   the shape and only marks itself as an action. */
+.sm-add-picker::after {
+  right: 9px;
+}
+.sm-add-select {
+  max-width: 150px;
+  padding-left: 22px;
+}
+.sm-add-picker::before {
+  content: "+";
+  position: absolute;
+  left: 9px;
+  top: 50%;
+  transform: translateY(-52%);
+  font-size: 13px;
+  line-height: 1;
+  color: var(--ui-muted);
+  pointer-events: none;
+}
+.sm-add-picker:hover .sm-add-select:not(:disabled),
+.sm-add-picker:hover::before {
+  color: var(--ui-fg-2);
+}
+
+.sm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
 .sm-status {
   display: inline-flex;
   align-items: center;
@@ -125,6 +171,95 @@
 .sm-status-live::before {
   background: var(--ui-accent);
   box-shadow: 0 0 0 3px rgba(130, 143, 255, 0.16);
+}
+.sm-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--ui-border);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+
+.sm-btn {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r);
+  background: var(--ui-panel);
+  color: var(--ui-fg-2);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    border-color var(--ui-fast) var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
+}
+.sm-btn svg {
+  flex: 0 0 auto;
+  color: var(--ui-muted);
+  transition: color var(--ui-fast) var(--ui-ease);
+}
+.sm-btn-error {
+  border-color: var(--ui-danger);
+  color: var(--ui-danger);
+}
+.sm-btn:hover:not(:disabled) {
+  background: var(--ui-panel-2);
+  border-color: var(--ui-border-2);
+  color: var(--ui-fg);
+}
+.sm-btn:hover:not(:disabled) svg {
+  color: var(--ui-fg-2);
+}
+.sm-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.sm-btn-primary,
+.sm-btn-primary svg {
+  border-color: var(--ui-accent-2);
+  background: var(--ui-accent-2);
+  color: #fff;
+}
+.sm-btn-primary:hover:not(:disabled),
+.sm-btn-primary:hover:not(:disabled) svg {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: #fff;
+}
+.sm-btn-ghost {
+  height: 26px;
+  padding: 0 8px;
+  border-color: transparent;
+  background: transparent;
+  color: var(--ui-muted);
+  font-weight: 400;
+}
+.sm-btn-ghost:hover:not(:disabled) {
+  border-color: transparent;
+  background: var(--ui-hover);
+  color: var(--ui-fg);
+}
+.sm-btn-danger:hover:not(:disabled),
+.sm-btn-danger:hover:not(:disabled) svg {
+  background: rgba(235, 87, 87, 0.12);
+  color: var(--ui-danger);
+}
+.sm-btn-icon {
+  width: 28px;
+  padding: 0;
+}
+.sm-btn-ghost.sm-btn-icon {
+  width: 26px;
 }
 
 /* ── Body ──────────────────────────────────────────────────────── */

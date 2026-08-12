@@ -13,7 +13,6 @@ working on a deck rather than on this codebase.
 ```bash
 pnpm demo             # studio on examples/demo
 pnpm demo:build       # static build of it
-pnpm browse           # template library, every template in every style
 pnpm typecheck        # typecheck
 pnpm types            # generate published .d.ts (runs on npm pack)
 
@@ -38,11 +37,6 @@ whether the package is installed globally, run through pnpm dlx, or linked.
 The comment API is middleware on the dev server, and comment changes are pushed
 to the studio over Vite's existing HMR socket rather than a second websocket.
 
-`slide-maker browse` is a third entry point on the same Vite root, backed by
-`src/vite/plugin-library.js` and its `virtual:slide-maker/library` module. It
-imports every template as a module and every style as a string of CSS, because
-the viewer renders each combination inside its own iframe.
-
 ## Two words
 
 A **style** is a design system: `styles/<name>/style.json` plus a `style.css`
@@ -55,7 +49,9 @@ template renders in any style.
 Templates are aimed at Claude working inside a deck, not at the person running
 `init`. `init` asks only for a style and seeds a cover; which layout a slide
 wants is decided while writing it, through `list_templates` and
-`read_template`. `browse` is the human view of the same library.
+`read_template`. The studio's Add slide picker is the same library from the
+other side: it copies a template into `slides/` with its example copy intact,
+for the user to then brief Claude on.
 
 Both are shadowed by deck-local copies in `styles/` and `templates/` inside the
 deck, so a project can fork a built-in by keeping its name.
@@ -71,6 +67,12 @@ style, which is the only thing that makes the library worth having.
 **Slides are a fixed 1280x720 canvas, scaled with a transform, never reflowed.**
 This is what makes the studio, the static build and the PDF pixel-identical, and
 what keeps comment anchors valid at any zoom.
+
+**The slides directory is watched, not just the slide files.** Vite only
+watches what the module graph already imports, and the case that has to work is
+a file that does not exist yet: adding one is how a deck grows, whoever is
+writing it. `plugin-deck.js` adds the directory itself to the watcher, and
+without that a new slide never appears, not even on a manual refresh.
 
 **Comments are a file, not a service.** `.slide-maker/comments.json` is the
 single source of truth, written atomically via temp file and rename. The studio

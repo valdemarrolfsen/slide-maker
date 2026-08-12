@@ -6,7 +6,6 @@ import { buildCommand } from './build.js';
 import { exportCommand } from './export.js';
 import { stylesCommand, useStyleCommand } from './styles.js';
 import { templatesCommand } from './templates.js';
-import { browseCommand } from './browse.js';
 import { clearCommentsCommand, commentsCommand, resolveCommentCommand } from './comments.js';
 import { resolveDeckDir } from '../core/paths.js';
 import { error } from '../core/log.js';
@@ -76,15 +75,6 @@ export function createCli() {
     .description('list the slide templates in the library')
     .option('-d, --deck <dir>', 'deck directory', '.')
     .action(templatesCommand);
-
-  program
-    .command('browse')
-    .argument('[dir]', 'deck directory, for local templates and styles', '.')
-    .description('open the template library, every template in every style')
-    .option('-p, --port <port>', 'port to listen on', '5171')
-    .option('--host [host]', 'expose the server on the network')
-    .option('--no-open', 'do not open a browser')
-    .action(browseCommand);
 
   const comments = program.command('comments').description('read and clear deck feedback');
 

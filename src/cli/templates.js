@@ -14,7 +14,7 @@ export async function templatesCommand(options) {
     if (template.description) console.log(`    ${color.dim(template.description)}`);
   }
   console.log('');
-  console.log(color.dim('  See them rendered in every style with `slide-maker browse`.'));
-  console.log(color.dim('  Claude reaches for these itself, through `list_templates`.'));
+  console.log(color.dim('  Add one to a deck from the studio, or ask Claude: it reads the'));
+  console.log(color.dim('  same library through `list_templates` and `read_template`.'));
   console.log('');
 }

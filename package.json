@@ -45,8 +45,7 @@
     "types": "tsc -p tsconfig.build.json",
     "prepack": "pnpm run types",
     "demo": "node bin/slide-maker.js start examples/demo",
-    "demo:build": "node bin/slide-maker.js build examples/demo",
-    "browse": "node bin/slide-maker.js browse examples/demo"
+    "demo:build": "node bin/slide-maker.js build examples/demo"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",

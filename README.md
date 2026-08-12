@@ -87,11 +87,11 @@ style. It is a starting point, not a constraint.
 slide-maker styles             # list the design systems
 slide-maker use noir           # switch the deck to one
 slide-maker templates          # list the slide layouts
-slide-maker browse             # see every template in every style
 ```
 
-While the Studio is running, you can also switch from the style picker next to
-the deck title. The deck reloads with the new design immediately.
+Both are also in the studio's top bar: a style picker next to the deck title,
+and an **Add slide** picker next to that. The deck reloads immediately either
+way.
 
 ### The styles
 
@@ -126,16 +126,18 @@ built-in of the same name.
 | `code` | A code block with commentary and one highlighted line |
 | `closing` | The decision being asked for, on the inverted palette |
 
-`slide-maker browse` opens the library in a browser: pick a template and see it
-in all five styles at once, or pick a style and see the whole library in it.
-Copy the JSX from there, or click **Add to deck** to append it to the deck you
-launched from. Fork a template by copying it into `templates/` inside your deck.
+Add one to a deck from the studio: the **Add slide** picker sits next to the
+style name and appends the template as a new slide, example copy and all. Then
+tell Claude what it should actually say. Picking the shape yourself and leaving
+the words to Claude is usually faster than describing a layout in prose.
 
-Templates are mostly for Claude, though. The deck's `CLAUDE.md` and the MCP
-server both point it at the library, and `read_template` hands it the JSX, so
-"make me a slide with three pillars on it" starts from `three-up` rather than
-from nothing. Browse is how you check its work, or find the shape you want to
-ask for.
+Claude reaches for the same library on its own. The deck's `CLAUDE.md` and the
+MCP server both point at it, and `read_template` hands over the JSX, so "a slide
+with three pillars" starts from `three-up` rather than from nothing.
+
+Fork a template by copying it into `templates/` inside your deck. A local
+template shadows a built-in of the same name, so a house cover slide is a
+`templates/cover/` away.
 
 ## Starting a deck
 
@@ -276,7 +278,6 @@ To register it by hand instead:
 ```
 slide-maker init [dir]         scaffold a deck and wire up Claude Code
 slide-maker start [dir]        open the studio
-slide-maker browse [dir]       open the template library
 slide-maker build [dir]        export a static site
 slide-maker export [dir]       render to PDF or PNG
 slide-maker styles             list the design systems

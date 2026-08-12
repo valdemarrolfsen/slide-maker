@@ -8,8 +8,8 @@ import { builtinTemplatesDir } from './paths.js';
  *
  * A template is one slide: a `slide.tsx` written against the runtime, plus a
  * manifest describing when to reach for it. Templates carry no colour and no
- * type scale, so the same template renders in every style, which is what
- * `slide-maker browse` puts on screen.
+ * type scale, so the same template renders in every style. Claude reaches for
+ * them over MCP; the studio's Add slide picker is the same library by hand.
  */
 
 export const TEMPLATE_MANIFEST = 'template.json';

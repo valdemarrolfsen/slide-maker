@@ -10,7 +10,6 @@ pnpm exec playwright install chromium   # only needed for PDF/PNG export work
 
 pnpm demo                         # studio on the example deck
 pnpm demo:build                   # static build of it
-pnpm browse                       # the template library
 pnpm typecheck                    # typecheck
 ```
 
@@ -59,8 +58,8 @@ bin/                CLI entry point
 src/
   cli/              commands, the prompt, and the files `init` scaffolds
   core/             deck config, slide discovery, comments, style and template registries
-  vite/             Vite config factory, the deck plugin and the library plugin
-  viewer/           the studio, the presentation and the template library, in React
+  vite/             Vite config factory and the deck plugin
+  viewer/           the studio and the standalone presentation, in React
   runtime/          the component library slides import, and its stylesheet
   render/           headless rendering for PDF, PNG and the MCP tool
   mcp/              the MCP server
@@ -115,20 +114,17 @@ Two things to watch:
   `--sm-head-min` and `--sm-head-gap` or long headings will crowd the content
   underneath. `noir` is the worked example.
 
-Test a style against the whole template library, which is what it is for:
+Test a style against the template library, which is what it is for. Copy the
+templates into a scratch deck, point it at the style, and render every slide:
 
 ```bash
-pnpm browse
+node bin/slide-maker.js init /tmp/style-check --style mystyle --yes
+for t in templates/*/; do cp "$t/slide.tsx" "/tmp/style-check/slides/$(basename $t).tsx"; done
+node bin/slide-maker.js export /tmp/style-check -f png -o out
 ```
 
-Switch to "One style, every template" and look at all fifteen. A style that has
-only been checked on a cover slide is a style that has not been checked. For
-pixel-level work, point the example deck at it and render:
-
-```bash
-node bin/slide-maker.js use mystyle --deck examples/demo
-node bin/slide-maker.js export examples/demo -f png -o ../../.preview
-```
+Look at all fifteen images. A style that has only been checked on a cover slide
+is a style that has not been checked.
 
 ## Writing a template
 
@@ -158,9 +154,10 @@ The `order` field positions it in the library, which runs roughly from opening
 to closing. `file` overrides the filename stem `init` and **Add to deck** use,
 which only `blank` currently needs.
 
-Check it with `pnpm browse`: pick the template and look at all five styles at
-once. Dense layouts are the ones that break, usually in `noir`, which has the
-largest type scale.
+Check it in every style, not just the default. Drop it into the example deck
+with the studio's Add slide picker, then switch styles from the picker beside
+it and watch what happens. Dense layouts are the ones that break, usually in
+`noir`, which has the largest type scale.
 
 ## Adding a runtime component
 

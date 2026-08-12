@@ -1,10 +1,11 @@
 import path from 'node:path';
+import fsp from 'node:fs/promises';
+import { createRequire } from 'node:module';
 import { normalizePath } from 'vite';
 import { listSlides, readConfig, writeConfig, CONFIG_FILE } from '../core/deck.js';
 import { resolveStyle, listStyles } from '../core/styles.js';
-import { runtimeCss } from '../core/paths.js';
-import { resolveAliases } from './aliases.js';
-import { readBody, sendJson } from './http.js';
+import { listTemplates, resolveTemplate } from '../core/templates.js';
+import { runtimeCss, runtimeEntry } from '../core/paths.js';
 import {
   addComment,
   clearResolved,
@@ -25,8 +26,78 @@ export const STYLE_MODULE = 'virtual:slide-maker/style';
 const RESOLVED = (id) => `\0${id}`;
 const API_PREFIX = '/__slide-maker/api';
 
+const require = createRequire(import.meta.url);
+
+/**
+ * Aliases that make a deck resolvable from anywhere on disk.
+ *
+ * A deck is content, not a project: it has no package.json and no node_modules.
+ * Slide files still compile to JSX runtime imports, and resolution for those
+ * starts from the slide's own directory, so without these a deck outside the
+ * package fails to build. Pinning React here also guarantees one React
+ * instance even if a deck happens to sit inside another project that has its
+ * own copy.
+ *
+ * The array form matters: object-form aliases match as prefixes, so a `react`
+ * key would also swallow `react-dom`.
+ */
+function resolveAliases(deckDir) {
+  const pinned = [
+    'react',
+    'react-dom',
+    'react-dom/client',
+    'react/jsx-runtime',
+    'react/jsx-dev-runtime',
+  ];
+  return [
+    { find: /^slide-maker\/runtime$/, replacement: runtimeEntry },
+    { find: /^@deck$/, replacement: deckDir },
+    { find: /^@deck\//, replacement: `${deckDir}/` },
+    ...pinned.map((id) => ({
+      find: new RegExp(`^${id.replace(/[/\\]/g, '\\$&')}$`),
+      replacement: require.resolve(id),
+    })),
+  ];
+}
+
 function toImportPath(absolute) {
   return normalizePath(absolute);
+}
+
+function readBody(req) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let size = 0;
+    req.on('data', (chunk) => {
+      size += chunk.length;
+      // A request here is a comment or a template name, not a payload. Cap it
+      // so a stray request cannot buffer the process out of memory.
+      if (size > 1_000_000) {
+        reject(new Error('Request body too large'));
+        req.destroy();
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      const raw = Buffer.concat(chunks).toString('utf8');
+      if (!raw) return resolve({});
+      try {
+        resolve(JSON.parse(raw));
+      } catch (err) {
+        reject(err);
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+function sendJson(res, status, data) {
+  const body = JSON.stringify(data);
+  res.statusCode = status;
+  res.setHeader('content-type', 'application/json; charset=utf-8');
+  res.setHeader('cache-control', 'no-store');
+  res.end(body);
 }
 
 function downloadName(title) {
@@ -45,6 +116,20 @@ function sendPdf(res, pdf, filename) {
   res.setHeader('content-length', pdf.length);
   res.setHeader('cache-control', 'no-store');
   res.end(pdf);
+}
+
+/** The next free `NN-name.tsx` in a deck's slides directory. */
+async function nextSlideFile(deckDir, config, stem) {
+  const slides = await listSlides(deckDir, config);
+  const taken = new Set(slides.map((s) => s.name));
+  const number = String(slides.length + 1).padStart(2, '0');
+  let name = `${number}-${stem}.tsx`;
+  let suffix = 2;
+  while (taken.has(name)) {
+    name = `${number}-${stem}-${suffix}.tsx`;
+    suffix += 1;
+  }
+  return path.posix.join(config.slides, name);
 }
 
 /**
@@ -136,6 +221,11 @@ ${entries}
       const commentsFile = commentsPath(deckDir);
       server.watcher.add(commentsFile);
       server.watcher.add(path.join(deckDir, CONFIG_FILE));
+      // The directory, not just the slide files inside it. Vite only watches
+      // what the module graph already imports, and a slide that does not exist
+      // yet is exactly the case that has to work: adding a file is how a deck
+      // grows, whether the writer is Claude, the studio or a text editor.
+      server.watcher.add(path.join(deckDir, current.slides));
 
       // The MCP server resolves comments in a different process. Watching the
       // file rather than routing everything through the API means the viewer
@@ -171,10 +261,11 @@ ${entries}
         try {
           if (route === '/state' && req.method === 'GET') {
             const cfg = await readConfig(deckDir);
-            const [slides, comments, styles] = await Promise.all([
+            const [slides, comments, styles, templates] = await Promise.all([
               listSlides(deckDir, cfg),
               listComments(deckDir),
               listStyles(deckDir),
+              listTemplates(deckDir),
             ]);
             return sendJson(res, 200, {
               deckDir,
@@ -182,6 +273,7 @@ ${entries}
               slides: slides.map(({ absolute, ...rest }) => rest),
               comments,
               styles: styles.map(({ dir, stylesheet, ...rest }) => rest),
+              templates: templates.map(({ dir, slide, order, ...rest }) => rest),
             });
           }
 
@@ -202,6 +294,25 @@ ${entries}
             const cfg = await readConfig(deckDir);
             await writeConfig(deckDir, { ...cfg, style: name });
             return sendJson(res, 200, { style: name });
+          }
+
+          if (route === '/slides' && req.method === 'POST') {
+            const body = await readBody(req);
+            const template = await resolveTemplate(deckDir, body.template);
+            if (!template) {
+              const available = (await listTemplates(deckDir)).map((t) => t.name);
+              return sendJson(res, 400, {
+                error: `No template named "${body.template}". Available: ${available.join(', ')}`,
+              });
+            }
+            const cfg = await readConfig(deckDir);
+            const file = await nextSlideFile(deckDir, cfg, template.stem);
+            const target = path.join(deckDir, file);
+            await fsp.mkdir(path.dirname(target), { recursive: true });
+            await fsp.writeFile(target, await fsp.readFile(template.slide, 'utf8'), 'utf8');
+            // The watcher picks the new file up and reloads the viewer, so
+            // there is nothing to push here beyond the name of what landed.
+            return sendJson(res, 201, { file });
           }
 
           if (route === '/export/pdf' && req.method === 'POST') {

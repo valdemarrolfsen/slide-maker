@@ -55,8 +55,14 @@ slides that do not resemble any of them. But check the library first, and say
 which template a slide came from when you report back, so the user knows what
 they are looking at.
 
-The user can see the library rendered by running `slide-maker browse`. That is
-theirs to run, like the studio: never start it yourself.
+### Slides the user added
+
+The studio has an **Add slide** picker next to the style name, which drops a
+template into `slides/` with its example copy still in it. A slide you did not
+write, still carrying that copy, is a slide the user has asked for by pointing
+at a shape: they picked the layout, and the words are yours to write. Replace
+the content, keep the structure, and ask what the slide is meant to say if the
+surrounding deck does not already tell you.
 
 ## Writing slides
 

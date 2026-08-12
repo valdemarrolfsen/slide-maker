@@ -10,7 +10,10 @@ import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
 import { captureSelection, capturePoint, clearSelection } from './selection';
-import type { Comment, DraftComment, StyleInfo } from './types';
+import type { Comment, DraftComment, StyleInfo, TemplateInfo } from './types';
+
+/** Which slide to show once the reload that follows an edit has happened. */
+const LANDING_KEY = 'slide-maker:landing';
 
 /** Ignores keyboard shortcuts while the user is typing. */
 function isTyping(target: EventTarget | null): boolean {
@@ -36,6 +39,9 @@ export function Studio() {
   const [styles, setStyles] = useState<StyleInfo[]>([]);
   const [stylePending, setStylePending] = useState(false);
   const [styleError, setStyleError] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
+  const [addPending, setAddPending] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -54,8 +60,20 @@ export function Studio() {
     api.fetchState().then((state) => {
       setComments(state.comments);
       setStyles(state.styles);
+      setTemplates(state.templates);
     }).catch(() => {});
     return api.onCommentsChanged(setComments);
+  }, []);
+
+  // Adding a slide writes a file, which reloads the page. Land on the new
+  // slide rather than back at the top of the deck, since looking at what you
+  // just added is the whole reason for adding it.
+  useEffect(() => {
+    const pending = sessionStorage.getItem(LANDING_KEY);
+    if (!pending) return;
+    sessionStorage.removeItem(LANDING_KEY);
+    const index = slides.findIndex((s) => s.file === pending);
+    if (index >= 0) setActiveIndex(index);
   }, []);
 
   useEffect(() => {
@@ -84,6 +102,20 @@ export function Studio() {
     } catch (err) {
       setStylePending(false);
       setStyleError(err instanceof Error ? err.message : 'Could not switch style');
+    }
+  };
+
+  /** Appends a slide built from a template, for the user to brief Claude on. */
+  const addSlide = async (template: string) => {
+    setAddPending(true);
+    setAddError(null);
+    try {
+      const { file } = await api.addSlide(template);
+      sessionStorage.setItem(LANDING_KEY, file);
+      // The file watcher reloads the viewer, so there is nothing to do here.
+    } catch (err) {
+      setAddPending(false);
+      setAddError(err instanceof Error ? err.message : 'Could not add the slide');
     }
   };
 
@@ -277,6 +309,30 @@ export function Studio() {
               {!style && <option value={config.style}>{config.style} (missing)</option>}
               {styles.map((item) => (
                 <option key={item.name} value={item.name}>
+                  {item.label}{item.source === 'local' ? ' (local)' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
+          {/* Always reads "Add slide" rather than holding a selection: it is an
+              action wearing a select, so the native list gets us a keyboard
+              accessible menu without a second popover system in the chrome. */}
+          <label className="sm-style-picker sm-add-picker">
+            <span className="sm-visually-hidden">Add a slide from a template</span>
+            <select
+              className={`sm-style-select sm-add-select${addError ? ' sm-style-select-error' : ''}`}
+              value=""
+              disabled={addPending || templates.length === 0}
+              onChange={(event) => addSlide(event.target.value)}
+              title={addError || 'Append a slide built from a template'}
+              aria-label="Add a slide from a template"
+              aria-invalid={Boolean(addError)}
+            >
+              <option value="" disabled>
+                {addPending ? 'Adding…' : addError ? 'Could not add' : 'Add slide'}
+              </option>
+              {templates.map((item) => (
+                <option key={item.name} value={item.name} title={item.description}>
                   {item.label}{item.source === 'local' ? ' (local)' : ''}
                 </option>
               ))}

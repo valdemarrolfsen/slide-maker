@@ -27,11 +27,11 @@ export function setStyle(name: string) {
   });
 }
 
-/** Appends a template to the deck browse was launched from. */
-export function insertTemplate(name: string) {
-  return request<{ file: string }>(`${BASE}/insert`, {
+/** Appends a slide to the deck, copied from a template. */
+export function addSlide(template: string) {
+  return request<{ file: string }>(`${BASE}/slides`, {
     method: 'POST',
-    body: JSON.stringify({ template: name }),
+    body: JSON.stringify({ template }),
   });
 }
 

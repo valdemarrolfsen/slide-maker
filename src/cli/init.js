@@ -166,7 +166,6 @@ export async function initCommand(target, options) {
   const where = path.relative(process.cwd(), deckDir);
   if (where) console.log(`    cd ${where}`);
   console.log(`    slide-maker start        ${color.dim('open the studio')}`);
-  console.log(`    slide-maker browse       ${color.dim('the slide templates, in this style')}`);
   console.log(`    claude                   ${color.dim('start building, MCP is already wired up')}`);
   console.log('');
   console.log(color.dim('  Claude Code asks you to approve the MCP server the first time it starts.'));

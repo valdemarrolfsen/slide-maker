@@ -39,7 +39,7 @@ export async function startCommand(target, options) {
       port: options.port ? Number(options.port) : 5170,
       strictPort: false,
       host: options.host || false,
-      open: options.open ?? false,
+      open: options.open !== false,
     },
   });
 

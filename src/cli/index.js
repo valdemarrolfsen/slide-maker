@@ -39,7 +39,7 @@ export function createCli() {
     .description('open the studio and watch for changes')
     .option('-p, --port <port>', 'port to listen on', '5170')
     .option('--host [host]', 'expose the server on the network')
-    .option('-o, --open', 'open a browser on start')
+    .option('--no-open', 'do not open a browser on start')
     .action(startCommand);
 
   program

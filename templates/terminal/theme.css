@@ -1,0 +1,89 @@
+/* ─────────────────────────────────────────────────────────────────
+   Terminal. Monospace everywhere, near-black ground, phosphor green
+   accent. Mono runs about 15% wider than a sans at the same size, so
+   the measures here are tightened to compensate.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  --sm-bg: #0b0e0c;
+  --sm-bg-0: rgba(11, 14, 12, 0);
+  --sm-panel: #121614;
+  --sm-fg: #d8e5dc;
+  --sm-fg-2: #b9c9be;
+  --sm-muted: #7d8f83;
+  --sm-muted-2: #5b6a60;
+  --sm-border: #1e2621;
+  --sm-border-2: #2c352e;
+  --sm-accent: #5fd68a;
+  --sm-accent-dim: #3aa864;
+
+  --sm-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sm-sans: var(--sm-mono);
+
+  --sm-title-size: 34px;
+  --sm-title-big: 44px;
+  --sm-title-huge: 52px;
+  --sm-title-weight: 500;
+  --sm-title-tracking: -0.02em;
+  --sm-title-leading: 1.2;
+  --sm-title-measure: 26ch;
+  --sm-body-size: 13px;
+  --sm-lede-size: 15px;
+  --sm-radius: 0px;
+  --sm-pad-x: 64px;
+  --sm-pad-top: 52px;
+  --sm-pad-bottom: 72px;
+}
+
+/* A light terminal, for the one slide that needs to be printed or shown
+   under bright lights. */
+.sm-slide.sm-dark {
+  --sm-bg: #f4f6f4;
+  --sm-bg-0: rgba(244, 246, 244, 0);
+  --sm-panel: #e8ece9;
+  --sm-fg: #0b0e0c;
+  --sm-fg-2: #232a26;
+  --sm-muted: #4d5a52;
+  --sm-muted-2: #6f7d74;
+  --sm-border: #d5dcd7;
+  --sm-border-2: #bcc5be;
+  --sm-accent: #1c7a45;
+  --sm-accent-dim: #3aa864;
+}
+
+.sm-lede {
+  max-width: 66ch;
+}
+
+/* Mono headings do not need tracking pulled in as far as a sans would. */
+.sm-eyebrow,
+.sm-kicker {
+  letter-spacing: 0.18em;
+}
+
+/* Section markers read as prompts. */
+.sm-eyebrow::before {
+  content: "› ";
+  color: var(--sm-accent);
+}
+
+.sm-tick::before {
+  top: 8px;
+  width: 10px;
+}
+
+.sm-code {
+  background: #050806;
+  border-color: var(--sm-border-2);
+  color: var(--sm-fg-2);
+  font-size: 13px;
+}
+
+.sm-quote {
+  border-left-color: var(--sm-accent);
+}
+.sm-quote-body {
+  font-size: 24px;
+  line-height: 1.42;
+  max-width: 34ch;
+}

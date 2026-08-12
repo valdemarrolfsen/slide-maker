@@ -1,0 +1,82 @@
+/* ─────────────────────────────────────────────────────────────────
+   Noir. Near-black ground, large type, amber accent. Sized for a
+   projected room, which means fewer words and a bigger scale than a
+   deck meant to be read at a desk.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  --sm-bg: #0e0e0d;
+  --sm-bg-0: rgba(14, 14, 13, 0);
+  --sm-panel: #171715;
+  --sm-fg: #fafaf8;
+  --sm-fg-2: #e6e5e0;
+  --sm-muted: #9a988f;
+  --sm-muted-2: #706e66;
+  --sm-border: #292927;
+  --sm-border-2: #3a3936;
+  --sm-accent: #e8a33d;
+  --sm-accent-dim: #b87c22;
+
+  --sm-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --sm-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --sm-title-size: 52px;
+  --sm-title-big: 68px;
+  --sm-title-huge: 84px;
+  --sm-title-weight: 600;
+  --sm-title-tracking: -0.028em;
+  --sm-title-leading: 1.08;
+  --sm-title-measure: 22ch;
+  --sm-lede-size: 20px;
+  --sm-radius: 0px;
+  --sm-pad-x: 88px;
+  --sm-pad-top: 72px;
+  --sm-pad-bottom: 84px;
+  /* The type here is much larger than the runtime default, so the heading
+     block needs proportionally more room. */
+  --sm-head-min: 128px;
+  --sm-head-min-tall: 180px;
+  --sm-head-gap: 40px;
+}
+
+/* An inverted slide, for a deliberate hard cut mid-deck. */
+.sm-slide.sm-dark {
+  --sm-bg: #fafaf8;
+  --sm-bg-0: rgba(250, 250, 248, 0);
+  --sm-panel: #f0efe9;
+  --sm-fg: #0e0e0d;
+  --sm-fg-2: #26262b;
+  --sm-muted: #5b5a54;
+  --sm-muted-2: #7d7b73;
+  --sm-border: #dedcd4;
+  --sm-border-2: #c9c7be;
+  --sm-accent: #a86f14;
+  --sm-accent-dim: #c98d28;
+}
+
+/* At this scale a hairline disappears from the back of the room. */
+.sm-slide {
+  --sm-hairline: 1px;
+}
+.sm-grid {
+  border-width: 0;
+}
+.sm-rule {
+  width: 64px;
+  height: 3px;
+}
+.sm-statement {
+  font-size: 46px;
+  line-height: 1.18;
+  max-width: 20ch;
+}
+.sm-stat-v {
+  font-size: 56px;
+}
+.sm-stat-big {
+  font-size: 76px;
+}
+.sm-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.2em;
+}

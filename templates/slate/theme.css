@@ -1,0 +1,79 @@
+/* ─────────────────────────────────────────────────────────────────
+   Slate. Cool neutral greys, a 4px corner radius and a teal accent.
+   The most forgiving of the shipped templates when a slide has to
+   carry a lot of information.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  --sm-bg: #ffffff;
+  --sm-bg-0: rgba(255, 255, 255, 0);
+  --sm-panel: #f4f6f8;
+  --sm-fg: #10161c;
+  --sm-fg-2: #253039;
+  --sm-muted: #56636e;
+  --sm-muted-2: #7b8794;
+  --sm-border: #e2e7ec;
+  --sm-border-2: #cdd5dd;
+  --sm-accent: #0f7d78;
+  --sm-accent-dim: #2ba39d;
+
+  --sm-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", "Helvetica Neue", Arial,
+    sans-serif;
+  --sm-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  --sm-title-size: 36px;
+  --sm-title-big: 48px;
+  --sm-title-huge: 58px;
+  --sm-title-weight: 600;
+  --sm-title-tracking: -0.016em;
+  --sm-title-measure: 32ch;
+  --sm-body-size: 14px;
+  --sm-lede-size: 17px;
+  --sm-radius: 4px;
+  --sm-pad-x: 64px;
+  --sm-pad-top: 48px;
+  --sm-pad-bottom: 72px;
+}
+
+.sm-slide.sm-dark {
+  --sm-bg: #10161c;
+  --sm-bg-0: rgba(16, 22, 28, 0);
+  --sm-panel: #18212a;
+  --sm-fg: #f4f6f8;
+  --sm-fg-2: #dbe2e8;
+  --sm-muted: #94a1ad;
+  --sm-muted-2: #6c7986;
+  --sm-border: #24303a;
+  --sm-border-2: #33414d;
+  --sm-accent: #4ecdc7;
+  --sm-accent-dim: #2ba39d;
+}
+
+/* Cells sit on the panel tint rather than white, so the hairline grid still
+   reads once corners are rounded. */
+.sm-cell {
+  background: var(--sm-panel);
+  padding: 20px 22px;
+}
+.sm-grid {
+  background: var(--sm-border);
+}
+
+.sm-card-title {
+  font-size: 18px;
+}
+.sm-eyebrow {
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+}
+.sm-tick::before {
+  top: 9px;
+  width: 6px;
+  border-radius: 1px;
+}
+.sm-badge-outline {
+  border-radius: 999px;
+}
+.sm-rule {
+  border-radius: 2px;
+}

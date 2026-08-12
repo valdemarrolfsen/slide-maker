@@ -1,0 +1,96 @@
+/* ─────────────────────────────────────────────────────────────────
+   Editorial. Warm paper, serif headlines, ink-black text and a deep
+   red accent. Built for decks with an argument to make, so measures
+   are wider and the type is set to be read, not glanced at.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  --sm-bg: #faf8f3;
+  --sm-bg-0: rgba(250, 248, 243, 0);
+  --sm-panel: #f2efe6;
+  --sm-fg: #1c1a17;
+  --sm-fg-2: #35322c;
+  --sm-muted: #5f5a51;
+  --sm-muted-2: #857f74;
+  --sm-border: #ddd8cb;
+  --sm-border-2: #cbc5b5;
+  --sm-accent: #9c2f2a;
+  --sm-accent-dim: #c2544d;
+
+  --sm-serif: "Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", serif;
+  --sm-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --sm-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --sm-title-size: 44px;
+  --sm-title-big: 58px;
+  --sm-title-huge: 70px;
+  --sm-title-weight: 400;
+  --sm-title-tracking: -0.008em;
+  --sm-title-leading: 1.18;
+  --sm-title-measure: 22ch;
+  --sm-body-size: 16px;
+  --sm-lede-size: 19px;
+  --sm-radius: 0px;
+  --sm-pad-x: 84px;
+  --sm-pad-top: 64px;
+  --sm-pad-bottom: 80px;
+  --sm-head-min: 104px;
+  --sm-head-min-tall: 148px;
+  --sm-head-gap: 32px;
+}
+
+.sm-slide.sm-dark {
+  --sm-bg: #1c1a17;
+  --sm-bg-0: rgba(28, 26, 23, 0);
+  --sm-panel: #26231f;
+  --sm-fg: #faf8f3;
+  --sm-fg-2: #e8e3d8;
+  --sm-muted: #a39c8f;
+  --sm-muted-2: #7d766a;
+  --sm-border: #363229;
+  --sm-border-2: #454033;
+  --sm-accent: #e0837c;
+  --sm-accent-dim: #c2544d;
+}
+
+/* Headlines and pull quotes carry the serif. Labels stay in the sans so
+   they read as apparatus rather than as part of the argument. */
+.sm-title,
+.sm-statement,
+.sm-quote-body,
+.sm-card-title {
+  font-family: var(--sm-serif);
+}
+
+.sm-lede {
+  max-width: 62ch;
+  line-height: 1.6;
+}
+
+.sm-eyebrow,
+.sm-kicker {
+  font-family: var(--sm-sans);
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.sm-quote-body {
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 1.34;
+}
+.sm-quote {
+  border-left-width: 3px;
+  padding-left: 28px;
+}
+
+.sm-cell {
+  padding: 28px 30px;
+}
+
+/* A rule under the heading, the way a feature spread separates a deck from
+   its standfirst. */
+.sm-head {
+  padding-bottom: 20px;
+  border-bottom: var(--sm-hairline) solid var(--sm-border);
+}

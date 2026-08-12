@@ -1,0 +1,68 @@
+import { createServer } from 'vite';
+import { resolveDeckDir } from '../core/paths.js';
+import { DeckError, readConfig, listSlides } from '../core/deck.js';
+import { resolveTemplate, listTemplates } from '../core/templates.js';
+import { listComments } from '../core/comments.js';
+import { color, fail, warn } from '../core/log.js';
+import { createViteConfig } from '../vite/config.js';
+
+export async function devCommand(target, options) {
+  const deckDir = resolveDeckDir(target);
+
+  let config;
+  try {
+    config = await readConfig(deckDir);
+  } catch (err) {
+    if (err instanceof DeckError) {
+      fail(err.message, 'Run `slide-maker init` here first.');
+    }
+    throw err;
+  }
+
+  const [slides, template, comments] = await Promise.all([
+    listSlides(deckDir, config),
+    resolveTemplate(deckDir, config.template),
+    listComments(deckDir, { status: 'open' }),
+  ]);
+
+  if (!template) {
+    const available = (await listTemplates(deckDir)).map((t) => t.name).join(', ');
+    warn(`Template "${config.template}" not found. Slides will render unstyled.`);
+    warn(`Available templates: ${available || 'none'}`);
+  }
+
+  const base = createViteConfig({ deckDir, config, mode: 'studio' });
+  const server = await createServer({
+    ...base,
+    server: {
+      ...base.server,
+      port: options.port ? Number(options.port) : 5170,
+      strictPort: false,
+      host: options.host || false,
+      open: options.open ?? false,
+    },
+  });
+
+  await server.listen();
+
+  const url = server.resolvedUrls?.local?.[0] ?? '';
+  console.log('');
+  console.log(`  ${color.bold(config.title)}`);
+  console.log(
+    `  ${color.dim('template')} ${template?.name ?? `${config.template} (missing)`}   ` +
+      `${color.dim('slides')} ${slides.length}   ` +
+      `${color.dim('open comments')} ${comments.length}`,
+  );
+  console.log('');
+  console.log(`  ${color.green('▸')} ${color.cyan(url)}`);
+  console.log('');
+  console.log(color.dim('  Select text on a slide to comment. Press C for a note on the slide.'));
+  console.log(color.dim('  Ctrl+C to stop.'));
+  console.log('');
+
+  if (!slides.length) {
+    warn(`No slides found in ${config.slides}/. Ask Claude to make you one.`);
+  }
+
+  return server;
+}

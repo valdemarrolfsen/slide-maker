@@ -1,0 +1,7 @@
+{
+  "label": "Terminal",
+  "description": "Monospace throughout on a near-black ground, with a phosphor green accent. For architecture reviews, incident writeups and anything with code on it.",
+  "tags": ["dark", "mono", "engineering", "technical"],
+  "dark": true,
+  "guidance": "Use for engineering audiences. Everything is set in mono, so Code blocks sit naturally in the page rather than looking pasted in. Checklist is the workhorse here for status tables, and Rows suits configuration or specification detail. Keep Titles short, since mono runs wide."
+}

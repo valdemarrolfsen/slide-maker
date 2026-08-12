@@ -1,0 +1,214 @@
+/* ─────────────────────────────────────────────────────────────────
+   Shared shell. Everything the studio and the exported deck both
+   need: the reset, the scaling stage, and the print rules.
+   Nothing in here styles a slide; templates own that.
+   ───────────────────────────────────────────────────────────────── */
+
+:root {
+  --ui-bg: #121211;
+  --ui-bg-2: #1a1a18;
+  --ui-panel: #201f1d;
+  --ui-fg: #f2f2f0;
+  --ui-fg-2: #c9c8c4;
+  --ui-muted: #8c8b85;
+  --ui-muted-2: #6d6c67;
+  --ui-border: #2e2d2a;
+  --ui-border-2: #3a3936;
+  --ui-accent: #6fa4f5;
+  --ui-accent-2: #4080eb;
+  --ui-danger: #e06a5a;
+  --ui-sans: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --ui-mono: ui-monospace, SFMono-Regular, Menlo, "JetBrains Mono", monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font-family: var(--ui-sans);
+  font-size: 13px;
+  -webkit-font-smoothing: antialiased;
+}
+
+kbd {
+  display: inline-block;
+  min-width: 16px;
+  padding: 1px 4px;
+  border: 1px solid var(--ui-border-2);
+  border-radius: 3px;
+  background: var(--ui-bg-2);
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  line-height: 14px;
+  text-align: center;
+  color: var(--ui-fg-2);
+}
+
+/* ── Stage ─────────────────────────────────────────────────────── */
+
+.sm-stage {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sm-stage-box {
+  position: relative;
+  /* A hairline ring plus a soft drop so a white slide separates from the
+     studio background without a heavy border competing with the design. */
+  box-shadow:
+    0 0 0 1px var(--ui-border),
+    0 24px 60px rgba(0, 0, 0, 0.45);
+}
+
+.sm-stage-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Sits over the scaled slide but is not itself scaled, so pins and the
+   composer stay legible however far the slide is zoomed out. */
+.sm-stage-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.sm-stage-overlay > * {
+  pointer-events: auto;
+}
+
+/* ── Broken slide ──────────────────────────────────────────────── */
+
+.sm-error-slide {
+  --sm-bg: #1a1412;
+  --sm-fg: #f6d9d2;
+  --sm-border: #4a2a22;
+  justify-content: center;
+  gap: 16px;
+}
+.sm-error-title {
+  font-family: var(--ui-mono);
+  font-size: 16px;
+  color: #e08a76;
+}
+.sm-error-body {
+  padding: 16px;
+  border: 1px solid var(--sm-border);
+  font-family: var(--ui-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #f6d9d2;
+  white-space: pre-wrap;
+  overflow: auto;
+  max-height: 60%;
+}
+
+/* ── Standalone presentation ───────────────────────────────────── */
+
+.sm-present {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #0d0d0c;
+}
+
+.sm-present-slide {
+  position: absolute;
+  display: none;
+  transform-origin: center center;
+}
+.sm-present-on {
+  display: block;
+}
+
+/* Click targets for paging without any visible chrome. */
+.sm-present-hit {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 25%;
+  cursor: pointer;
+}
+.sm-present-prev {
+  left: 0;
+}
+.sm-present-next {
+  left: 25%;
+  width: 75%;
+}
+
+.sm-present-counter,
+.sm-present-hint {
+  position: fixed;
+  bottom: 16px;
+  font-family: var(--ui-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: var(--ui-muted-2);
+  user-select: none;
+  pointer-events: none;
+}
+.sm-present-counter {
+  right: 20px;
+}
+.sm-present-hint {
+  left: 20px;
+}
+
+/* ── Print ─────────────────────────────────────────────────────── */
+
+@media print {
+  html,
+  body {
+    height: auto;
+    background: #fff;
+  }
+  .sm-present {
+    position: static;
+    display: block;
+    overflow: visible;
+    background: #fff;
+  }
+  .sm-present-hit,
+  .sm-present-hint,
+  .sm-present-counter {
+    display: none !important;
+  }
+  /* Every slide prints, at true size, one per page.
+     Returning them to normal flow is the load-bearing part: an absolutely
+     positioned element is outside pagination, so the whole deck would stack
+     on a single page. */
+  .sm-present-slide {
+    position: static !important;
+    display: block !important;
+    transform: none !important;
+    break-after: page;
+    page-break-after: always;
+  }
+  .sm-present-slide:last-child {
+    break-after: auto;
+    page-break-after: auto;
+  }
+  .sm-slide {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+}

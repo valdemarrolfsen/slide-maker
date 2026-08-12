@@ -1,0 +1,75 @@
+{
+  "name": "slide-maker",
+  "version": "0.1.0",
+  "description": "A local slide deck studio you drive from Claude Code. Write slides as JSX, review them in a live browser UI, and send comments straight back to Claude.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": [
+    "slides",
+    "presentation",
+    "deck",
+    "claude",
+    "claude-code",
+    "mcp",
+    "jsx",
+    "react",
+    "vite"
+  ],
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "bin": {
+    "slide-maker": "bin/slide-maker.js"
+  },
+  "exports": {
+    ".": "./src/index.js",
+    "./runtime": {
+      "types": "./types/index.d.ts",
+      "default": "./src/runtime/index.tsx"
+    },
+    "./runtime.css": "./src/runtime/runtime.css",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin",
+    "src",
+    "types",
+    "templates",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "types": "tsc -p tsconfig.build.json",
+    "prepack": "npm run types",
+    "demo": "node bin/slide-maker.js dev examples/demo",
+    "demo:build": "node bin/slide-maker.js build examples/demo"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "@vitejs/plugin-react": "^6.0.5",
+    "commander": "^15.0.0",
+    "picocolors": "^1.1.1",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8",
+    "vite": "^8.2.1",
+    "zod": "^4.1.14"
+  },
+  "optionalDependencies": {
+    "playwright": "^1.62.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "typescript": "^7.0.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/heisthq/slide-maker.git"
+  },
+  "bugs": {
+    "url": "https://github.com/heisthq/slide-maker/issues"
+  },
+  "homepage": "https://github.com/heisthq/slide-maker#readme"
+}

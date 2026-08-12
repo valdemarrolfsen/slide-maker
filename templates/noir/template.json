@@ -1,0 +1,7 @@
+{
+  "label": "Noir",
+  "description": "Dark ground, oversized headlines and a warm amber accent. Built for a room with the lights down and one idea per slide.",
+  "tags": ["dark", "keynote", "high-contrast", "sparse"],
+  "dark": true,
+  "guidance": "Choose this for a stage talk rather than a working session. It punishes dense slides: keep to a Statement or a Title plus at most three Grid cells, and prefer Stat over prose for numbers. Set `dark={false}` on a slide to invert it for emphasis, which reads as a hard cut rather than a transition."
+}

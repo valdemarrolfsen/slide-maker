@@ -1,0 +1,46 @@
+/* ─────────────────────────────────────────────────────────────────
+   Granite. Warm neutral greys, a single blue accent, hairline 1px
+   borders and square corners. Labels speak in mono, content speaks
+   in the sans. Nothing is rounded and nothing casts a shadow.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  --sm-bg: #ffffff;
+  --sm-bg-0: rgba(255, 255, 255, 0);
+  --sm-panel: #f7f7f6;
+  --sm-fg: #1a1a17;
+  --sm-fg-2: #272725;
+  --sm-muted: #545350;
+  --sm-muted-2: #6d6c67;
+  --sm-border: #e4e3e0;
+  --sm-border-2: #d8d7d3;
+  --sm-accent: #1a5ed8;
+  --sm-accent-dim: #4080eb;
+
+  --sm-sans: "Host Grotesk", "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Helvetica Neue", Arial, sans-serif;
+  --sm-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --sm-title-weight: 500;
+  --sm-title-tracking: -0.012em;
+  --sm-radius: 0px;
+  --sm-pad-x: 72px;
+  --sm-pad-top: 56px;
+  --sm-pad-bottom: 76px;
+}
+
+/* The same palette in the dark direction, so `dark` on any slide flips
+   cleanly without a second template. */
+.sm-slide.sm-dark {
+  --sm-bg: #1a1a17;
+  --sm-bg-0: rgba(26, 26, 23, 0);
+  --sm-panel: #201f1d;
+  --sm-fg: #f7f7f6;
+  --sm-fg-2: #eeeeec;
+  --sm-muted: #8c8b85;
+  --sm-muted-2: #6d6c67;
+  --sm-border: #30302d;
+  --sm-border-2: #3a3936;
+  --sm-accent: #6fa4f5;
+  --sm-accent-dim: #4080eb;
+}

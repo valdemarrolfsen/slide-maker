@@ -1,0 +1,9 @@
+# slide-maker working directory: comments and view state
+.slide-maker/
+
+# Exported decks
+dist/
+out/
+
+node_modules/
+.DS_Store

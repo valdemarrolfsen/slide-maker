@@ -1,0 +1,629 @@
+/* ─────────────────────────────────────────────────────────────────
+   slide-maker runtime stylesheet.
+
+   Structure only. Every visual decision reads from a custom property,
+   so a template can restyle a whole deck by redefining tokens on
+   `.sm-slide` without touching a single rule below.
+
+   Templates that want to go further may override any `.sm-` class;
+   this file is loaded first so template rules win at equal specificity.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-slide {
+  /* ── Palette ── */
+  --sm-bg: #ffffff;
+  --sm-bg-0: rgba(255, 255, 255, 0); /* --sm-bg at zero alpha, for grid fades */
+  --sm-panel: #f7f7f6;
+  --sm-fg: #16161a;
+  --sm-fg-2: #26262b;
+  --sm-muted: #55555d;
+  --sm-muted-2: #6e6e77;
+  --sm-border: #e4e4e2;
+  --sm-border-2: #d8d8d5;
+  --sm-accent: #1a5ed8;
+  --sm-accent-dim: #4080eb;
+
+  /* ── Type ── */
+  --sm-sans: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --sm-mono: ui-monospace, SFMono-Regular, Menlo, "JetBrains Mono", monospace;
+  --sm-title-size: 40px;
+  --sm-title-big: 52px;
+  --sm-title-huge: 62px;
+  --sm-title-weight: 500;
+  --sm-title-leading: 1.14;
+  --sm-title-tracking: -0.014em;
+  --sm-title-measure: 30ch;
+  --sm-body-size: 15px;
+  --sm-lede-size: 18px;
+
+  /* ── Geometry ── */
+  --sm-pad-x: 72px;
+  --sm-pad-top: 56px;
+  --sm-pad-bottom: 76px;
+  /* Reserved height for the eyebrow-plus-heading block, and the gap below it.
+     Tokenised because a template with a larger type scale needs more room
+     before headings start crowding the content underneath. */
+  --sm-head-min: 84px;
+  --sm-head-min-tall: 120px;
+  --sm-head-gap: 28px;
+  --sm-radius: 0px;
+  --sm-grid-cell: 64px;
+  --sm-hairline: 1px;
+}
+
+/* ── Stage and frame ───────────────────────────────────────────── */
+
+.sm-slide {
+  position: relative;
+  /* Establishes a stacking context so the grid backdrop can sit at z-index -1:
+     above the slide's own background, below every piece of content, without
+     content needing to be positioned to escape it. */
+  isolation: isolate;
+  box-sizing: border-box;
+  width: var(--sm-slide-w, 1280px);
+  height: var(--sm-slide-h, 720px);
+  flex: 0 0 auto;
+  padding: var(--sm-pad-top) var(--sm-pad-x) var(--sm-pad-bottom);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--sm-bg);
+  color: var(--sm-fg);
+  font-family: var(--sm-sans);
+  font-size: var(--sm-body-size);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+.sm-slide *,
+.sm-slide *::before,
+.sm-slide *::after {
+  box-sizing: border-box;
+}
+
+/* Wrapped in :where() so the whole reset carries zero specificity. Written as
+   plain selectors it would out-specify every single-class component rule below
+   and silently eat their margins and padding. */
+:where(.sm-slide) :where(h1, h2, h3, h4, p, ul, ol, li, figure, blockquote, pre, cite) {
+  margin: 0;
+  padding: 0;
+}
+
+.sm-slide-center {
+  justify-content: center;
+}
+
+.sm-gridbg {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    radial-gradient(ellipse 60% 60% at 50% 45%, var(--sm-bg-0) 0%, var(--sm-bg) 78%),
+    linear-gradient(to right, var(--sm-border) var(--sm-hairline), transparent var(--sm-hairline)),
+    linear-gradient(to bottom, var(--sm-border) var(--sm-hairline), transparent var(--sm-hairline));
+  background-size: 100% 100%, var(--sm-grid-cell) var(--sm-grid-cell),
+    var(--sm-grid-cell) var(--sm-grid-cell);
+  background-repeat: no-repeat, repeat, repeat;
+}
+
+.sm-chrome {
+  position: absolute;
+  left: var(--sm-pad-x);
+  right: var(--sm-pad-x);
+  bottom: 24px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: var(--sm-hairline) solid var(--sm-border);
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sm-muted-2);
+}
+
+/* ── Layout helpers ────────────────────────────────────────────── */
+
+.sm-head {
+  min-height: var(--sm-head-min);
+}
+.sm-head-tall {
+  min-height: var(--sm-head-min-tall);
+}
+/* Whatever follows the heading gets clear air, even when a long title has
+   already eaten the block's reserved height. */
+.sm-slide > .sm-head + * {
+  margin-top: var(--sm-head-gap);
+}
+
+.sm-fill {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Optical centring: sits fractionally above the true midpoint, which reads
+     as centred once the footer bar is accounted for. */
+  padding-bottom: 40px;
+}
+
+.sm-grow {
+  flex: 1 1 auto;
+}
+
+/* ── Type ──────────────────────────────────────────────────────── */
+
+.sm-eyebrow {
+  font-family: var(--sm-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+
+.sm-kicker {
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+.sm-kicker.sm-accent {
+  color: var(--sm-accent);
+}
+
+.sm-title {
+  margin-top: 18px;
+  font-family: var(--sm-sans);
+  font-size: var(--sm-title-size);
+  font-weight: var(--sm-title-weight);
+  line-height: var(--sm-title-leading);
+  letter-spacing: var(--sm-title-tracking);
+  color: var(--sm-fg);
+  max-width: var(--sm-title-measure);
+  text-wrap: balance;
+}
+.sm-title-big {
+  font-size: var(--sm-title-big);
+}
+.sm-title-huge {
+  font-size: var(--sm-title-huge);
+  line-height: 1.06;
+  letter-spacing: -0.028em;
+}
+.sm-title.sm-wide {
+  max-width: none;
+}
+
+.sm-lede {
+  margin-top: 16px;
+  font-size: var(--sm-lede-size);
+  line-height: 1.5;
+  color: var(--sm-muted);
+  max-width: 74ch;
+}
+
+.sm-line {
+  margin-top: 8px;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--sm-muted);
+}
+
+.sm-statement {
+  font-size: 34px;
+  font-weight: var(--sm-title-weight);
+  line-height: 1.24;
+  letter-spacing: -0.015em;
+  color: var(--sm-fg);
+  max-width: 26ch;
+  text-wrap: balance;
+}
+
+.sm-rule {
+  width: 48px;
+  height: 2px;
+  background: var(--sm-accent);
+}
+
+.sm-track {
+  display: inline-flex;
+  align-self: flex-start;
+  align-items: center;
+  gap: 10px;
+  border: var(--sm-hairline) solid var(--sm-border-2);
+  border-radius: var(--sm-radius);
+  padding: 5px 12px;
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--sm-fg-2);
+}
+.sm-track i {
+  width: 5px;
+  height: 5px;
+  background: var(--sm-accent);
+  font-style: normal;
+}
+
+.sm-badge {
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.sm-badge-accent {
+  color: var(--sm-accent);
+}
+.sm-badge-strong {
+  color: var(--sm-fg-2);
+}
+.sm-badge-muted {
+  color: var(--sm-muted-2);
+}
+.sm-badge-outline {
+  border: var(--sm-hairline) solid var(--sm-accent);
+  border-radius: var(--sm-radius);
+  padding: 4px 10px;
+  color: var(--sm-accent);
+}
+
+/* ── Hairline grid ─────────────────────────────────────────────── */
+
+.sm-grid {
+  display: grid;
+  gap: var(--sm-hairline);
+  border: var(--sm-hairline) solid var(--sm-border);
+  border-radius: var(--sm-radius);
+  background: var(--sm-border);
+  overflow: hidden;
+}
+.sm-grid.sm-grow {
+  grid-auto-rows: 1fr;
+}
+.sm-c1 { grid-template-columns: 1fr; }
+.sm-c2 { grid-template-columns: repeat(2, 1fr); }
+.sm-c3 { grid-template-columns: repeat(3, 1fr); }
+.sm-c4 { grid-template-columns: repeat(4, 1fr); }
+.sm-c5 { grid-template-columns: repeat(5, 1fr); }
+
+.sm-cell {
+  background: var(--sm-bg);
+  padding: 24px 26px;
+  display: flex;
+  flex-direction: column;
+  /* Top-aligned by default so headings across a row share a baseline even
+     when one of them wraps to a second line. */
+  justify-content: flex-start;
+}
+.sm-grid.sm-mid > .sm-cell {
+  justify-content: center;
+}
+.sm-pad-sm { padding: 14px 18px; }
+.sm-pad-md { padding: 24px 26px; }
+.sm-pad-lg { padding: 32px 28px; }
+
+.sm-card-title {
+  margin-top: 10px;
+  font-size: 21px;
+  font-weight: var(--sm-title-weight);
+  line-height: 1.25;
+  color: var(--sm-fg);
+}
+.sm-card-title.sm-sm {
+  font-size: 18px;
+}
+/* First thing in a cell needs no top offset. */
+.sm-cell > .sm-card-title:first-child,
+.sm-card > .sm-card-title:first-child {
+  margin-top: 0;
+}
+
+.sm-card {
+  border: var(--sm-hairline) solid var(--sm-border);
+  border-radius: var(--sm-radius);
+  padding: 24px 26px;
+  background: var(--sm-bg);
+}
+.sm-card.sm-fillbg {
+  background: var(--sm-panel);
+}
+
+.sm-columns {
+  display: grid;
+}
+.sm-column {
+  min-width: 0;
+}
+
+/* ── Lists ─────────────────────────────────────────────────────── */
+
+.sm-ticks {
+  list-style: none;
+  margin-top: 12px;
+}
+.sm-tick {
+  position: relative;
+  padding-left: 20px;
+  margin-top: 9px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--sm-muted);
+}
+.sm-tick::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 10px;
+  width: 8px;
+  height: var(--sm-hairline);
+  background: var(--sm-accent);
+}
+.sm-tick b,
+.sm-tick strong {
+  color: var(--sm-fg-2);
+  font-weight: 500;
+}
+
+.sm-step-row {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  align-items: center;
+  gap: 24px;
+}
+.sm-step .sm-step-title {
+  margin-top: 0;
+}
+.sm-stepnum {
+  font-family: var(--sm-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--sm-muted-2);
+}
+.sm-step-current .sm-stepnum {
+  color: var(--sm-accent);
+}
+
+/* ── Data ──────────────────────────────────────────────────────── */
+
+.sm-stat-v {
+  font-size: 34px;
+  font-weight: var(--sm-title-weight);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--sm-fg);
+}
+.sm-stat-big {
+  font-size: 46px;
+  letter-spacing: -0.025em;
+}
+.sm-stat-v.sm-accent {
+  color: var(--sm-accent);
+}
+.sm-stat-l {
+  margin-top: 10px;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--sm-muted);
+}
+
+.sm-rows {
+  border: var(--sm-hairline) solid var(--sm-border);
+  border-radius: var(--sm-radius);
+  background: var(--sm-panel);
+}
+.sm-rows-h {
+  padding: 10px 16px;
+  border-bottom: var(--sm-hairline) solid var(--sm-border);
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+.sm-row {
+  display: grid;
+  grid-template-columns: 96px 1fr;
+  gap: 12px;
+  padding: 9px 16px;
+  border-bottom: var(--sm-hairline) solid var(--sm-border);
+  font-size: 13px;
+}
+.sm-row:last-child {
+  border-bottom: none;
+}
+.sm-row-k {
+  padding-top: 2px;
+  font-family: var(--sm-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+.sm-row-v {
+  font-family: var(--sm-mono);
+  font-size: 12px;
+  color: var(--sm-fg-2);
+}
+
+.sm-checklist {
+  border: var(--sm-hairline) solid var(--sm-border);
+  border-radius: var(--sm-radius);
+}
+.sm-checklist-h,
+.sm-checklist-f {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 10px 16px;
+  font-family: var(--sm-mono);
+}
+.sm-checklist-h {
+  border-bottom: var(--sm-hairline) solid var(--sm-border);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+.sm-checklist-f {
+  border-top: var(--sm-hairline) solid var(--sm-border);
+  font-size: 12px;
+  color: var(--sm-fg);
+}
+.sm-checklist-f span:last-child {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--sm-muted);
+}
+.sm-checklist-row {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 3px 16px;
+  font-family: var(--sm-mono);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--sm-muted);
+}
+.sm-checklist-name {
+  color: var(--sm-fg-2);
+}
+.sm-checklist-row.sm-dim .sm-checklist-name {
+  color: var(--sm-muted);
+}
+.sm-checklist-st {
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.sm-tone-accent { color: var(--sm-accent); }
+.sm-tone-strong { color: var(--sm-fg-2); }
+.sm-tone-muted { color: var(--sm-muted-2); }
+
+/* ── Media and misc ────────────────────────────────────────────── */
+
+.sm-code {
+  padding: 14px 16px;
+  border: var(--sm-hairline) solid var(--sm-border);
+  border-radius: var(--sm-radius);
+  background: var(--sm-panel);
+  font-family: var(--sm-mono);
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: var(--sm-muted);
+  white-space: pre-wrap;
+  overflow: hidden;
+}
+.sm-hl {
+  color: var(--sm-accent);
+}
+
+.sm-note {
+  border-top: var(--sm-hairline) solid var(--sm-border);
+  padding-top: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--sm-muted);
+}
+.sm-note strong {
+  color: var(--sm-fg-2);
+  font-weight: 500;
+}
+
+.sm-figure {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sm-figure img {
+  display: block;
+  width: 100%;
+  min-height: 0;
+  flex: 1 1 auto;
+  border-radius: var(--sm-radius);
+}
+.sm-figcaption {
+  margin-top: 10px;
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+
+.sm-quote {
+  border-left: 2px solid var(--sm-accent);
+  padding-left: 24px;
+}
+.sm-quote-body {
+  font-size: 28px;
+  font-weight: var(--sm-title-weight);
+  line-height: 1.32;
+  letter-spacing: -0.012em;
+  color: var(--sm-fg);
+  max-width: 30ch;
+  text-wrap: balance;
+}
+.sm-quote-cite {
+  display: block;
+  margin-top: 18px;
+  font-family: var(--sm-mono);
+  font-size: 11px;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sm-muted);
+}
+
+/* ── Composite layouts ─────────────────────────────────────────── */
+
+.sm-cover {
+  justify-content: center;
+}
+.sm-cover-body {
+  max-width: 90%;
+}
+.sm-cover-title {
+  margin-top: 28px;
+}
+.sm-cover-rule {
+  margin-top: 32px;
+}
+.sm-cover-lede {
+  margin-top: 28px;
+  font-size: 20px;
+  line-height: 1.5;
+  color: var(--sm-muted);
+  max-width: 60ch;
+}
+.sm-cover-footer {
+  position: absolute;
+  left: var(--sm-pad-x);
+  bottom: 56px;
+}
+.sm-cover-footer-body {
+  margin-top: 10px;
+  font-size: 15px;
+  color: var(--sm-fg-2);
+}
+
+.sm-section-n {
+  font-family: var(--sm-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--sm-accent);
+  margin-bottom: 20px;
+}
+.sm-section-body {
+  max-width: 34ch;
+}
+.sm-section .sm-title {
+  margin-top: 0;
+}

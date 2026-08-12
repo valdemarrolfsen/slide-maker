@@ -1,0 +1,7 @@
+{
+  "label": "Granite",
+  "description": "Warm neutral surfaces, hairline rules, square corners and a mono voice for labels. A product-company look that stays out of the way of dense content.",
+  "tags": ["light", "neutral", "technical", "workshop"],
+  "dark": false,
+  "guidance": "The default for working sessions and partner workshops. Leans on the hairline Grid for structure rather than on cards with shadows. Use Eyebrow above every Title, keep Titles under roughly 12 words, and set `dark` on Section slides to break up a long deck. Nothing here has rounded corners, so avoid adding any."
+}

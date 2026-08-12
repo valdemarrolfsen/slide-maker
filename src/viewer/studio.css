@@ -1,0 +1,554 @@
+/* ─────────────────────────────────────────────────────────────────
+   Studio chrome. Deliberately quiet and dark so it reads as a frame
+   around the deck rather than competing with whatever template the
+   slides are wearing.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-studio {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* ── Top bar ───────────────────────────────────────────────────── */
+
+.sm-topbar {
+  flex: 0 0 auto;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  border-bottom: 1px solid var(--ui-border);
+  background: var(--ui-bg-2);
+}
+.sm-topbar-left,
+.sm-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.sm-deck-title {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ui-fg);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sm-chip {
+  padding: 3px 8px;
+  border: 1px solid var(--ui-border-2);
+  border-radius: 3px;
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-muted);
+  white-space: nowrap;
+}
+.sm-status {
+  font-family: var(--ui-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--ui-muted-2);
+  white-space: nowrap;
+}
+.sm-status-live {
+  color: var(--ui-accent);
+}
+
+/* ── Buttons ───────────────────────────────────────────────────── */
+
+.sm-btn {
+  appearance: none;
+  border: 1px solid var(--ui-border-2);
+  border-radius: 3px;
+  padding: 5px 10px;
+  background: transparent;
+  color: var(--ui-fg-2);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.4;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 90ms ease, border-color 90ms ease, color 90ms ease;
+}
+.sm-btn:hover:not(:disabled) {
+  border-color: var(--ui-muted-2);
+  color: var(--ui-fg);
+  background: rgba(255, 255, 255, 0.04);
+}
+.sm-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.sm-btn-primary {
+  border-color: var(--ui-accent-2);
+  background: var(--ui-accent-2);
+  color: #fff;
+}
+.sm-btn-primary:hover:not(:disabled) {
+  background: var(--ui-accent);
+  border-color: var(--ui-accent);
+  color: #10131a;
+}
+.sm-btn-ghost {
+  border-color: transparent;
+  padding: 4px 8px;
+  color: var(--ui-muted);
+  font-size: 11px;
+}
+.sm-btn-ghost:hover:not(:disabled) {
+  border-color: var(--ui-border-2);
+}
+.sm-btn-danger:hover:not(:disabled) {
+  color: var(--ui-danger);
+}
+.sm-btn-icon {
+  width: 26px;
+  padding: 4px 0;
+  text-align: center;
+  font-size: 13px;
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+
+.sm-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr) 320px;
+}
+
+.sm-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--ui-bg);
+}
+
+.sm-stage-host {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+}
+.sm-stage-host.sm-pinning {
+  cursor: crosshair;
+}
+.sm-stage-host.sm-pinning .sm-stage-frame {
+  /* Stops a click from landing inside the slide's own text selection. */
+  pointer-events: none;
+}
+
+/* ── Filmstrip ─────────────────────────────────────────────────── */
+
+.sm-filmstrip {
+  overflow-y: auto;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-right: 1px solid var(--ui-border);
+  background: var(--ui-bg-2);
+}
+
+.sm-thumb {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+}
+.sm-thumb-no {
+  padding-top: 2px;
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  color: var(--ui-muted-2);
+}
+.sm-thumb-box {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 0 0 1px var(--ui-border);
+  transition: box-shadow 90ms ease;
+}
+.sm-thumb:hover .sm-thumb-box {
+  box-shadow: 0 0 0 1px var(--ui-muted-2);
+}
+.sm-thumb-on .sm-thumb-box {
+  box-shadow: 0 0 0 2px var(--ui-accent);
+}
+.sm-thumb-on .sm-thumb-no {
+  color: var(--ui-accent);
+}
+.sm-thumb-frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+}
+.sm-thumb-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 8px;
+  background: var(--ui-accent-2);
+  color: #fff;
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+}
+
+/* ── Stage bar ─────────────────────────────────────────────────── */
+
+.sm-stagebar {
+  flex: 0 0 auto;
+  height: 40px;
+  display: grid;
+  grid-template-columns: auto auto 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 0 16px;
+  border-top: 1px solid var(--ui-border);
+  background: var(--ui-bg-2);
+}
+.sm-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.sm-counter {
+  font-family: var(--ui-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ui-fg-2);
+}
+.sm-stagebar-file {
+  font-family: var(--ui-mono);
+  font-size: 11px;
+  color: var(--ui-muted-2);
+}
+.sm-stagebar-notes {
+  font-size: 11px;
+  color: var(--ui-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  justify-self: end;
+  max-width: 100%;
+}
+
+/* ── Pins ──────────────────────────────────────────────────────── */
+
+.sm-pin {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border: 1px solid var(--ui-accent);
+  border-radius: 11px 11px 11px 2px;
+  background: var(--ui-accent-2);
+  color: #fff;
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+}
+.sm-pin-resolved {
+  background: var(--ui-panel);
+  border-color: var(--ui-border-2);
+  color: var(--ui-muted);
+}
+.sm-pin-active {
+  outline: 2px solid var(--ui-accent);
+  outline-offset: 2px;
+}
+
+/* ── Composer ──────────────────────────────────────────────────── */
+
+.sm-composer {
+  position: absolute;
+  width: 280px;
+  padding: 10px;
+  border: 1px solid var(--ui-border-2);
+  border-radius: 4px;
+  background: var(--ui-panel);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  z-index: 5;
+}
+.sm-composer-quote {
+  margin-bottom: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--ui-accent);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ui-muted);
+  /* A long selection should hint at its length, not fill the popover. */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sm-composer-input {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: 3px;
+  background: var(--ui-bg);
+  color: var(--ui-fg);
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 1.5;
+  resize: vertical;
+}
+.sm-composer-input:focus {
+  outline: none;
+  border-color: var(--ui-accent-2);
+}
+.sm-composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+.sm-composer-hint {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 10px;
+  color: var(--ui-muted-2);
+}
+.sm-composer-buttons {
+  display: flex;
+  gap: 6px;
+}
+
+/* ── Comment panel ─────────────────────────────────────────────── */
+
+.sm-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  border-left: 1px solid var(--ui-border);
+  background: var(--ui-bg-2);
+}
+.sm-panel-head {
+  flex: 0 0 auto;
+  padding: 10px 12px 0;
+}
+.sm-tabs {
+  display: flex;
+  gap: 4px;
+}
+.sm-tab {
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: none;
+  color: var(--ui-muted);
+  font-family: inherit;
+  font-size: 11px;
+  cursor: pointer;
+}
+.sm-tab:hover {
+  color: var(--ui-fg-2);
+}
+.sm-tab-on {
+  border-color: var(--ui-border-2);
+  background: var(--ui-panel);
+  color: var(--ui-fg);
+}
+.sm-tab-count {
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  color: var(--ui-muted-2);
+}
+.sm-tab-on .sm-tab-count {
+  color: var(--ui-accent);
+}
+
+.sm-panel-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 4px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--ui-border);
+}
+
+.sm-panel-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sm-comment {
+  padding: 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: 4px;
+  background: var(--ui-panel);
+  cursor: pointer;
+}
+.sm-comment:hover {
+  border-color: var(--ui-border-2);
+}
+.sm-comment-active {
+  border-color: var(--ui-accent);
+}
+.sm-comment-resolved {
+  opacity: 0.55;
+}
+.sm-comment-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  color: var(--ui-muted-2);
+}
+.sm-comment-slide {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sm-comment-time {
+  flex: 0 0 auto;
+}
+.sm-comment-quote {
+  margin-top: 8px;
+  padding-left: 8px;
+  border-left: 2px solid var(--ui-accent);
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--ui-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sm-comment-body {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ui-fg);
+}
+.sm-comment-resolution {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.5;
+  color: var(--ui-muted);
+}
+.sm-comment-resolution span {
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ui-accent);
+}
+.sm-comment-actions {
+  display: flex;
+  gap: 2px;
+  margin-top: 6px;
+}
+
+/* ── Empty states ──────────────────────────────────────────────── */
+
+.sm-empty {
+  padding: 24px 16px;
+  text-align: center;
+}
+.sm-empty-title {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ui-fg-2);
+}
+.sm-empty-body {
+  margin: 8px 0 0;
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--ui-muted-2);
+}
+.sm-empty-body code {
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  color: var(--ui-fg-2);
+}
+.sm-studio-empty {
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Presenting ────────────────────────────────────────────────── */
+
+.sm-presenting .sm-topbar,
+.sm-presenting .sm-filmstrip,
+.sm-presenting .sm-panel,
+.sm-presenting .sm-stagebar {
+  display: none;
+}
+.sm-presenting .sm-body {
+  grid-template-columns: 1fr;
+}
+.sm-presenting .sm-stage-box {
+  box-shadow: none;
+}
+.sm-presenting {
+  background: #0d0d0c;
+}
+
+.sm-exit-present {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  padding: 5px 12px;
+  border: 1px solid var(--ui-border-2);
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.5);
+  color: var(--ui-muted);
+  font-family: var(--ui-mono);
+  font-size: 11px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 140ms ease;
+}
+.sm-exit-present:hover,
+.sm-presenting:hover .sm-exit-present {
+  opacity: 1;
+}
+
+/* ── Narrow windows ────────────────────────────────────────────── */
+
+@media (max-width: 1180px) {
+  .sm-body {
+    grid-template-columns: 150px minmax(0, 1fr) 280px;
+  }
+}
+@media (max-width: 940px) {
+  .sm-body {
+    grid-template-columns: minmax(0, 1fr) 280px;
+  }
+  .sm-filmstrip {
+    display: none;
+  }
+}

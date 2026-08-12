@@ -14,6 +14,8 @@ export interface Captured {
   /** Whitespace-collapsed text that was selected. */
   quote: string;
   context: { before: string; after: string };
+  /** The live DOM range, kept only long enough to highlight the draft. */
+  range: Range;
   /**
    * Position on the slide in 0..1 coordinates. Normalised rather than absolute
    * so a pin lands in the same place at any window size, and so the overlay can
@@ -75,6 +77,7 @@ export function captureSelection(
 
   return {
     quote,
+    range: range.cloneRange(),
     context: {
       before: squish(full.slice(Math.max(0, start - CONTEXT_CHARS), start)),
       after: squish(full.slice(start + rawQuoteLength, start + rawQuoteLength + CONTEXT_CHARS)),
@@ -84,6 +87,18 @@ export function captureSelection(
       y: clamp01((box.y + box.h) / height),
     },
   };
+}
+
+const DRAFT_HIGHLIGHT = 'sm-comment-selection';
+
+/** Keeps the captured words highlighted while focus is in the comment box. */
+export function highlightSelection(range: Range) {
+  CSS.highlights?.set(DRAFT_HIGHLIGHT, new Highlight(range));
+}
+
+/** Removes the persistent draft highlight. */
+export function clearSelectionHighlight() {
+  CSS.highlights?.delete(DRAFT_HIGHLIGHT);
 }
 
 /** Reads a click position on the slide, for a comment pinned to a spot. */

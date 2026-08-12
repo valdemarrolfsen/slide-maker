@@ -10,7 +10,13 @@ import { TemplateMenu } from './TemplateMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
-import { captureSelection, capturePoint, clearSelection } from './selection';
+import {
+  captureSelection,
+  capturePoint,
+  clearSelection,
+  clearSelectionHighlight,
+  highlightSelection,
+} from './selection';
 import type { Comment, DraftComment, StyleInfo } from './types';
 
 /** Which slide to show once the reload that follows an edit has happened. */
@@ -51,6 +57,7 @@ export function Studio() {
   const [addError, setAddError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
+  const [selectionRange, setSelectionRange] = useState<Range | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
@@ -211,6 +218,20 @@ export function Studio() {
 
   /* ── Capturing feedback ── */
 
+  // Focusing the composer makes browsers hide their native selection paint.
+  // A custom highlight keeps the captured range visible without changing the
+  // slide DOM, then follows the draft lifecycle so stale highlights cannot
+  // survive cancel, navigation or presentation mode.
+  useEffect(() => {
+    if (draft?.kind === 'selection' && selectionRange && !presenting) {
+      highlightSelection(selectionRange);
+    } else {
+      clearSelectionHighlight();
+    }
+  }, [draft, selectionRange, presenting]);
+
+  useEffect(() => () => clearSelectionHighlight(), []);
+
   // A selection is only meaningful once the drag ends, so this listens for the
   // release rather than for selectionchange, which would fire continuously.
   useEffect(() => {
@@ -221,6 +242,7 @@ export function Studio() {
       requestAnimationFrame(() => {
         const captured = captureSelection(frameRef.current, config.width, config.height);
         if (!captured || !active) return;
+        setSelectionRange(captured.range);
         setDraft({
           kind: 'selection',
           slideId: active.id,

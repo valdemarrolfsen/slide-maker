@@ -30,7 +30,7 @@
 }
 
 /* The same palette in the dark direction, so `dark` on any slide flips
-   cleanly without a second template. */
+   cleanly without a second style. */
 .sm-slide.sm-dark {
   --sm-bg: #1a1a17;
   --sm-bg-0: rgba(26, 26, 23, 0);

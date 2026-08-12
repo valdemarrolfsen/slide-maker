@@ -1,0 +1,7 @@
+{
+  "label": "Closing",
+  "description": "The last slide: the decision being asked for, who owns it, and by when, on the inverted palette.",
+  "tags": ["closing", "dark", "grid"],
+  "order": 150,
+  "guidance": "End on the ask, never on a thank you. Each cell should be answerable with a yes or a no, and the deck is finished when someone in the room can say which one they are giving."
+}

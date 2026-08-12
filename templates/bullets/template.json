@@ -1,0 +1,7 @@
+{
+  "label": "Points",
+  "description": "A short dash-marked list, each item leading with the point in bold and explaining itself in one sentence.",
+  "tags": ["list", "narrative"],
+  "order": 60,
+  "guidance": "Three items, four at the outside. Lead each with a bolded claim so the slide is readable at a glance and the sentence after it is what you say out loud. If a list runs past five items, it is two slides or a Checklist."
+}

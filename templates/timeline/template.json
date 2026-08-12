@@ -1,0 +1,7 @@
+{
+  "label": "Timeline",
+  "description": "Four phases running left to right, each with a date, a name and a sentence on what lands.",
+  "tags": ["grid", "plan", "process"],
+  "order": 100,
+  "guidance": "For a plan with dates on it. Say what is delivered at the end of each phase rather than what happens during it, since a phase nobody can check is a phase nobody believes. Mark the phase you are in with an accent Kicker."
+}

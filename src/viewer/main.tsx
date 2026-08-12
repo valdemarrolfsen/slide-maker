@@ -1,7 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import 'virtual:slide-maker/theme';
+import 'virtual:slide-maker/style';
 import './base.css';
+import './chrome.css';
 import './studio.css';
 import { Studio } from './Studio';
 

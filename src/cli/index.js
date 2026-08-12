@@ -4,7 +4,9 @@ import { initCommand } from './init.js';
 import { startCommand } from './start.js';
 import { buildCommand } from './build.js';
 import { exportCommand } from './export.js';
-import { templatesCommand, useTemplateCommand } from './templates.js';
+import { stylesCommand, useStyleCommand } from './styles.js';
+import { templatesCommand } from './templates.js';
+import { browseCommand } from './browse.js';
 import { clearCommentsCommand, commentsCommand, resolveCommentCommand } from './comments.js';
 import { resolveDeckDir } from '../core/paths.js';
 import { error } from '../core/log.js';
@@ -24,11 +26,12 @@ export function createCli() {
     .command('init')
     .argument('[dir]', 'where to create the deck', '.')
     .description('scaffold a deck and wire it up to Claude Code')
-    .option('-t, --template <name>', 'template to start with', 'granite')
+    .option('-s, --style <name>', 'design system for the deck, prompts if omitted')
     .option('--title <title>', 'deck title, defaults to the directory name')
     .option('--author <name>', 'deck author')
     .option('--no-mcp', 'skip writing the .mcp.json entry')
     .option('-f, --force', 'write missing files into an existing deck')
+    .option('-y, --yes', 'take the defaults instead of asking')
     .action(initCommand);
 
   program
@@ -56,17 +59,32 @@ export function createCli() {
     .action(exportCommand);
 
   program
+    .command('styles')
+    .description('list the available design systems')
+    .option('-d, --deck <dir>', 'deck directory', '.')
+    .action(stylesCommand);
+
+  program
+    .command('use')
+    .argument('<style>', 'style name')
+    .description('switch the deck to another style')
+    .option('-d, --deck <dir>', 'deck directory', '.')
+    .action(useStyleCommand);
+
+  program
     .command('templates')
-    .description('list the available slide templates')
+    .description('list the slide templates in the library')
     .option('-d, --deck <dir>', 'deck directory', '.')
     .action(templatesCommand);
 
   program
-    .command('use')
-    .argument('<template>', 'template name')
-    .description('switch the deck to another template')
-    .option('-d, --deck <dir>', 'deck directory', '.')
-    .action(useTemplateCommand);
+    .command('browse')
+    .argument('[dir]', 'deck directory, for local templates and styles', '.')
+    .description('open the template library, every template in every style')
+    .option('-p, --port <port>', 'port to listen on', '5171')
+    .option('--host [host]', 'expose the server on the network')
+    .option('--no-open', 'do not open a browser')
+    .action(browseCommand);
 
   const comments = program.command('comments').description('read and clear deck feedback');
 

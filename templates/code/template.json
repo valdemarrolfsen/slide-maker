@@ -1,0 +1,7 @@
+{
+  "label": "Code",
+  "description": "A monospace block on the left with the commentary beside it, and one highlighted line to point at.",
+  "tags": ["technical", "columns", "code"],
+  "order": 140,
+  "guidance": "Show the smallest excerpt that makes the point, not the real file. Wrap the one line the slide is about in Hl and let the accent do the pointing. If the code needs more than three notes beside it, it is more than one slide."
+}

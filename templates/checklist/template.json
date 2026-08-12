@@ -1,0 +1,7 @@
+{
+  "label": "Status table",
+  "description": "A dense mono table of items with a status against each, plus a summary strip along the bottom.",
+  "tags": ["data", "status", "technical"],
+  "order": 110,
+  "guidance": "For readiness reviews, launch gates and anything with a column of states. It tolerates ten or twelve rows, which no other layout here does. Keep statuses to one or two words from a fixed set, and dim rows that are out of scope rather than deleting them."
+}

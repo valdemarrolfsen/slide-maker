@@ -4,7 +4,8 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { listSlides, readConfig, readSlide, writeConfig } from '../core/deck.js';
-import { listTemplates, resolveTemplate } from '../core/templates.js';
+import { listStyles, resolveStyle } from '../core/styles.js';
+import { listTemplates, readTemplateSource, resolveTemplate } from '../core/templates.js';
 import { listComments, readState, resolveComment, reopenComment } from '../core/comments.js';
 import { renderSlides, closeRenderer } from '../render/renderer.js';
 
@@ -38,16 +39,22 @@ export async function startMcpServer(deckDir) {
         'inspect a dev server, and never fetch localhost. render_slide brings up its',
         'own renderer and works whether or not the studio is open.',
         '',
+        'A style is the design system the whole deck wears; a template is a',
+        'ready-made slide layout. A deck has one style and any number of templates.',
+        '',
         'Working rules:',
-        '- Call deck_overview first. It reports the template, the slide list and how',
+        '- Call deck_overview first. It reports the style, the slide list and how',
         '  many comments are waiting.',
+        '- Call list_templates early and often. The library is the fastest way to',
+        '  decide what each slide should be, and read_template hands you the JSX to',
+        '  copy into a new slide file. Check it before building a layout by hand.',
         '- The user leaves feedback by selecting text in the studio. Call list_comments',
         '  to read it. Each comment names the file it belongs to and quotes the exact',
         '  text it was left on, so search the file for that quote.',
         '- After acting on a comment, call resolve_comment so it clears from the',
         '  user\'s panel. Say what you changed in the note argument.',
         '- Compose slides from the components exported by "slide-maker/runtime"',
-        '  rather than raw HTML, otherwise switching template will not restyle them.',
+        '  rather than raw HTML, otherwise switching style will not restyle them.',
         '- Call render_slide to see your own work before claiming a slide is done.',
       ].join('\n'),
     },
@@ -60,29 +67,35 @@ export async function startMcpServer(deckDir) {
     {
       title: 'Deck overview',
       description:
-        'The state of the deck: title, active template, every slide in running order, ' +
-        'how many comments are open, and which slide the user is currently looking at. ' +
-        'Start here.',
+        'The state of the deck: title, active style, every slide in running order, ' +
+        'how many comments are open, how many templates are available, and which ' +
+        'slide the user is currently looking at. Start here.',
       inputSchema: {},
     },
     async () => {
       const config = await readConfig(deckDir);
-      const [slides, comments, state, template] = await Promise.all([
+      const [slides, comments, state, style, templates] = await Promise.all([
         listSlides(deckDir, config),
         listComments(deckDir),
         readState(deckDir),
-        resolveTemplate(deckDir, config.template),
+        resolveStyle(deckDir, config.style),
+        listTemplates(deckDir),
       ]);
       const open = comments.filter((c) => c.status === 'open');
       return json({
         deckDir,
         title: config.title,
-        template: config.template,
-        templateFound: Boolean(template),
-        templateGuidance: template?.guidance || null,
+        style: config.style,
+        styleFound: Boolean(style),
+        styleGuidance: style?.guidance || null,
         canvas: `${config.width}x${config.height}`,
         slideCount: slides.length,
         openComments: open.length,
+        // Surfaced here so the library is visible from the first call, rather
+        // than only to whoever thinks to go looking for it.
+        templatesAvailable: templates.length,
+        templateHint:
+          'Ready-made slide layouts. Call list_templates before building one by hand.',
         viewing: state.slideId
           ? { slideId: state.slideId, slideNumber: (state.slideIndex ?? 0) + 1 }
           : null,
@@ -177,6 +190,55 @@ export async function startMcpServer(deckDir) {
     },
   );
 
+  /* ── Styles ── */
+
+  server.registerTool(
+    'list_styles',
+    {
+      title: 'List styles',
+      description:
+        'Available design systems with guidance on what each is for. Read this before ' +
+        'starting a new deck and pick the one that matches the audience.',
+      inputSchema: {},
+    },
+    async () => {
+      const styles = await listStyles(deckDir);
+      return json(
+        styles.map((s) => ({
+          name: s.name,
+          label: s.label,
+          description: s.description,
+          tags: s.tags,
+          dark: s.dark,
+          guidance: s.guidance,
+          source: s.source,
+        })),
+      );
+    },
+  );
+
+  server.registerTool(
+    'set_style',
+    {
+      title: 'Set the style',
+      description:
+        'Switches the deck to a different design system. Restyles every slide ' +
+        'immediately, with no edits to slide files, provided they are built from ' +
+        'runtime components.',
+      inputSchema: { name: z.string().describe('Style name from list_styles') },
+    },
+    async ({ name }) => {
+      const style = await resolveStyle(deckDir, name);
+      if (!style) {
+        const available = (await listStyles(deckDir)).map((s) => s.name).join(', ');
+        return text(`No style named "${name}". Available: ${available}`);
+      }
+      const config = await readConfig(deckDir);
+      await writeConfig(deckDir, { ...config, style: name });
+      return text(`Style set to ${name}. The studio has reloaded.\n\n${style.guidance}`);
+    },
+  );
+
   /* ── Templates ── */
 
   server.registerTool(
@@ -184,8 +246,11 @@ export async function startMcpServer(deckDir) {
     {
       title: 'List templates',
       description:
-        'Available slide templates with guidance on what each is for. Read this before ' +
-        'starting a new deck and pick the one that matches the audience.',
+        'The template library: ready-made slide layouts, with guidance on when each ' +
+        'one is the right shape. Templates carry no colour of their own, so any of ' +
+        'them renders in the deck\'s style. Read this before building a layout by ' +
+        'hand, and again whenever you plan a run of slides: picking a template per ' +
+        'slide is most of what deck structure is.',
       inputSchema: {},
     },
     async () => {
@@ -196,7 +261,6 @@ export async function startMcpServer(deckDir) {
           label: t.label,
           description: t.description,
           tags: t.tags,
-          dark: t.dark,
           guidance: t.guidance,
           source: t.source,
         })),
@@ -205,12 +269,14 @@ export async function startMcpServer(deckDir) {
   );
 
   server.registerTool(
-    'set_template',
+    'read_template',
     {
-      title: 'Set the template',
+      title: 'Read a template',
       description:
-        'Switches the deck to a different template. Restyles every slide immediately, ' +
-        'with no edits to slide files, provided they are built from runtime components.',
+        'The JSX behind one template. Copy it into a new file under the slides ' +
+        'directory with your own content: the structure is the part worth keeping. ' +
+        'Faster and safer than composing a layout from scratch, since every template ' +
+        'has been checked in every style.',
       inputSchema: { name: z.string().describe('Template name from list_templates') },
     },
     async ({ name }) => {
@@ -219,9 +285,8 @@ export async function startMcpServer(deckDir) {
         const available = (await listTemplates(deckDir)).map((t) => t.name).join(', ');
         return text(`No template named "${name}". Available: ${available}`);
       }
-      const config = await readConfig(deckDir);
-      await writeConfig(deckDir, { ...config, template: name });
-      return text(`Template set to ${name}. The studio has reloaded.\n\n${template.guidance}`);
+      const source = await readTemplateSource(template);
+      return text(`${template.label}\n\n${template.guidance}\n\n${source}`);
     },
   );
 

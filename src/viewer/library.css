@@ -1,0 +1,282 @@
+/* ─────────────────────────────────────────────────────────────────
+   The template library. Same quiet dark chrome as the studio, laid
+   out as a catalogue: a rail of names on the left, and a grid of
+   previews that are the only bright thing on the page.
+   ───────────────────────────────────────────────────────────────── */
+
+.sm-lib {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ui-bg);
+}
+
+.sm-lib :focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 1px;
+  border-radius: var(--ui-r-sm);
+}
+
+/* ── Top bar ───────────────────────────────────────────────────── */
+
+.sm-lib-top {
+  flex: 0 0 auto;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 10px 0 12px;
+}
+.sm-lib-top-left,
+.sm-lib-top-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.sm-lib-wordmark {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--ui-fg);
+  white-space: nowrap;
+}
+.sm-lib-count {
+  font-size: 12px;
+  color: var(--ui-muted);
+  white-space: nowrap;
+}
+
+/* Reads as one control with two states rather than as two buttons. */
+.sm-lib-toggle {
+  display: inline-flex;
+  padding: 2px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r);
+  background: var(--ui-panel);
+}
+.sm-lib-tab {
+  appearance: none;
+  height: 22px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: var(--ui-r-sm);
+  background: transparent;
+  font-family: inherit;
+  font-size: 11.5px;
+  color: var(--ui-muted);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
+}
+.sm-lib-tab:hover {
+  color: var(--ui-fg-2);
+}
+.sm-lib-tab-on,
+.sm-lib-tab-on:hover {
+  background: var(--ui-panel-2);
+  color: var(--ui-fg);
+  box-shadow: 0 0 0 1px var(--ui-border);
+}
+
+.sm-lib-flash {
+  font-size: 12px;
+  color: var(--ui-accent);
+  white-space: nowrap;
+}
+
+/* ── Body ──────────────────────────────────────────────────────── */
+
+.sm-lib-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 208px minmax(0, 1fr);
+  gap: 8px;
+  padding: 0 10px 10px;
+}
+
+.sm-lib-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-lg);
+  background: var(--ui-bg-2);
+  overflow-y: auto;
+}
+.sm-lib-railitem {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 9px;
+  border: 0;
+  border-radius: var(--ui-r);
+  background: transparent;
+  font-family: inherit;
+  font-size: 12.5px;
+  color: var(--ui-muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
+}
+.sm-lib-railitem:hover {
+  background: var(--ui-hover);
+  color: var(--ui-fg-2);
+}
+.sm-lib-railitem-on,
+.sm-lib-railitem-on:hover {
+  background: var(--ui-hover-2);
+  color: var(--ui-fg);
+}
+.sm-lib-railname {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sm-lib-tag {
+  flex: 0 0 auto;
+  font-family: var(--ui-mono);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ui-muted-2);
+}
+
+/* ── Main ──────────────────────────────────────────────────────── */
+
+.sm-lib-main {
+  min-width: 0;
+  padding: 20px 24px 28px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-lg);
+  background: var(--ui-bg-2);
+  overflow-y: auto;
+}
+
+.sm-lib-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+.sm-lib-head-text {
+  min-width: 0;
+}
+.sm-lib-title {
+  margin: 0;
+  font-size: 19px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: var(--ui-fg);
+}
+.sm-lib-desc {
+  margin: 6px 0 0;
+  max-width: 76ch;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--ui-muted);
+}
+.sm-lib-actions {
+  flex: 0 0 auto;
+  display: flex;
+  gap: 8px;
+}
+
+/* Set apart from the description because it is advice to whoever is composing
+   the deck, not a statement of what the thing is. */
+.sm-lib-guidance {
+  margin: 16px 0 0;
+  padding-left: 12px;
+  border-left: 2px solid var(--ui-border-2);
+  max-width: 76ch;
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--ui-muted-2);
+}
+
+.sm-lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.sm-lib-card {
+  margin: 0;
+  min-width: 0;
+}
+
+/* The preview box is exactly the scaled slide, so the ring sits on the slide
+   edge rather than around a padded container. */
+.sm-lib-preview {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--ui-panel);
+  box-shadow:
+    0 0 0 1px var(--ui-border-2),
+    0 12px 28px rgba(0, 0, 0, 0.4);
+}
+.sm-lib-iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: 0;
+  transform-origin: top left;
+  /* The previews are for looking at, and a scrollable iframe would swallow
+     the page's own wheel events. */
+  pointer-events: none;
+}
+
+.sm-lib-cap {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+.sm-lib-capname,
+.sm-lib-caplink {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ui-fg-2);
+}
+.sm-lib-caplink {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+}
+.sm-lib-caplink:hover {
+  color: var(--ui-accent);
+}
+.sm-lib-capsub {
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  color: var(--ui-muted-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 900px) {
+  .sm-lib-body {
+    grid-template-columns: 168px minmax(0, 1fr);
+  }
+  .sm-lib-toggle {
+    display: none;
+  }
+}

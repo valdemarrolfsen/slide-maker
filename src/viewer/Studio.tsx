@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { config, slides } from 'virtual:slide-maker/deck';
-import { template } from 'virtual:slide-maker/theme';
+import { style } from 'virtual:slide-maker/style';
 import * as api from './api';
 import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
@@ -10,7 +10,7 @@ import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
 import { captureSelection, capturePoint, clearSelection } from './selection';
-import type { Comment, DraftComment, TemplateInfo } from './types';
+import type { Comment, DraftComment, StyleInfo } from './types';
 
 /** Ignores keyboard shortcuts while the user is typing. */
 function isTyping(target: EventTarget | null): boolean {
@@ -33,9 +33,9 @@ export function Studio() {
   const [presenting, setPresenting] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
-  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
-  const [templatePending, setTemplatePending] = useState(false);
-  const [templateError, setTemplateError] = useState<string | null>(null);
+  const [styles, setStyles] = useState<StyleInfo[]>([]);
+  const [stylePending, setStylePending] = useState(false);
+  const [styleError, setStyleError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -53,7 +53,7 @@ export function Studio() {
   useEffect(() => {
     api.fetchState().then((state) => {
       setComments(state.comments);
-      setTemplates(state.templates);
+      setStyles(state.styles);
     }).catch(() => {});
     return api.onCommentsChanged(setComments);
   }, []);
@@ -74,16 +74,16 @@ export function Studio() {
     setComments(next);
   }, []);
 
-  const changeTemplate = async (name: string) => {
-    if (name === config.template) return;
-    setTemplatePending(true);
-    setTemplateError(null);
+  const changeStyle = async (name: string) => {
+    if (name === config.style) return;
+    setStylePending(true);
+    setStyleError(null);
     try {
-      await api.setTemplate(name);
-      // Writing deck.json triggers a full reload, which imports the new theme.
+      await api.setStyle(name);
+      // Writing deck.json triggers a full reload, which imports the new style.
     } catch (err) {
-      setTemplatePending(false);
-      setTemplateError(err instanceof Error ? err.message : 'Could not switch template');
+      setStylePending(false);
+      setStyleError(err instanceof Error ? err.message : 'Could not switch style');
     }
   };
 
@@ -263,19 +263,19 @@ export function Studio() {
           <span className="sm-crumb" aria-hidden="true">
             /
           </span>
-          <label className="sm-template-picker">
-            <span className="sm-visually-hidden">Template</span>
+          <label className="sm-style-picker">
+            <span className="sm-visually-hidden">Style</span>
             <select
-              className={`sm-template-select${templateError ? ' sm-template-select-error' : ''}`}
-              value={config.template}
-              disabled={templatePending || templates.length === 0}
-              onChange={(event) => changeTemplate(event.target.value)}
-              title={templateError || 'Swap template'}
-              aria-label="Template"
-              aria-invalid={Boolean(templateError)}
+              className={`sm-style-select${styleError ? ' sm-style-select-error' : ''}`}
+              value={config.style}
+              disabled={stylePending || styles.length === 0}
+              onChange={(event) => changeStyle(event.target.value)}
+              title={styleError || 'Swap style'}
+              aria-label="Style"
+              aria-invalid={Boolean(styleError)}
             >
-              {!template && <option value={config.template}>{config.template} (missing)</option>}
-              {templates.map((item) => (
+              {!style && <option value={config.style}>{config.style} (missing)</option>}
+              {styles.map((item) => (
                 <option key={item.name} value={item.name}>
                   {item.label}{item.source === 'local' ? ' (local)' : ''}
                 </option>

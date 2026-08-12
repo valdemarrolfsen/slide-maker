@@ -3,7 +3,8 @@ import type { ComponentType } from 'react';
 export interface DeckConfig {
   title: string;
   author: string;
-  template: string;
+  /** Name of the design system the deck wears. */
+  style: string;
   width: number;
   height: number;
   slides: string;
@@ -42,7 +43,7 @@ export interface Comment {
   resolution: string | null;
 }
 
-export interface TemplateInfo {
+export interface StyleInfo {
   name: string;
   label: string;
   description: string;
@@ -57,7 +58,41 @@ export interface DeckState {
   config: DeckConfig;
   slides: Array<Omit<SlideEntry, 'module'>>;
   comments: Comment[];
-  templates: TemplateInfo[];
+  styles: StyleInfo[];
+}
+
+/* ── The template library, as `slide-maker browse` sees it ─────── */
+
+export interface LibraryTemplate {
+  name: string;
+  label: string;
+  description: string;
+  tags: string[];
+  guidance: string;
+  /** Filename stem to use when the template lands in a deck. */
+  stem: string;
+  origin: 'builtin' | 'local';
+  module: { default?: ComponentType };
+  /** The template's own source, for the copy button. */
+  jsx: string;
+}
+
+export interface LibraryStyle {
+  name: string;
+  label: string;
+  description: string;
+  tags: string[];
+  dark: boolean;
+  guidance: string;
+  origin: 'builtin' | 'local';
+  /** The stylesheet as text, so it can be injected into a preview document. */
+  css: string;
+}
+
+export interface LibraryDeck {
+  dir: string;
+  title: string;
+  style: string;
 }
 
 export interface DraftComment {

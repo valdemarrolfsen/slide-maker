@@ -20,10 +20,18 @@ export function fetchComments() {
   return request<{ comments: Comment[] }>(`${BASE}/comments`);
 }
 
-export function setTemplate(name: string) {
-  return request<{ template: string }>(`${BASE}/template`, {
+export function setStyle(name: string) {
+  return request<{ style: string }>(`${BASE}/style`, {
     method: 'POST',
     body: JSON.stringify({ name }),
+  });
+}
+
+/** Appends a template to the deck browse was launched from. */
+export function insertTemplate(name: string) {
+  return request<{ file: string }>(`${BASE}/insert`, {
+    method: 'POST',
+    body: JSON.stringify({ template: name }),
   });
 }
 

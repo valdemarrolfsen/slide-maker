@@ -4,10 +4,12 @@
  * Exposed so a deck can be driven from a script or another tool rather than
  * only from the CLI, for example to build decks in CI.
  */
-export { createViteConfig } from './vite/config.js';
+export { createViteConfig, createBrowseViteConfig } from './vite/config.js';
 export { deckPlugin } from './vite/plugin-deck.js';
+export { libraryPlugin } from './vite/plugin-library.js';
 export { readConfig, writeConfig, listSlides, readSlide, defaults } from './core/deck.js';
-export { listTemplates, resolveTemplate } from './core/templates.js';
+export { listStyles, resolveStyle } from './core/styles.js';
+export { listTemplates, resolveTemplate, readTemplateSource } from './core/templates.js';
 export {
   listComments,
   addComment,

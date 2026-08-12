@@ -1,0 +1,7 @@
+{
+  "label": "Section divider",
+  "description": "A full-bleed break between parts of a deck, numbered and set on the inverted palette.",
+  "tags": ["structure", "divider", "dark"],
+  "order": 40,
+  "guidance": "Use one wherever the argument turns. The title should name the shift rather than repeat the agenda line, and the lede is optional. Pass dark={false} if the surrounding slides are already dark."
+}

@@ -98,6 +98,24 @@ function sendJson(res, status, data) {
   res.end(body);
 }
 
+function downloadName(title) {
+  const slug =
+    title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '') || 'deck';
+  return `${slug}.pdf`;
+}
+
+function sendPdf(res, pdf, filename) {
+  res.statusCode = 200;
+  res.setHeader('content-type', 'application/pdf');
+  res.setHeader('content-disposition', `attachment; filename="${filename}"`);
+  res.setHeader('content-length', pdf.length);
+  res.setHeader('cache-control', 'no-store');
+  res.end(pdf);
+}
+
 /**
  * Wires a deck directory into Vite.
  *
@@ -253,6 +271,19 @@ ${entries}
             const cfg = await readConfig(deckDir);
             await writeConfig(deckDir, { ...cfg, template: name });
             return sendJson(res, 200, { template: name });
+          }
+
+          if (route === '/export/pdf' && req.method === 'POST') {
+            const cfg = await readConfig(deckDir);
+            const slides = await listSlides(deckDir, cfg);
+            if (!slides.length) {
+              return sendJson(res, 400, { error: 'Add at least one slide before exporting' });
+            }
+            // Import lazily to keep the normal studio startup light and avoid a
+            // cycle through renderer -> Vite config -> this plugin.
+            const { renderPdf } = await import('../render/renderer.js');
+            const pdf = await renderPdf({ deckDir, config: cfg });
+            return sendPdf(res, pdf, downloadName(cfg.title));
           }
 
           if (route === '/comments' && req.method === 'POST') {

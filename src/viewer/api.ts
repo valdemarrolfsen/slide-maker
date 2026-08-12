@@ -27,6 +27,27 @@ export function setTemplate(name: string) {
   });
 }
 
+/** Renders the current deck and lets the browser save it as a PDF. */
+export async function exportPdf(): Promise<void> {
+  const res = await fetch(`${BASE}/export/pdf`, { method: 'POST' });
+  if (!res.ok) {
+    const data = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(data.error || `Export failed: ${res.status}`);
+  }
+
+  const disposition = res.headers.get('content-disposition') || '';
+  const filename = disposition.match(/filename="([^"]+)"/)?.[1] || 'deck.pdf';
+  const url = URL.createObjectURL(await res.blob());
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  // Safari can cancel a download when its object URL is revoked in the same tick.
+  setTimeout(() => URL.revokeObjectURL(url), 0);
+}
+
 export function createComment(input: Record<string, unknown>) {
   return request<{ comment: Comment }>(`${BASE}/comments`, {
     method: 'POST',

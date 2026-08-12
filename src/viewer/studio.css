@@ -182,6 +182,14 @@
   color: var(--ui-muted);
   transition: color var(--ui-fast) var(--ui-ease);
 }
+.sm-btn:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.sm-btn-error {
+  border-color: var(--ui-danger);
+  color: var(--ui-danger);
+}
 .sm-btn:hover:not(:disabled) {
   background: var(--ui-panel-2);
   border-color: var(--ui-border-2);

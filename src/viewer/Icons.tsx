@@ -71,6 +71,16 @@ export function Play(props: IconProps) {
   );
 }
 
+export function Download(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 2.5v7" />
+      <path d="m5.3 7.2 2.7 2.7 2.7-2.7" />
+      <path d="M3 12.5h10" />
+    </Icon>
+  );
+}
+
 export function Check(props: IconProps) {
   return (
     <Icon {...props}>

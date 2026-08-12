@@ -38,6 +38,10 @@ raw HTML.
 rail, the current slide, and a comment panel. Files reload the moment they are
 saved.
 
+**You export from the same view.** Click **Export PDF** in the studio to download
+the current deck with selectable vector text. PDF export requires Playwright and
+Chromium, just like the export command.
+
 **You comment back.** Select any text on a slide and a note composer appears.
 The comment records the slide's file path, the exact text you selected, and the
 text on either side of it. Claude searches the file for that quote and finds the
@@ -163,6 +167,9 @@ slide-maker build              # one self-contained dist/index.html
 slide-maker export             # deck.pdf, real vector text
 slide-maker export -f png      # one image per slide
 ```
+
+While the Studio is running, click **Export PDF** to render and download the
+same PDF without leaving the browser.
 
 `build` produces a single HTML file with the script, styles and images inlined.
 No server, no sibling directory: double-click it, or email it to someone. Arrow

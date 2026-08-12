@@ -29,7 +29,7 @@ function json(value) {
  */
 export async function startMcpServer(deckDir) {
   const server = new McpServer(
-    { name: 'slide-maker', version: '0.1.0' },
+    { name: 'slide-maker', version: '0.2.0' },
     {
       instructions: [
         'This project is a slide-maker deck. Slides are JSX modules under the deck',

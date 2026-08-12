@@ -66,10 +66,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/heisthq/slide-maker.git"
+    "url": "git+https://github.com/valdemarrolfsen/slide-maker.git"
   },
   "bugs": {
-    "url": "https://github.com/heisthq/slide-maker/issues"
+    "url": "https://github.com/valdemarrolfsen/slide-maker/issues"
   },
-  "homepage": "https://github.com/heisthq/slide-maker#readme"
+  "homepage": "https://github.com/valdemarrolfsen/slide-maker#readme",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  }
 }

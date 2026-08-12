@@ -16,8 +16,8 @@ let harness = null;
 
 const PLAYWRIGHT_HINT =
   'Rendering needs Playwright and a Chromium build.\n' +
-  '  npm install playwright\n' +
-  '  npx playwright install chromium';
+  '  pnpm add playwright\n' +
+  '  pnpm exec playwright install chromium';
 
 async function loadChromium() {
   try {

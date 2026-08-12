@@ -6,7 +6,7 @@ import { listComments } from '../core/comments.js';
 import { color, fail, warn } from '../core/log.js';
 import { createViteConfig } from '../vite/config.js';
 
-export async function devCommand(target, options) {
+export async function startCommand(target, options) {
   const deckDir = resolveDeckDir(target);
 
   let config;

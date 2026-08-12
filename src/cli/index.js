@@ -1,7 +1,7 @@
 import { createRequire } from 'node:module';
 import { Command } from 'commander';
 import { initCommand } from './init.js';
-import { devCommand } from './dev.js';
+import { startCommand } from './start.js';
 import { buildCommand } from './build.js';
 import { exportCommand } from './export.js';
 import { templatesCommand, useTemplateCommand } from './templates.js';
@@ -32,13 +32,13 @@ export function createCli() {
     .action(initCommand);
 
   program
-    .command('dev', { isDefault: true })
+    .command('start', { isDefault: true })
     .argument('[dir]', 'deck directory', '.')
     .description('open the studio and watch for changes')
     .option('-p, --port <port>', 'port to listen on', '5170')
     .option('--host [host]', 'expose the server on the network')
     .option('-o, --open', 'open a browser on start')
-    .action(devCommand);
+    .action(startCommand);
 
   program
     .command('build')

@@ -148,15 +148,15 @@ export async function renderPdf({ deckDir, config, outFile }) {
 
   try {
     await page.emulateMedia({ media: 'print' });
-    await page.pdf({
-      path: outFile,
+    const pdf = await page.pdf({
+      ...(outFile ? { path: outFile } : {}),
       width: `${config.width / 96}in`,
       height: `${config.height / 96}in`,
       printBackground: true,
       margin: { top: '0', right: '0', bottom: '0', left: '0' },
       preferCSSPageSize: true,
     });
-    return outFile;
+    return outFile || pdf;
   } finally {
     await page.close();
   }

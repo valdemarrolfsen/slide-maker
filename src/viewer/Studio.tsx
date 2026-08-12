@@ -5,7 +5,7 @@ import * as api from './api';
 import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
-import { ChevronLeft, ChevronRight, Close, Deck, Message, Pin, Play } from './Icons';
+import { ChevronLeft, ChevronRight, Close, Deck, Download, Message, Pin, Play } from './Icons';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
@@ -36,6 +36,8 @@ export function Studio() {
   const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [templatePending, setTemplatePending] = useState(false);
   const [templateError, setTemplateError] = useState<string | null>(null);
+  const [exportPending, setExportPending] = useState(false);
+  const [exportError, setExportError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
@@ -82,6 +84,18 @@ export function Studio() {
     } catch (err) {
       setTemplatePending(false);
       setTemplateError(err instanceof Error ? err.message : 'Could not switch template');
+    }
+  };
+
+  const exportPdf = async () => {
+    setExportPending(true);
+    setExportError(null);
+    try {
+      await api.exportPdf();
+    } catch (err) {
+      setExportError(err instanceof Error ? err.message : 'Could not export PDF');
+    } finally {
+      setExportPending(false);
     }
   };
 
@@ -295,6 +309,17 @@ export function Studio() {
           >
             <Play />
             Present
+          </button>
+          <button
+            type="button"
+            className={`sm-btn${exportError ? ' sm-btn-error' : ''}`}
+            onClick={exportPdf}
+            disabled={exportPending}
+            title={exportError || 'Download PDF'}
+            aria-label={exportError ? `Export PDF: ${exportError}` : 'Export PDF'}
+          >
+            <Download />
+            {exportPending ? 'Exporting…' : exportError ? 'Export failed' : 'Export PDF'}
           </button>
         </div>
       </header>

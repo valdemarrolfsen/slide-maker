@@ -90,7 +90,7 @@ slide-maker templates          # list the slide layouts
 ```
 
 Both are also in the studio's top bar: a style picker next to the deck title,
-and an **Add slide** picker next to that. The deck reloads immediately either
+and an **Add slide** gallery next to that. The deck reloads immediately either
 way.
 
 ### The styles
@@ -126,10 +126,13 @@ built-in of the same name.
 | `code` | A code block with commentary and one highlighted line |
 | `closing` | The decision being asked for, on the inverted palette |
 
-Add one to a deck from the studio: the **Add slide** picker sits next to the
-style name and appends the template as a new slide, example copy and all. Then
-tell Claude what it should actually say. Picking the shape yourself and leaving
-the words to Claude is usually faster than describing a layout in prose.
+Add one to a deck from the studio. The **Add slide** button next to the style
+name opens a gallery of every layout, each previewed as a live thumbnail in
+your deck's own style, so you pick a shape by looking at it rather than by
+guessing from a name. Clicking one appends it as a new slide and takes you
+there. Then tell Claude what it should actually say: picking the shape yourself
+and leaving the words to Claude is usually faster than describing a layout in
+prose.
 
 Claude reaches for the same library on its own. The deck's `CLAUDE.md` and the
 MCP server both point at it, and `read_template` hands over the JSX, so "a slide

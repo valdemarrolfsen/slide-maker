@@ -6,24 +6,32 @@ import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
 import { ChevronLeft, ChevronRight, Close, Deck, Download, Message, Pin, Play } from './Icons';
+import { TemplateMenu } from './TemplateMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
 import { captureSelection, capturePoint, clearSelection } from './selection';
-import type { Comment, DraftComment, StyleInfo, TemplateInfo } from './types';
+import type { Comment, DraftComment, StyleInfo } from './types';
 
 /** Which slide to show once the reload that follows an edit has happened. */
 const LANDING_KEY = 'slide-maker:landing';
 
-/** Ignores keyboard shortcuts while the user is typing. */
-function isTyping(target: EventTarget | null): boolean {
+/**
+ * True when the focused element is handling its own keys.
+ *
+ * Text inputs are the obvious case. An open menu is the other one: its arrow
+ * keys move a highlight, and without this they would page the deck behind it
+ * at the same time.
+ */
+function ownsKeyboard(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
   if (!el) return false;
   return (
     el.tagName === 'TEXTAREA' ||
     el.tagName === 'INPUT' ||
     el.tagName === 'SELECT' ||
-    el.isContentEditable === true
+    el.isContentEditable === true ||
+    Boolean(el.closest?.('[role="menu"]'))
   );
 }
 
@@ -39,7 +47,6 @@ export function Studio() {
   const [styles, setStyles] = useState<StyleInfo[]>([]);
   const [stylePending, setStylePending] = useState(false);
   const [styleError, setStyleError] = useState<string | null>(null);
-  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
   const [addPending, setAddPending] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
@@ -60,7 +67,6 @@ export function Studio() {
     api.fetchState().then((state) => {
       setComments(state.comments);
       setStyles(state.styles);
-      setTemplates(state.templates);
     }).catch(() => {});
     return api.onCommentsChanged(setComments);
   }, []);
@@ -158,7 +164,7 @@ export function Studio() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (isTyping(e.target)) return;
+      if (ownsKeyboard(e.target)) return;
       switch (e.key) {
         case 'ArrowRight':
         case 'PageDown':
@@ -210,7 +216,7 @@ export function Studio() {
   useEffect(() => {
     if (presenting) return;
     const onMouseUp = (e: MouseEvent) => {
-      if (isTyping(e.target)) return;
+      if (ownsKeyboard(e.target)) return;
       // Let the browser finish updating the selection before reading it.
       requestAnimationFrame(() => {
         const captured = captureSelection(frameRef.current, config.width, config.height);
@@ -314,30 +320,12 @@ export function Studio() {
               ))}
             </select>
           </label>
-          {/* Always reads "Add slide" rather than holding a selection: it is an
-              action wearing a select, so the native list gets us a keyboard
-              accessible menu without a second popover system in the chrome. */}
-          <label className="sm-style-picker sm-add-picker">
-            <span className="sm-visually-hidden">Add a slide from a template</span>
-            <select
-              className={`sm-style-select sm-add-select${addError ? ' sm-style-select-error' : ''}`}
-              value=""
-              disabled={addPending || templates.length === 0}
-              onChange={(event) => addSlide(event.target.value)}
-              title={addError || 'Append a slide built from a template'}
-              aria-label="Add a slide from a template"
-              aria-invalid={Boolean(addError)}
-            >
-              <option value="" disabled>
-                {addPending ? 'Adding…' : addError ? 'Could not add' : 'Add slide'}
-              </option>
-              {templates.map((item) => (
-                <option key={item.name} value={item.name} title={item.description}>
-                  {item.label}{item.source === 'local' ? ' (local)' : ''}
-                </option>
-              ))}
-            </select>
-          </label>
+          <TemplateMenu
+            config={config}
+            pending={addPending}
+            error={addError}
+            onPick={addSlide}
+          />
         </div>
         <div className="sm-topbar-right">
           <span className={`sm-status${openCount ? ' sm-status-live' : ''}`}>

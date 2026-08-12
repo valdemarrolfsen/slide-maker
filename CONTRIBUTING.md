@@ -154,10 +154,11 @@ The `order` field positions it in the library, which runs roughly from opening
 to closing. `file` overrides the filename stem `init` and **Add to deck** use,
 which only `blank` currently needs.
 
-Check it in every style, not just the default. Drop it into the example deck
-with the studio's Add slide picker, then switch styles from the picker beside
-it and watch what happens. Dense layouts are the ones that break, usually in
-`noir`, which has the largest type scale.
+Check it in every style, not just the default. Run `pnpm demo`, open the Add
+slide gallery and switch styles from the picker beside it: the previews are
+live, so the whole library restyles as you go. Then add the slide and look at
+it full size. Dense layouts are the ones that break, usually in `noir`, which
+has the largest type scale.
 
 ## Adding a runtime component
 

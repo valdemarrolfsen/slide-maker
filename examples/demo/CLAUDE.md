@@ -57,7 +57,7 @@ they are looking at.
 
 ### Slides the user added
 
-The studio has an **Add slide** picker next to the style name, which drops a
+The studio has an **Add slide** gallery next to the style name, which drops a
 template into `slides/` with its example copy still in it. A slide you did not
 write, still carrying that copy, is a slide the user has asked for by pointing
 at a shape: they picked the layout, and the words are yours to write. Replace

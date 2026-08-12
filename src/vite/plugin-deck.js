@@ -22,6 +22,9 @@ import { warn } from '../core/log.js';
    whatever is on disk, so adding a slide file is all it takes to add a slide. */
 export const DECK_MODULE = 'virtual:slide-maker/deck';
 export const STYLE_MODULE = 'virtual:slide-maker/style';
+/* Only the studio imports this one. The exported deck has no use for fifteen
+   layouts it did not ask for, and index.html is never part of a build. */
+export const TEMPLATES_MODULE = 'virtual:slide-maker/templates';
 
 const RESOLVED = (id) => `\0${id}`;
 const API_PREFIX = '/__slide-maker/api';
@@ -154,6 +157,7 @@ export function deckPlugin({ deckDir, config }) {
     if (!server) return;
     invalidate(DECK_MODULE);
     invalidate(STYLE_MODULE);
+    invalidate(TEMPLATES_MODULE);
     server.ws.send({ type: 'full-reload' });
   };
 
@@ -171,7 +175,9 @@ export function deckPlugin({ deckDir, config }) {
     },
 
     resolveId(id) {
-      if (id === DECK_MODULE || id === STYLE_MODULE) return RESOLVED(id);
+      if (id === DECK_MODULE || id === STYLE_MODULE || id === TEMPLATES_MODULE) {
+        return RESOLVED(id);
+      }
       return null;
     },
 
@@ -193,6 +199,32 @@ export function deckPlugin({ deckDir, config }) {
 
 export const config = ${JSON.stringify(current, null, 2)};
 export const slides = [
+${entries}
+];
+`;
+      }
+
+      if (id === RESOLVED(TEMPLATES_MODULE)) {
+        const templates = await listTemplates(deckDir);
+        const imports = templates
+          .map((t, i) => `import * as tpl${i} from ${JSON.stringify(toImportPath(t.slide))};`)
+          .join('\n');
+        // Shaped like a slide entry so the studio can hand a template straight
+        // to SlideFrame and get the same error boundary a real slide gets.
+        const entries = templates
+          .map(
+            (t, i) =>
+              `  { id: ${JSON.stringify(t.name)}, index: 0, number: 1, ` +
+              `name: ${JSON.stringify(t.name)}, ` +
+              `file: ${JSON.stringify(path.posix.join('templates', t.name, 'slide.tsx'))}, ` +
+              `label: ${JSON.stringify(t.label)}, description: ${JSON.stringify(t.description)}, ` +
+              `stem: ${JSON.stringify(t.stem)}, source: ${JSON.stringify(t.source)}, ` +
+              `module: tpl${i} }`,
+          )
+          .join(',\n');
+        return `${imports}
+
+export const templates = [
 ${entries}
 ];
 `;
@@ -261,11 +293,10 @@ ${entries}
         try {
           if (route === '/state' && req.method === 'GET') {
             const cfg = await readConfig(deckDir);
-            const [slides, comments, styles, templates] = await Promise.all([
+            const [slides, comments, styles] = await Promise.all([
               listSlides(deckDir, cfg),
               listComments(deckDir),
               listStyles(deckDir),
-              listTemplates(deckDir),
             ]);
             return sendJson(res, 200, {
               deckDir,
@@ -273,7 +304,6 @@ ${entries}
               slides: slides.map(({ absolute, ...rest }) => rest),
               comments,
               styles: styles.map(({ dir, stylesheet, ...rest }) => rest),
-              templates: templates.map(({ dir, slide, order, ...rest }) => rest),
             });
           }
 

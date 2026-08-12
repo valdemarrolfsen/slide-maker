@@ -59,16 +59,17 @@ export interface DeckState {
   slides: Array<Omit<SlideEntry, 'module'>>;
   comments: Comment[];
   styles: StyleInfo[];
-  templates: TemplateInfo[];
 }
 
-/** A ready-made slide layout, offered in the studio's Add slide picker. */
-export interface TemplateInfo {
-  name: string;
+/**
+ * A ready-made slide layout, offered in the studio's Add slide picker.
+ *
+ * Extends SlideEntry so a template can be handed straight to SlideFrame and
+ * rendered as a preview, error boundary and all.
+ */
+export interface TemplateEntry extends SlideEntry {
   label: string;
   description: string;
-  tags: string[];
-  guidance: string;
   /** Filename stem to use when the template lands in a deck. */
   stem: string;
   source: 'builtin' | 'local';

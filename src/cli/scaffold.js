@@ -158,8 +158,17 @@ export default function TryIt() {
 export function deckClaudeMd({ title, template }) {
   return `# ${title}
 
-A slide-maker deck. The user is watching these slides in a browser studio while
-you edit them, and leaves comments on the text directly.
+A slide-maker deck. Your job in this folder is to write the slides. That is the
+whole job: edit files under \`slides/\`, look at the result, act on the comments.
+
+The user runs the studio and watches these slides in a browser while you work.
+It reloads on save. You never start it, stop it, check whether it is running, or
+open anything on localhost, and \`render_slide\` starts its own renderer, so it
+works whether the studio is open or not.
+
+Also not yours: the slide-maker package, its build, and anything outside this
+folder. If a slide will not render for a reason you cannot fix in a slide file,
+say so and let the user look.
 
 ## Working loop
 
@@ -170,8 +179,8 @@ you edit them, and leaves comments on the text directly.
 4. Run \`list_comments\` to read the user's feedback, act on it, then \`resolve_comment\`
    with a note on what you changed.
 
-If the MCP server is not connected, the same information is on disk:
-comments live in \`.slide-maker/comments.json\`.
+If the MCP server is not connected, work from disk instead: slide sources are in
+\`slides/\`, settings in \`deck.json\`, comments in \`.slide-maker/comments.json\`.
 
 ## Writing slides
 

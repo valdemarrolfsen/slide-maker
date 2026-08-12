@@ -1,7 +1,7 @@
 import path from 'node:path';
 import { createRequire } from 'node:module';
 import { normalizePath } from 'vite';
-import { listSlides, readConfig, CONFIG_FILE } from '../core/deck.js';
+import { listSlides, readConfig, writeConfig, CONFIG_FILE } from '../core/deck.js';
 import { resolveTemplate, listTemplates } from '../core/templates.js';
 import { runtimeCss, runtimeEntry } from '../core/paths.js';
 import {
@@ -238,6 +238,21 @@ ${entries}
 
           if (route === '/comments' && req.method === 'GET') {
             return sendJson(res, 200, { comments: await listComments(deckDir) });
+          }
+
+          if (route === '/template' && req.method === 'POST') {
+            const body = await readBody(req);
+            const name = typeof body.name === 'string' ? body.name : '';
+            const template = await resolveTemplate(deckDir, name);
+            if (!template) {
+              const available = (await listTemplates(deckDir)).map((item) => item.name);
+              return sendJson(res, 400, {
+                error: `No template named "${name}". Available: ${available.join(', ')}`,
+              });
+            }
+            const cfg = await readConfig(deckDir);
+            await writeConfig(deckDir, { ...cfg, template: name });
+            return sendJson(res, 200, { template: name });
           }
 
           if (route === '/comments' && req.method === 'POST') {

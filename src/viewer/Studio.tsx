@@ -10,7 +10,7 @@ import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
 import { captureSelection, capturePoint, clearSelection } from './selection';
-import type { Comment, DraftComment } from './types';
+import type { Comment, DraftComment, TemplateInfo } from './types';
 
 /** Ignores keyboard shortcuts while the user is typing. */
 function isTyping(target: EventTarget | null): boolean {
@@ -19,6 +19,7 @@ function isTyping(target: EventTarget | null): boolean {
   return (
     el.tagName === 'TEXTAREA' ||
     el.tagName === 'INPUT' ||
+    el.tagName === 'SELECT' ||
     el.isContentEditable === true
   );
 }
@@ -32,6 +33,9 @@ export function Studio() {
   const [presenting, setPresenting] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
+  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
+  const [templatePending, setTemplatePending] = useState(false);
+  const [templateError, setTemplateError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
@@ -45,10 +49,10 @@ export function Studio() {
   /* ── Data ── */
 
   useEffect(() => {
-    api
-      .fetchComments()
-      .then((r) => setComments(r.comments))
-      .catch(() => {});
+    api.fetchState().then((state) => {
+      setComments(state.comments);
+      setTemplates(state.templates);
+    }).catch(() => {});
     return api.onCommentsChanged(setComments);
   }, []);
 
@@ -67,6 +71,19 @@ export function Studio() {
     const { comments: next } = await api.fetchComments();
     setComments(next);
   }, []);
+
+  const changeTemplate = async (name: string) => {
+    if (name === config.template) return;
+    setTemplatePending(true);
+    setTemplateError(null);
+    try {
+      await api.setTemplate(name);
+      // Writing deck.json triggers a full reload, which imports the new theme.
+    } catch (err) {
+      setTemplatePending(false);
+      setTemplateError(err instanceof Error ? err.message : 'Could not switch template');
+    }
+  };
 
   /* ── Navigation ── */
 
@@ -232,9 +249,25 @@ export function Studio() {
           <span className="sm-crumb" aria-hidden="true">
             /
           </span>
-          <span className="sm-tag" title="Active template">
-            {template ?? `${config.template} (missing)`}
-          </span>
+          <label className="sm-template-picker">
+            <span className="sm-visually-hidden">Template</span>
+            <select
+              className={`sm-template-select${templateError ? ' sm-template-select-error' : ''}`}
+              value={config.template}
+              disabled={templatePending || templates.length === 0}
+              onChange={(event) => changeTemplate(event.target.value)}
+              title={templateError || 'Swap template'}
+              aria-label="Template"
+              aria-invalid={Boolean(templateError)}
+            >
+              {!template && <option value={config.template}>{config.template} (missing)</option>}
+              {templates.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.label}{item.source === 'local' ? ' (local)' : ''}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
         <div className="sm-topbar-right">
           <span className={`sm-status${openCount ? ' sm-status-live' : ''}`}>

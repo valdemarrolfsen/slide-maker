@@ -67,16 +67,61 @@
   color: var(--ui-border-2);
   user-select: none;
 }
-/* Named sm-tag, not sm-badge: the runtime owns .sm-badge for slide content and
-   the two stylesheets share a page. */
-.sm-tag {
-  padding: 2px 8px;
+/* The native select keeps template switching keyboard-accessible without
+   introducing a second popover system into the studio chrome. */
+.sm-template-picker {
+  position: relative;
+  display: inline-flex;
+  min-width: 0;
+}
+.sm-template-picker::after {
+  content: "";
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 5px;
+  height: 5px;
+  border-right: 1px solid var(--ui-muted);
+  border-bottom: 1px solid var(--ui-muted);
+  transform: translateY(-70%) rotate(45deg);
+  pointer-events: none;
+}
+.sm-template-select {
+  appearance: none;
+  height: 24px;
+  max-width: 180px;
+  padding: 0 24px 0 8px;
   border: 1px solid var(--ui-border);
   border-radius: 999px;
   background: var(--ui-panel);
+  font-family: inherit;
   font-size: 11px;
   color: var(--ui-muted);
   white-space: nowrap;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.sm-template-select:hover:not(:disabled) {
+  border-color: var(--ui-border-2);
+  color: var(--ui-fg-2);
+}
+.sm-template-select:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.sm-template-select-error {
+  border-color: var(--ui-danger);
+}
+.sm-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 .sm-status {
   display: inline-flex;

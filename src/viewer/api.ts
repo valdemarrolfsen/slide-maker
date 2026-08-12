@@ -20,6 +20,13 @@ export function fetchComments() {
   return request<{ comments: Comment[] }>(`${BASE}/comments`);
 }
 
+export function setTemplate(name: string) {
+  return request<{ template: string }>(`${BASE}/template`, {
+    method: 'POST',
+    body: JSON.stringify({ name }),
+  });
+}
+
 export function createComment(input: Record<string, unknown>) {
   return request<{ comment: Comment }>(`${BASE}/comments`, {
     method: 'POST',

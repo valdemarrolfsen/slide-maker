@@ -23,6 +23,12 @@
   background: rgba(94, 106, 210, 0.35);
 }
 
+/* The composer takes focus from the slide, so the draft's captured range uses
+   the Highlight API to keep the same selection treatment while it is open. */
+.sm-studio ::highlight(sm-comment-selection) {
+  background: rgba(94, 106, 210, 0.35);
+}
+
 /* One focus treatment for everything, drawn outside the element so it never
    nudges a layout. */
 .sm-studio :focus-visible {

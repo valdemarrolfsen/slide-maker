@@ -8,7 +8,7 @@ export const packageRoot = path.resolve(fileURLToPath(new URL('../..', import.me
 export const builtinTemplatesDir = path.join(packageRoot, 'templates');
 
 /** The runtime module, aliased into every deck so slides resolve it wherever
- *  slide-maker happens to be installed (globally, via npx, or locally). */
+ *  slide-maker happens to be installed (globally, via pnpm dlx, or locally). */
 export const runtimeEntry = path.join(packageRoot, 'src', 'runtime', 'index.tsx');
 export const runtimeCss = path.join(packageRoot, 'src', 'runtime', 'runtime.css');
 

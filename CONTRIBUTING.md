@@ -5,17 +5,17 @@
 ```bash
 git clone https://github.com/valdemarrolfsen/slide-maker
 cd slide-maker
-npm install
-npx playwright install chromium   # only needed for PDF/PNG export work
+pnpm install
+pnpm exec playwright install chromium   # only needed for PDF/PNG export work
 
-npm run demo                      # studio on the example deck
-npm run demo:build                # static build of it
-npx tsc --noEmit                  # typecheck
+pnpm demo                         # studio on the example deck
+pnpm demo:build                   # static build of it
+pnpm typecheck                    # typecheck
 ```
 
 There is no build step for development. The Node side is plain ESM JavaScript
 and the viewer is TypeScript compiled by Vite on demand, so edits take effect on
-save. `npm run types` generates the published type declarations and runs
+save. `pnpm types` generates the published type declarations and runs
 automatically on `npm pack`.
 
 ## Publishing a release
@@ -24,12 +24,12 @@ The `Publish to npm` GitHub Actions workflow publishes a GitHub Release whose
 tag is exactly `v` followed by the version in `package.json`. For example, to
 publish version `0.2.0`:
 
-1. Run `npm version 0.2.0` and push the commit and `v0.2.0` tag.
+1. Run `pnpm version 0.2.0` and push the commit and `v0.2.0` tag.
 2. Create and publish a GitHub Release from the `v0.2.0` tag.
 3. Confirm that the `Publish to npm` workflow succeeds.
 
 The workflow checks the tag and package versions match, installs from
-`package-lock.json`, typechecks, verifies the package contents, and publishes
+`pnpm-lock.yaml`, typechecks, verifies the package contents, and publishes
 the public package with provenance.
 
 ### One-time npm setup

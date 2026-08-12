@@ -9,9 +9,9 @@ slide and say so, and Claude picks the comment up directly.
 No accounts, no cloud, no export dance. A deck is a folder of files on your disk.
 
 ```bash
-npx slide-maker init my-deck
+pnpm dlx slide-maker init my-deck
 cd my-deck
-slide-maker dev
+pnpm dlx slide-maker start
 ```
 
 Then open Claude Code in the same directory and start briefing it.
@@ -34,7 +34,7 @@ structured data with a file path attached, not as a paragraph of description.
 with its normal file tools, composing from a small component library rather than
 raw HTML.
 
-**You watch in the studio.** `slide-maker dev` serves a browser UI with a slide
+**You watch in the studio.** `slide-maker start` serves a browser UI with a slide
 rail, the current slide, and a comment panel. Files reload the moment they are
 saved.
 
@@ -168,8 +168,8 @@ keys page through, <kbd>F</kbd> is fullscreen, <kbd>P</kbd> prints.
 PDF and PNG export need Playwright:
 
 ```bash
-npm install playwright
-npx playwright install chromium
+pnpm add playwright
+pnpm exec playwright install chromium
 ```
 
 ## Claude Code setup
@@ -196,8 +196,8 @@ To register it by hand instead:
 {
   "mcpServers": {
     "slide-maker": {
-      "command": "npx",
-      "args": ["-y", "slide-maker", "mcp", "/absolute/path/to/deck"]
+      "command": "pnpm",
+      "args": ["dlx", "slide-maker", "mcp", "/absolute/path/to/deck"]
     }
   }
 }
@@ -207,7 +207,7 @@ To register it by hand instead:
 
 ```
 slide-maker init [dir]         scaffold a deck and wire up Claude Code
-slide-maker dev [dir]          open the studio
+slide-maker start [dir]        open the studio
 slide-maker build [dir]        export a static site
 slide-maker export [dir]       render to PDF or PNG
 slide-maker templates          list templates

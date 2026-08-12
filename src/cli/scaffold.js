@@ -23,7 +23,7 @@ export function deckConfig({ title, template, author }) {
 /**
  * The MCP registration.
  *
- * Points at an absolute path rather than at `npx slide-maker` so the server
+ * Points at an absolute path rather than at `pnpm dlx slide-maker` so the server
  * starts without a network round trip and keeps working if the package is
  * never published to a registry.
  */

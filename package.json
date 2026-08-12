@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "A local slide deck studio you drive from Claude Code. Write slides as JSX, review them in a live browser UI, and send comments straight back to Claude.",
   "type": "module",
+  "packageManager": "pnpm@10.34.3",
   "license": "MIT",
   "keywords": [
     "slides",
@@ -41,8 +42,8 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "types": "tsc -p tsconfig.build.json",
-    "prepack": "npm run types",
-    "demo": "node bin/slide-maker.js dev examples/demo",
+    "prepack": "pnpm run types",
+    "demo": "node bin/slide-maker.js start examples/demo",
     "demo:build": "node bin/slide-maker.js build examples/demo"
   },
   "dependencies": {

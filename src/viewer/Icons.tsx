@@ -126,6 +126,14 @@ export function Close(props: IconProps) {
   );
 }
 
+export function Plus(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M8 3.5v9M3.5 8h9" />
+    </Icon>
+  );
+}
+
 /** The mark in the top bar: a deck, drawn as one slide stacked on another. */
 export function Deck(props: IconProps) {
   return (

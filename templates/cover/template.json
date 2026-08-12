@@ -1,0 +1,7 @@
+{
+  "label": "Cover",
+  "description": "The opening slide: occasion, title, one-line claim, and who is presenting.",
+  "tags": ["opening", "title"],
+  "order": 20,
+  "guidance": "Every deck starts with one. Break the title across two lines with <br /> where the phrasing has a natural hinge, and keep the lede to a single sentence the room could repeat back."
+}

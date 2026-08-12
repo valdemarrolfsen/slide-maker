@@ -35,6 +35,7 @@
     "bin",
     "src",
     "types",
+    "styles",
     "templates",
     "README.md",
     "LICENSE"

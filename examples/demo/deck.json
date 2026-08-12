@@ -1,7 +1,7 @@
 {
   "title": "slide-maker demo",
   "author": "",
-  "template": "granite",
+  "style": "granite",
   "width": 1280,
   "height": 720,
   "slides": "slides",

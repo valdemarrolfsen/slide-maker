@@ -20,10 +20,18 @@ export function fetchComments() {
   return request<{ comments: Comment[] }>(`${BASE}/comments`);
 }
 
-export function setTemplate(name: string) {
-  return request<{ template: string }>(`${BASE}/template`, {
+export function setStyle(name: string) {
+  return request<{ style: string }>(`${BASE}/style`, {
     method: 'POST',
     body: JSON.stringify({ name }),
+  });
+}
+
+/** Appends a slide to the deck, copied from a template. */
+export function addSlide(template: string) {
+  return request<{ file: string }>(`${BASE}/slides`, {
+    method: 'POST',
+    body: JSON.stringify({ template }),
   });
 }
 

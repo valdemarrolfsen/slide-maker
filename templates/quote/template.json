@@ -1,0 +1,7 @@
+{
+  "label": "Quote",
+  "description": "A pull quote with an attribution, sitting on its own in the frame.",
+  "tags": ["emphasis", "research", "sparse"],
+  "order": 130,
+  "guidance": "Strongest when the words are someone else's: a customer, an interview, a support ticket. Quote verbatim and keep it under about twenty-five words. Attribute to a role and a context rather than to a name nobody in the room knows."
+}

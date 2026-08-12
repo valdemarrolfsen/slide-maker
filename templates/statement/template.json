@@ -1,0 +1,7 @@
+{
+  "label": "Statement",
+  "description": "One sentence, centred in the frame, with a footnote carrying the caveat.",
+  "tags": ["emphasis", "sparse"],
+  "order": 50,
+  "guidance": "For the claim the whole deck is built on. Nothing else goes on the slide. If the statement needs a qualifier to be true, put the qualifier in the Note rather than in the sentence."
+}

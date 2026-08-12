@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { config } from 'virtual:slide-maker/deck';
-import 'virtual:slide-maker/theme';
+import 'virtual:slide-maker/style';
 import './base.css';
 import { Presenter } from './Presenter';
 

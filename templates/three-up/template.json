@@ -1,0 +1,7 @@
+{
+  "label": "Three up",
+  "description": "Three numbered cells on the hairline grid. The workhorse layout for a process, a set of pillars, or three parallel ideas.",
+  "tags": ["grid", "structure", "process"],
+  "order": 70,
+  "guidance": "Only use it when the three things really are parallel. Keep every CardTitle to two or three words and every Line to one sentence, or the columns stop scanning as a row. Drop to Grid cols={2} rather than squeezing a fourth item in."
+}

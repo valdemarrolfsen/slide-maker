@@ -1,0 +1,7 @@
+{
+  "label": "Before and after",
+  "description": "Two cells side by side, each with a label and a short list. For contrasting the old way with the new one, or two options against each other.",
+  "tags": ["grid", "contrast", "options"],
+  "order": 80,
+  "guidance": "Keep the two sides symmetrical: same number of items, same kind of phrasing, in the same order. An asymmetric comparison reads as a rigged one. Mark the side you are recommending with an accent Kicker."
+}

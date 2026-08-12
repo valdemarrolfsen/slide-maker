@@ -1,8 +1,10 @@
 import path from 'node:path';
+import fsp from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { normalizePath } from 'vite';
 import { listSlides, readConfig, writeConfig, CONFIG_FILE } from '../core/deck.js';
-import { resolveTemplate, listTemplates } from '../core/templates.js';
+import { resolveStyle, listStyles } from '../core/styles.js';
+import { listTemplates, resolveTemplate } from '../core/templates.js';
 import { runtimeCss, runtimeEntry } from '../core/paths.js';
 import {
   addComment,
@@ -19,7 +21,10 @@ import { warn } from '../core/log.js';
 /* Virtual modules. The viewer imports these; the plugin generates them from
    whatever is on disk, so adding a slide file is all it takes to add a slide. */
 export const DECK_MODULE = 'virtual:slide-maker/deck';
-export const THEME_MODULE = 'virtual:slide-maker/theme';
+export const STYLE_MODULE = 'virtual:slide-maker/style';
+/* Only the studio imports this one. The exported deck has no use for fifteen
+   layouts it did not ask for, and index.html is never part of a build. */
+export const TEMPLATES_MODULE = 'virtual:slide-maker/templates';
 
 const RESOLVED = (id) => `\0${id}`;
 const API_PREFIX = '/__slide-maker/api';
@@ -68,8 +73,8 @@ function readBody(req) {
     let size = 0;
     req.on('data', (chunk) => {
       size += chunk.length;
-      // A comment is a sentence, not a payload. Cap it so a stray request
-      // cannot buffer the process out of memory.
+      // A request here is a comment or a template name, not a payload. Cap it
+      // so a stray request cannot buffer the process out of memory.
       if (size > 1_000_000) {
         reject(new Error('Request body too large'));
         req.destroy();
@@ -116,11 +121,25 @@ function sendPdf(res, pdf, filename) {
   res.end(pdf);
 }
 
+/** The next free `NN-name.tsx` in a deck's slides directory. */
+async function nextSlideFile(deckDir, config, stem) {
+  const slides = await listSlides(deckDir, config);
+  const taken = new Set(slides.map((s) => s.name));
+  const number = String(slides.length + 1).padStart(2, '0');
+  let name = `${number}-${stem}.tsx`;
+  let suffix = 2;
+  while (taken.has(name)) {
+    name = `${number}-${stem}-${suffix}.tsx`;
+    suffix += 1;
+  }
+  return path.posix.join(config.slides, name);
+}
+
 /**
  * Wires a deck directory into Vite.
  *
  * Responsible for four things: making `slide-maker/runtime` resolvable from
- * anywhere, generating the deck and theme modules, serving the comment API,
+ * anywhere, generating the deck and style modules, serving the comment API,
  * and pushing comment changes to the viewer over the existing HMR socket so
  * there is no second websocket to manage.
  */
@@ -137,7 +156,8 @@ export function deckPlugin({ deckDir, config }) {
   const reload = () => {
     if (!server) return;
     invalidate(DECK_MODULE);
-    invalidate(THEME_MODULE);
+    invalidate(STYLE_MODULE);
+    invalidate(TEMPLATES_MODULE);
     server.ws.send({ type: 'full-reload' });
   };
 
@@ -155,7 +175,9 @@ export function deckPlugin({ deckDir, config }) {
     },
 
     resolveId(id) {
-      if (id === DECK_MODULE || id === THEME_MODULE) return RESOLVED(id);
+      if (id === DECK_MODULE || id === STYLE_MODULE || id === TEMPLATES_MODULE) {
+        return RESOLVED(id);
+      }
       return null;
     },
 
@@ -182,17 +204,43 @@ ${entries}
 `;
       }
 
-      if (id === RESOLVED(THEME_MODULE)) {
+      if (id === RESOLVED(TEMPLATES_MODULE)) {
+        const templates = await listTemplates(deckDir);
+        const imports = templates
+          .map((t, i) => `import * as tpl${i} from ${JSON.stringify(toImportPath(t.slide))};`)
+          .join('\n');
+        // Shaped like a slide entry so the studio can hand a template straight
+        // to SlideFrame and get the same error boundary a real slide gets.
+        const entries = templates
+          .map(
+            (t, i) =>
+              `  { id: ${JSON.stringify(t.name)}, index: 0, number: 1, ` +
+              `name: ${JSON.stringify(t.name)}, ` +
+              `file: ${JSON.stringify(path.posix.join('templates', t.name, 'slide.tsx'))}, ` +
+              `label: ${JSON.stringify(t.label)}, description: ${JSON.stringify(t.description)}, ` +
+              `stem: ${JSON.stringify(t.stem)}, source: ${JSON.stringify(t.source)}, ` +
+              `module: tpl${i} }`,
+          )
+          .join(',\n');
+        return `${imports}
+
+export const templates = [
+${entries}
+];
+`;
+      }
+
+      if (id === RESOLVED(STYLE_MODULE)) {
         current = await readConfig(deckDir);
-        const template = await resolveTemplate(deckDir, current.template);
+        const style = await resolveStyle(deckDir, current.style);
         const lines = [`import ${JSON.stringify(toImportPath(runtimeCss))};`];
-        if (template) {
-          lines.push(`import ${JSON.stringify(toImportPath(template.stylesheet))};`);
+        if (style) {
+          lines.push(`import ${JSON.stringify(toImportPath(style.stylesheet))};`);
         } else {
-          const available = (await listTemplates(deckDir)).map((t) => t.name).join(', ');
-          warn(`Template "${current.template}" not found. Available: ${available || 'none'}`);
+          const available = (await listStyles(deckDir)).map((s) => s.name).join(', ');
+          warn(`Style "${current.style}" not found. Available: ${available || 'none'}`);
         }
-        lines.push(`export const template = ${JSON.stringify(template?.name ?? null)};`);
+        lines.push(`export const style = ${JSON.stringify(style?.name ?? null)};`);
         return lines.join('\n');
       }
 
@@ -205,6 +253,11 @@ ${entries}
       const commentsFile = commentsPath(deckDir);
       server.watcher.add(commentsFile);
       server.watcher.add(path.join(deckDir, CONFIG_FILE));
+      // The directory, not just the slide files inside it. Vite only watches
+      // what the module graph already imports, and a slide that does not exist
+      // yet is exactly the case that has to work: adding a file is how a deck
+      // grows, whether the writer is Claude, the studio or a text editor.
+      server.watcher.add(path.join(deckDir, current.slides));
 
       // The MCP server resolves comments in a different process. Watching the
       // file rather than routing everything through the API means the viewer
@@ -240,17 +293,17 @@ ${entries}
         try {
           if (route === '/state' && req.method === 'GET') {
             const cfg = await readConfig(deckDir);
-            const [slides, comments, templates] = await Promise.all([
+            const [slides, comments, styles] = await Promise.all([
               listSlides(deckDir, cfg),
               listComments(deckDir),
-              listTemplates(deckDir),
+              listStyles(deckDir),
             ]);
             return sendJson(res, 200, {
               deckDir,
               config: cfg,
               slides: slides.map(({ absolute, ...rest }) => rest),
               comments,
-              templates: templates.map(({ dir, stylesheet, ...rest }) => rest),
+              styles: styles.map(({ dir, stylesheet, ...rest }) => rest),
             });
           }
 
@@ -258,19 +311,38 @@ ${entries}
             return sendJson(res, 200, { comments: await listComments(deckDir) });
           }
 
-          if (route === '/template' && req.method === 'POST') {
+          if (route === '/style' && req.method === 'POST') {
             const body = await readBody(req);
             const name = typeof body.name === 'string' ? body.name : '';
-            const template = await resolveTemplate(deckDir, name);
-            if (!template) {
-              const available = (await listTemplates(deckDir)).map((item) => item.name);
+            const style = await resolveStyle(deckDir, name);
+            if (!style) {
+              const available = (await listStyles(deckDir)).map((item) => item.name);
               return sendJson(res, 400, {
-                error: `No template named "${name}". Available: ${available.join(', ')}`,
+                error: `No style named "${name}". Available: ${available.join(', ')}`,
               });
             }
             const cfg = await readConfig(deckDir);
-            await writeConfig(deckDir, { ...cfg, template: name });
-            return sendJson(res, 200, { template: name });
+            await writeConfig(deckDir, { ...cfg, style: name });
+            return sendJson(res, 200, { style: name });
+          }
+
+          if (route === '/slides' && req.method === 'POST') {
+            const body = await readBody(req);
+            const template = await resolveTemplate(deckDir, body.template);
+            if (!template) {
+              const available = (await listTemplates(deckDir)).map((t) => t.name);
+              return sendJson(res, 400, {
+                error: `No template named "${body.template}". Available: ${available.join(', ')}`,
+              });
+            }
+            const cfg = await readConfig(deckDir);
+            const file = await nextSlideFile(deckDir, cfg, template.stem);
+            const target = path.join(deckDir, file);
+            await fsp.mkdir(path.dirname(target), { recursive: true });
+            await fsp.writeFile(target, await fsp.readFile(template.slide, 'utf8'), 'utf8');
+            // The watcher picks the new file up and reloads the viewer, so
+            // there is nothing to push here beyond the name of what landed.
+            return sendJson(res, 201, { file });
           }
 
           if (route === '/export/pdf' && req.method === 'POST') {

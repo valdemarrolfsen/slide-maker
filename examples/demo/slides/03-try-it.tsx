@@ -23,7 +23,7 @@ export default function TryIt() {
       </Fill>
 
       <Note>
-        Delete these starter slides once you are ready. Ask Claude to swap the template and
+        Delete these starter slides once you are ready. Ask Claude to swap the style and
         the whole deck restyles, with no edits to any slide.
       </Note>
     </Slide>

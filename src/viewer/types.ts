@@ -3,7 +3,8 @@ import type { ComponentType } from 'react';
 export interface DeckConfig {
   title: string;
   author: string;
-  template: string;
+  /** Name of the design system the deck wears. */
+  style: string;
   width: number;
   height: number;
   slides: string;
@@ -42,7 +43,7 @@ export interface Comment {
   resolution: string | null;
 }
 
-export interface TemplateInfo {
+export interface StyleInfo {
   name: string;
   label: string;
   description: string;
@@ -57,7 +58,21 @@ export interface DeckState {
   config: DeckConfig;
   slides: Array<Omit<SlideEntry, 'module'>>;
   comments: Comment[];
-  templates: TemplateInfo[];
+  styles: StyleInfo[];
+}
+
+/**
+ * A ready-made slide layout, offered in the studio's Add slide picker.
+ *
+ * Extends SlideEntry so a template can be handed straight to SlideFrame and
+ * rendered as a preview, error boundary and all.
+ */
+export interface TemplateEntry extends SlideEntry {
+  label: string;
+  description: string;
+  /** Filename stem to use when the template lands in a deck. */
+  stem: string;
+  source: 'builtin' | 'local';
 }
 
 export interface DraftComment {

@@ -1,7 +1,7 @@
 /* ─────────────────────────────────────────────────────────────────
    Shared shell. Everything the studio and the exported deck both
    need: the reset, the scaling stage, and the print rules.
-   Nothing in here styles a slide; templates own that.
+   Nothing in here styles a slide; the deck's style owns that.
    ───────────────────────────────────────────────────────────────── */
 
 :root {

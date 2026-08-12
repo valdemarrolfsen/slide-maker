@@ -1,0 +1,7 @@
+{
+  "label": "Detail panel",
+  "description": "An argument on the left, a key and value panel on the right. For proposals where the shape matters as much as the reasoning.",
+  "tags": ["columns", "reference", "proposal"],
+  "order": 120,
+  "guidance": "The panel is for facts somebody will want to quote back: scope, cost, dates, owners. Keep keys to one word. Anything that needs a sentence belongs in the left column, not in a Row."
+}

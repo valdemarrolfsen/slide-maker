@@ -1,12 +1,12 @@
 /**
  * slide-maker runtime.
  *
- * The component contract that every template styles. Slides are plain JSX, but
+ * The component contract that every style dresses. Slides are plain JSX, but
  * they compose these primitives instead of bespoke markup, which is what makes
- * a deck swappable between templates: the runtime owns structure and semantics,
- * the template owns tokens and looks.
+ * a deck swappable between styles: the runtime owns structure and semantics,
+ * the style owns tokens and looks.
  *
- * Every element carries an `sm-` prefixed class. A template restyles a deck by
+ * Every element carries an `sm-` prefixed class. A style restyles a deck by
  * redefining CSS custom properties and, where it wants to go further, by
  * overriding those classes.
  */
@@ -61,9 +61,9 @@ interface Base {
 /* ── Frame ─────────────────────────────────────────────────────── */
 
 export interface SlideProps extends Base {
-  /** Flip this slide to the template's dark palette. */
+  /** Flip this slide to the style's dark palette. */
   dark?: boolean;
-  /** Draw the template's ruled grid backdrop behind the content. */
+  /** Draw the style's ruled grid backdrop behind the content. */
   grid?: boolean;
   /** Hide the footer bar. Cover and section slides usually want this. */
   bare?: boolean;
@@ -396,7 +396,7 @@ export interface StatProps extends Base {
   value: ReactNode;
   /** What the number means. */
   label?: ReactNode;
-  /** Tint the value with the template's accent. */
+  /** Tint the value with the style's accent. */
   accent?: boolean;
   /** Type scale for the value. */
   size?: 'default' | 'big';

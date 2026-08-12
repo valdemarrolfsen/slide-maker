@@ -34,7 +34,7 @@ export function createViteConfig({ deckDir, config, mode = 'studio', outDir, bas
       __SM_MODE__: JSON.stringify(mode),
     },
     css: {
-      // Slides are rendered at a fixed pixel size, so a template's px values
+      // Slides are rendered at a fixed pixel size, so a style's px values
       // are deliberate. Nothing here should be rewritten.
       devSourcemap: true,
     },

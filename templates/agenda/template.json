@@ -1,0 +1,7 @@
+{
+  "label": "Agenda",
+  "description": "A numbered running order with timings on the right. Sets the shape of the session before the argument starts.",
+  "tags": ["structure", "opening"],
+  "order": 30,
+  "guidance": "Use it once, right after the cover, and only when the session is long enough that the room needs a map. Four or five items. Drop the badges if the meeting is not timeboxed."
+}

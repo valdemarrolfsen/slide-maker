@@ -5,14 +5,16 @@ import { packageRoot } from '../core/paths.js';
  * The files `slide-maker init` writes.
  *
  * Kept together and away from the command itself so the starter deck is easy
- * to read and change without wading through filesystem plumbing.
+ * to read and change without wading through filesystem plumbing. The deck's
+ * first slide is not here: it comes from the template library, so a deck that
+ * forks `templates/cover` starts from its own.
  */
 
-export function deckConfig({ title, template, author }) {
+export function deckConfig({ title, style, author }) {
   return {
     title,
     author,
-    template,
+    style,
     width: 1280,
     height: 720,
     slides: 'slides',
@@ -66,96 +68,8 @@ node_modules/
 .DS_Store
 `;
 
-export const SLIDES = {
-  '01-cover.tsx': `import { Cover } from 'slide-maker/runtime';
-
-export default function CoverSlide() {
-  return (
-    <Cover
-      eyebrow="Draft · replace this line"
-      title={
-        <>
-          A deck you build
-          <br />
-          by talking to Claude
-        </>
-      }
-      lede="Write slides in the terminal. Review them in the browser. Comment on anything."
-      footerLabel="slide-maker"
-      footer="Your name here"
-    />
-  );
-}
-`,
-
-  '02-how-it-works.tsx': `import { Slide, Head, Eyebrow, Title, Grid, Cell, Kicker, CardTitle, Line } from 'slide-maker/runtime';
-
-export default function HowItWorks() {
-  return (
-    <Slide grid>
-      <Head>
-        <Eyebrow>How this works</Eyebrow>
-        <Title>Three surfaces, one deck</Title>
-      </Head>
-
-      <Grid cols={3} grow>
-        <Cell pad="lg">
-          <Kicker accent>01</Kicker>
-          <CardTitle>You brief Claude</CardTitle>
-          <Line>Describe the deck in your terminal. Claude writes the slide files.</Line>
-        </Cell>
-        <Cell pad="lg">
-          <Kicker accent>02</Kicker>
-          <CardTitle>You review here</CardTitle>
-          <Line>Slides reload the moment a file is saved. No build step to wait on.</Line>
-        </Cell>
-        <Cell pad="lg">
-          <Kicker accent>03</Kicker>
-          <CardTitle>You comment back</CardTitle>
-          <Line>Select any text on a slide and leave a note. Claude reads it directly.</Line>
-        </Cell>
-      </Grid>
-    </Slide>
-  );
-}
-`,
-
-  '03-try-it.tsx': `import { Slide, Head, Eyebrow, Title, Fill, Ticks, Tick, Note } from 'slide-maker/runtime';
-
-export default function TryIt() {
-  return (
-    <Slide notes="Reminder: select the sentence below and leave a comment, to see the loop close.">
-      <Head>
-        <Eyebrow>Try it now</Eyebrow>
-        <Title>Select this sentence and tell Claude to rewrite it.</Title>
-      </Head>
-
-      <Fill>
-        <Ticks>
-          <Tick>
-            <b>Select text</b> anywhere on a slide to comment on those exact words.
-          </Tick>
-          <Tick>
-            <b>Pin a note</b> to drop a marker on a specific spot in the layout.
-          </Tick>
-          <Tick>
-            <b>Press C</b> to leave a note about the whole slide.
-          </Tick>
-        </Ticks>
-      </Fill>
-
-      <Note>
-        Delete these starter slides once you are ready. Ask Claude to swap the template and
-        the whole deck restyles, with no edits to any slide.
-      </Note>
-    </Slide>
-  );
-}
-`,
-};
-
 /** The brief Claude reads when it opens the deck. */
-export function deckClaudeMd({ title, template }) {
+export function deckClaudeMd({ title, style }) {
   return `# ${title}
 
 A slide-maker deck. Your job in this folder is to write the slides. That is the
@@ -170,17 +84,57 @@ Also not yours: the slide-maker package, its build, and anything outside this
 folder. If a slide will not render for a reason you cannot fix in a slide file,
 say so and let the user look.
 
+## Two words that mean different things
+
+A **style** is the design system the whole deck wears: colours, type, spacing.
+The deck has exactly one, set in \`deck.json\`.
+
+A **template** is a ready-made slide layout, written against the same runtime
+components you write with. Templates carry no colour of their own, so any
+template renders in any style. They are a starting point for a slide, not a
+constraint on it, and the deck can use as many or as few as suits it.
+
 ## Working loop
 
-1. Run \`deck_overview\` to see the template, the running order and any waiting comments.
-2. Write or edit slide files under \`slides/\`.
-3. Run \`render_slide\` to look at what you produced. Do this before saying a slide is done:
+1. Run \`deck_overview\` to see the style, the running order and any waiting comments.
+2. Run \`list_templates\` before you write anything. It is the fastest way to
+   decide what each slide should be.
+3. Write or edit slide files under \`slides/\`.
+4. Run \`render_slide\` to look at what you produced. Do this before saying a slide is done:
    overflowing text and broken layouts are invisible in the source.
-4. Run \`list_comments\` to read the user's feedback, act on it, then \`resolve_comment\`
+5. Run \`list_comments\` to read the user's feedback, act on it, then \`resolve_comment\`
    with a note on what you changed.
 
 If the MCP server is not connected, work from disk instead: slide sources are in
 \`slides/\`, settings in \`deck.json\`, comments in \`.slide-maker/comments.json\`.
+
+## Start from a template
+
+There is a library of ready-made slides. **Look at it before building a layout
+by hand.** \`list_templates\` gives you the whole catalogue with a note on when
+each shape is the right one, and \`read_template\` gives you the JSX to copy into
+a new file under \`slides/\` and fill with real content.
+
+Reach for it constantly, not once. Planning a deck is largely choosing which
+template each slide should be: a \`cover\`, then \`agenda\`, then a \`section\`
+divider, \`three-up\` for the pillars, \`metrics\` for the numbers, \`closing\` for
+the ask. Copying a template and replacing its content is faster than composing
+from scratch, and it lands closer to how the style expects to be used, because
+every template has been checked in all of them.
+
+Deviating is fine. A template is a starting point, and \`blank\` exists for the
+slides that do not resemble any of them. But check the library first, and say
+which template a slide came from when you report back, so the user knows what
+they are looking at.
+
+### Slides the user added
+
+The studio has an **Add slide** gallery next to the style name, which drops a
+template into \`slides/\` with its example copy still in it. A slide you did not
+write, still carrying that copy, is a slide the user has asked for by pointing
+at a shape: they picked the layout, and the words are yours to write. Replace
+the content, keep the structure, and ask what the slide is meant to say if the
+surrounding deck does not already tell you.
 
 ## Writing slides
 
@@ -189,8 +143,8 @@ the number at the start of the filename, so reordering the deck is a rename.
 Prefix a file with \`_\` to park it without deleting it.
 
 Compose from the components exported by \`slide-maker/runtime\`. Do not write raw
-HTML for layout: the template styles the runtime classes, so bespoke markup is
-what breaks a template switch.
+HTML for layout: the style targets the runtime classes, so bespoke markup is
+what breaks a style switch.
 
 \`\`\`tsx
 import { Slide, Head, Eyebrow, Title, Grid, Cell, CardTitle, Line } from 'slide-maker/runtime';
@@ -236,16 +190,16 @@ export default function Approach() {
   its spine.
 - Use \`Fill\` when a block should sit in the middle of the leftover space, and
   \`grow\` on a \`Grid\` when cells should stretch to the bottom.
-- Set \`dark\` on \`Slide\` to flip the palette for a break slide. Same template,
+- Set \`dark\` on \`Slide\` to flip the palette for a break slide. Same style,
   no extra CSS.
 - Put speaker notes in the \`notes\` prop. They never render on the slide.
 - Reach for inline \`style\` only for one-off spacing. Anything you would write
-  twice belongs in the template.
+  twice belongs in the style.
 
 ## This deck
 
-Template: \`${template}\`. Run \`list_templates\` to see the alternatives and what
-each is for, and \`set_template\` to switch. Switching restyles every slide with
-no edits to slide files.
+Style: \`${style}\`. Run \`list_styles\` to see the alternatives and what each is
+for, and \`set_style\` to switch. Switching restyles every slide with no edits to
+slide files.
 `;
 }

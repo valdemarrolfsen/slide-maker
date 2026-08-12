@@ -1,7 +1,7 @@
 import { createServer } from 'vite';
 import { resolveDeckDir } from '../core/paths.js';
 import { DeckError, readConfig, listSlides } from '../core/deck.js';
-import { resolveTemplate, listTemplates } from '../core/templates.js';
+import { resolveStyle, listStyles } from '../core/styles.js';
 import { listComments } from '../core/comments.js';
 import { color, fail, warn } from '../core/log.js';
 import { createViteConfig } from '../vite/config.js';
@@ -19,16 +19,16 @@ export async function startCommand(target, options) {
     throw err;
   }
 
-  const [slides, template, comments] = await Promise.all([
+  const [slides, style, comments] = await Promise.all([
     listSlides(deckDir, config),
-    resolveTemplate(deckDir, config.template),
+    resolveStyle(deckDir, config.style),
     listComments(deckDir, { status: 'open' }),
   ]);
 
-  if (!template) {
-    const available = (await listTemplates(deckDir)).map((t) => t.name).join(', ');
-    warn(`Template "${config.template}" not found. Slides will render unstyled.`);
-    warn(`Available templates: ${available || 'none'}`);
+  if (!style) {
+    const available = (await listStyles(deckDir)).map((s) => s.name).join(', ');
+    warn(`Style "${config.style}" not found. Slides will render unstyled.`);
+    warn(`Available styles: ${available || 'none'}`);
   }
 
   const base = createViteConfig({ deckDir, config, mode: 'studio' });
@@ -49,7 +49,7 @@ export async function startCommand(target, options) {
   console.log('');
   console.log(`  ${color.bold(config.title)}`);
   console.log(
-    `  ${color.dim('template')} ${template?.name ?? `${config.template} (missing)`}   ` +
+    `  ${color.dim('style')} ${style?.name ?? `${config.style} (missing)`}   ` +
       `${color.dim('slides')} ${slides.length}   ` +
       `${color.dim('open comments')} ${comments.length}`,
   );

@@ -8,13 +8,14 @@ export const CONFIG_FILE = 'deck.json';
  * Deck defaults. A deck.json only needs to state what differs from these.
  *
  * The config is JSON rather than JavaScript on purpose: slide-maker writes it
- * back when Claude switches template through MCP, and a round trip through a
+ * back when Claude switches style through MCP, and a round trip through a
  * JS module would lose comments and formatting.
  */
 export const defaults = {
   title: 'Untitled deck',
   author: '',
-  template: 'granite',
+  /** Name of the design system the deck wears. See src/core/styles.js. */
+  style: 'granite',
   /** Slide canvas in CSS pixels. 1280x720 is 16:9 and maps cleanly to a
    *  13.333in x 7.5in PDF page. */
   width: 1280,
@@ -47,7 +48,22 @@ export async function readConfig(deckDir) {
   } catch (err) {
     throw new DeckError(`${CONFIG_FILE} is not valid JSON: ${err.message}`);
   }
-  return { ...defaults, ...parsed };
+  return { ...defaults, ...migrate(parsed) };
+}
+
+/**
+ * Brings an older deck.json forward.
+ *
+ * `template` used to mean what `style` means now, and "template" has since been
+ * taken by the slide library. Decks on disk outlive a rename, so the old key is
+ * still read rather than leaving a deck silently unstyled.
+ */
+function migrate(parsed) {
+  if (parsed.style === undefined && typeof parsed.template === 'string') {
+    const { template, ...rest } = parsed;
+    return { ...rest, style: template };
+  }
+  return parsed;
 }
 
 /** Writes a deck configuration back to disk, preserving key order. */

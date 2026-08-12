@@ -1,0 +1,7 @@
+{
+  "label": "Slate",
+  "description": "Cool greys, soft corners and a teal accent. The conventional business deck, done carefully: structured, legible and quiet.",
+  "tags": ["light", "corporate", "dense", "reporting"],
+  "dark": false,
+  "guidance": "The safe choice for a client or board audience, and the most tolerant of dense slides. Use Grid and Rows freely, put numbers in Stat, and close a slide with Note where a caveat belongs. This is the only shipped style with rounded corners, so cards may sit on the panel background rather than needing a border."
+}

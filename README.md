@@ -14,7 +14,8 @@ cd my-deck
 pnpm dlx slide-maker start
 ```
 
-Then open Claude Code in the same directory and start briefing it.
+`init` asks which style the deck should wear. Then open Claude Code in the same
+directory and start briefing it.
 
 ---
 
@@ -69,22 +70,32 @@ Three ways to leave a comment:
 If you have not wired up MCP, **Copy for Claude** in the panel puts every open
 comment on your clipboard as a markdown brief. Paste it into the terminal.
 
-## Templates
+## Styles and templates
 
-A template is a design system, not a wrapper. Slides never state a colour or a
-font. They compose semantic components, and the template decides what those look
-like, so switching template restyles the whole deck without editing a single
-slide.
+Two different things, and the difference is the whole design.
+
+A **style** is a design system. Slides never state a colour or a font: they
+compose semantic components, and the style decides what those look like, so
+switching style restyles the whole deck without editing a single slide. A deck
+wears exactly one.
+
+A **template** is a ready-made slide. It is written against the same components
+you write with, carries no colour of its own, and therefore renders in any
+style. It is a starting point, not a constraint.
 
 ```bash
-slide-maker templates          # list them
-slide-maker use noir           # switch
+slide-maker styles             # list the design systems
+slide-maker use noir           # switch the deck to one
+slide-maker templates          # list the slide layouts
 ```
 
-While the Studio is running, you can also switch from the template picker next
-to the deck title. The deck reloads with the new design immediately.
+Both are also in the studio's top bar: a style picker next to the deck title,
+and an **Add slide** gallery next to that. The deck reloads immediately either
+way.
 
-| Template | For |
+### The styles
+
+| Style | For |
 | --- | --- |
 | `granite` | Working sessions and partner workshops. Warm neutrals, hairline rules, mono labels. |
 | `noir` | Stage talks. Dark ground, oversized headlines, one idea per slide. |
@@ -92,8 +103,59 @@ to the deck title. The deck reloads with the new design immediately.
 | `slate` | Clients and boards. Cool greys, soft corners, tolerant of dense slides. |
 | `terminal` | Engineering audiences. Monospace throughout, built around code and status tables. |
 
-Fork one by copying it into `templates/` inside your deck. A local template
-shadows a built-in of the same name.
+Fork one by copying it into `styles/` inside your deck. A local style shadows a
+built-in of the same name.
+
+### The template library
+
+| Template | The slide it makes |
+| --- | --- |
+| `blank` | A heading block and nothing else |
+| `cover` | Opening slide: occasion, title, claim, presenter |
+| `agenda` | Numbered running order with timings |
+| `section` | Divider between parts of the deck |
+| `statement` | One sentence, centred, with the caveat as a footnote |
+| `bullets` | Three points, each leading with the claim in bold |
+| `three-up` | Three numbered cells on the hairline grid |
+| `comparison` | Before and after, side by side |
+| `metrics` | Three figures with captions saying what they mean |
+| `timeline` | Four phases running left to right |
+| `checklist` | Dense status table with a summary strip |
+| `spec` | An argument on the left, a facts panel on the right |
+| `quote` | A pull quote with an attribution |
+| `code` | A code block with commentary and one highlighted line |
+| `closing` | The decision being asked for, on the inverted palette |
+
+Add one to a deck from the studio. The **Add slide** button next to the style
+name opens a gallery of every layout, each previewed as a live thumbnail in
+your deck's own style, so you pick a shape by looking at it rather than by
+guessing from a name. Clicking one appends it as a new slide and takes you
+there. Then tell Claude what it should actually say: picking the shape yourself
+and leaving the words to Claude is usually faster than describing a layout in
+prose.
+
+Claude reaches for the same library on its own. The deck's `CLAUDE.md` and the
+MCP server both point at it, and `read_template` hands over the JSX, so "a slide
+with three pillars" starts from `three-up` rather than from nothing.
+
+Fork a template by copying it into `templates/` inside your deck. A local
+template shadows a built-in of the same name, so a house cover slide is a
+`templates/cover/` away.
+
+## Starting a deck
+
+```bash
+slide-maker init my-deck
+```
+
+It asks one question: which style. The deck starts with a cover slide, and
+which template each slide after that wants is a question for while you are
+writing it, not before.
+
+```bash
+slide-maker init my-deck --style noir     # skip the prompt
+slide-maker init my-deck --yes            # take the default
+```
 
 ## Writing slides
 
@@ -143,7 +205,7 @@ point: content that does not fit is content to cut. The whole frame is scaled
 with a CSS transform, so the studio, the exported HTML and the PDF are identical
 to the pixel.
 
-Set `dark` on any `Slide` to flip it to the template's dark palette. Put speaker
+Set `dark` on any `Slide` to flip it to the style's dark palette. Put speaker
 notes in the `notes` prop; they never render on the slide.
 
 ### Images
@@ -192,11 +254,12 @@ The server exposes:
 
 | Tool | Purpose |
 | --- | --- |
-| `deck_overview` | Template, running order, open comment count, what you are looking at |
+| `deck_overview` | Style, running order, open comment count, what you are looking at |
 | `read_slide` | Source of one slide |
 | `list_comments` | Your feedback, with file paths and quoted text |
 | `resolve_comment` | Clear a note once it is addressed |
-| `list_templates` / `set_template` | Pick and switch the design system |
+| `list_styles` / `set_style` | Pick and switch the design system |
+| `list_templates` / `read_template` | Find a ready-made layout and read its JSX to copy |
 | `render_slide` | Render to PNG, so Claude can check its own work |
 | `deck_files` | Where things live, and what to name the next slide |
 
@@ -220,8 +283,9 @@ slide-maker init [dir]         scaffold a deck and wire up Claude Code
 slide-maker start [dir]        open the studio
 slide-maker build [dir]        export a static site
 slide-maker export [dir]       render to PDF or PNG
-slide-maker templates          list templates
-slide-maker use <template>     switch template
+slide-maker styles             list the design systems
+slide-maker use <style>        switch style
+slide-maker templates          list the slide layouts
 slide-maker comments           read feedback from the terminal
 slide-maker comments resolve <id>
 slide-maker mcp [dir]          run the MCP server over stdio
@@ -231,12 +295,13 @@ slide-maker mcp [dir]          run the MCP server over stdio
 
 ```
 my-deck/
-  deck.json            title, template, canvas size
+  deck.json            title, style, canvas size
   slides/
     01-cover.tsx       order comes from the filename
     02-agenda.tsx
   assets/              served from the root
-  templates/           optional local templates
+  styles/              optional local design systems
+  templates/           optional local slide layouts
   CLAUDE.md            how Claude should work with this deck
   .mcp.json            MCP registration
   .slide-maker/        comments and view state, gitignored
@@ -260,8 +325,9 @@ export and for `render_slide`.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). New templates are especially welcome:
-a template is a `template.json` and a `theme.css`, and the runtime does the rest.
+See [CONTRIBUTING.md](CONTRIBUTING.md). New styles and templates are especially
+welcome: a style is a `style.json` and a `style.css`, a template is a
+`template.json` and a `slide.tsx`, and the runtime does the rest.
 
 ## License
 

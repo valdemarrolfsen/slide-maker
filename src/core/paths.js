@@ -4,7 +4,10 @@ import path from 'node:path';
 /** Absolute path to the installed slide-maker package root. */
 export const packageRoot = path.resolve(fileURLToPath(new URL('../..', import.meta.url)));
 
-/** Directory holding the built-in templates. */
+/** Directory holding the built-in styles, one design system per subdirectory. */
+export const builtinStylesDir = path.join(packageRoot, 'styles');
+
+/** Directory holding the built-in template slides. */
 export const builtinTemplatesDir = path.join(packageRoot, 'templates');
 
 /** The runtime module, aliased into every deck so slides resolve it wherever

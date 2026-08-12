@@ -2,11 +2,11 @@
    slide-maker runtime stylesheet.
 
    Structure only. Every visual decision reads from a custom property,
-   so a template can restyle a whole deck by redefining tokens on
+   so a style can restyle a whole deck by redefining tokens on
    `.sm-slide` without touching a single rule below.
 
-   Templates that want to go further may override any `.sm-` class;
-   this file is loaded first so template rules win at equal specificity.
+   Styles that want to go further may override any `.sm-` class;
+   this file is loaded first so style rules win at equal specificity.
    ───────────────────────────────────────────────────────────────── */
 
 .sm-slide {
@@ -41,7 +41,7 @@
   --sm-pad-top: 56px;
   --sm-pad-bottom: 76px;
   /* Reserved height for the eyebrow-plus-heading block, and the gap below it.
-     Tokenised because a template with a larger type scale needs more room
+     Tokenised because a style with a larger type scale needs more room
      before headings start crowding the content underneath. */
   --sm-head-min: 84px;
   --sm-head-min-tall: 120px;

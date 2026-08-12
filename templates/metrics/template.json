@@ -1,0 +1,7 @@
+{
+  "label": "Metrics",
+  "description": "Three figures across the hairline grid, each with a caption saying what the number means.",
+  "tags": ["data", "grid", "numbers"],
+  "order": 90,
+  "guidance": "A number without a period and a baseline is decoration. Put the comparison in the label. Accent at most one figure, which should be the one the slide is actually about, and say where the data came from in the Note."
+}

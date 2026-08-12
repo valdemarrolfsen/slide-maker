@@ -1,26 +1,37 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { config, slides } from 'virtual:slide-maker/deck';
-import { template } from 'virtual:slide-maker/theme';
+import { style } from 'virtual:slide-maker/style';
 import * as api from './api';
 import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
 import { ChevronLeft, ChevronRight, Close, Deck, Download, Message, Pin, Play } from './Icons';
+import { TemplateMenu } from './TemplateMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
 import { captureSelection, capturePoint, clearSelection } from './selection';
-import type { Comment, DraftComment, TemplateInfo } from './types';
+import type { Comment, DraftComment, StyleInfo } from './types';
 
-/** Ignores keyboard shortcuts while the user is typing. */
-function isTyping(target: EventTarget | null): boolean {
+/** Which slide to show once the reload that follows an edit has happened. */
+const LANDING_KEY = 'slide-maker:landing';
+
+/**
+ * True when the focused element is handling its own keys.
+ *
+ * Text inputs are the obvious case. An open menu is the other one: its arrow
+ * keys move a highlight, and without this they would page the deck behind it
+ * at the same time.
+ */
+function ownsKeyboard(target: EventTarget | null): boolean {
   const el = target as HTMLElement | null;
   if (!el) return false;
   return (
     el.tagName === 'TEXTAREA' ||
     el.tagName === 'INPUT' ||
     el.tagName === 'SELECT' ||
-    el.isContentEditable === true
+    el.isContentEditable === true ||
+    Boolean(el.closest?.('[role="menu"]'))
   );
 }
 
@@ -33,9 +44,11 @@ export function Studio() {
   const [presenting, setPresenting] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
   const [scale, setScale] = useState(1);
-  const [templates, setTemplates] = useState<TemplateInfo[]>([]);
-  const [templatePending, setTemplatePending] = useState(false);
-  const [templateError, setTemplateError] = useState<string | null>(null);
+  const [styles, setStyles] = useState<StyleInfo[]>([]);
+  const [stylePending, setStylePending] = useState(false);
+  const [styleError, setStyleError] = useState<string | null>(null);
+  const [addPending, setAddPending] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
@@ -53,9 +66,20 @@ export function Studio() {
   useEffect(() => {
     api.fetchState().then((state) => {
       setComments(state.comments);
-      setTemplates(state.templates);
+      setStyles(state.styles);
     }).catch(() => {});
     return api.onCommentsChanged(setComments);
+  }, []);
+
+  // Adding a slide writes a file, which reloads the page. Land on the new
+  // slide rather than back at the top of the deck, since looking at what you
+  // just added is the whole reason for adding it.
+  useEffect(() => {
+    const pending = sessionStorage.getItem(LANDING_KEY);
+    if (!pending) return;
+    sessionStorage.removeItem(LANDING_KEY);
+    const index = slides.findIndex((s) => s.file === pending);
+    if (index >= 0) setActiveIndex(index);
   }, []);
 
   useEffect(() => {
@@ -74,16 +98,30 @@ export function Studio() {
     setComments(next);
   }, []);
 
-  const changeTemplate = async (name: string) => {
-    if (name === config.template) return;
-    setTemplatePending(true);
-    setTemplateError(null);
+  const changeStyle = async (name: string) => {
+    if (name === config.style) return;
+    setStylePending(true);
+    setStyleError(null);
     try {
-      await api.setTemplate(name);
-      // Writing deck.json triggers a full reload, which imports the new theme.
+      await api.setStyle(name);
+      // Writing deck.json triggers a full reload, which imports the new style.
     } catch (err) {
-      setTemplatePending(false);
-      setTemplateError(err instanceof Error ? err.message : 'Could not switch template');
+      setStylePending(false);
+      setStyleError(err instanceof Error ? err.message : 'Could not switch style');
+    }
+  };
+
+  /** Appends a slide built from a template, for the user to brief Claude on. */
+  const addSlide = async (template: string) => {
+    setAddPending(true);
+    setAddError(null);
+    try {
+      const { file } = await api.addSlide(template);
+      sessionStorage.setItem(LANDING_KEY, file);
+      // The file watcher reloads the viewer, so there is nothing to do here.
+    } catch (err) {
+      setAddPending(false);
+      setAddError(err instanceof Error ? err.message : 'Could not add the slide');
     }
   };
 
@@ -126,7 +164,7 @@ export function Studio() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (isTyping(e.target)) return;
+      if (ownsKeyboard(e.target)) return;
       switch (e.key) {
         case 'ArrowRight':
         case 'PageDown':
@@ -178,7 +216,7 @@ export function Studio() {
   useEffect(() => {
     if (presenting) return;
     const onMouseUp = (e: MouseEvent) => {
-      if (isTyping(e.target)) return;
+      if (ownsKeyboard(e.target)) return;
       // Let the browser finish updating the selection before reading it.
       requestAnimationFrame(() => {
         const captured = captureSelection(frameRef.current, config.width, config.height);
@@ -263,25 +301,31 @@ export function Studio() {
           <span className="sm-crumb" aria-hidden="true">
             /
           </span>
-          <label className="sm-template-picker">
-            <span className="sm-visually-hidden">Template</span>
+          <label className="sm-style-picker">
+            <span className="sm-visually-hidden">Style</span>
             <select
-              className={`sm-template-select${templateError ? ' sm-template-select-error' : ''}`}
-              value={config.template}
-              disabled={templatePending || templates.length === 0}
-              onChange={(event) => changeTemplate(event.target.value)}
-              title={templateError || 'Swap template'}
-              aria-label="Template"
-              aria-invalid={Boolean(templateError)}
+              className={`sm-style-select${styleError ? ' sm-style-select-error' : ''}`}
+              value={config.style}
+              disabled={stylePending || styles.length === 0}
+              onChange={(event) => changeStyle(event.target.value)}
+              title={styleError || 'Swap style'}
+              aria-label="Style"
+              aria-invalid={Boolean(styleError)}
             >
-              {!template && <option value={config.template}>{config.template} (missing)</option>}
-              {templates.map((item) => (
+              {!style && <option value={config.style}>{config.style} (missing)</option>}
+              {styles.map((item) => (
                 <option key={item.name} value={item.name}>
                   {item.label}{item.source === 'local' ? ' (local)' : ''}
                 </option>
               ))}
             </select>
           </label>
+          <TemplateMenu
+            config={config}
+            pending={addPending}
+            error={addError}
+            onPick={addSlide}
+          />
         </div>
         <div className="sm-topbar-right">
           <span className={`sm-status${openCount ? ' sm-status-live' : ''}`}>

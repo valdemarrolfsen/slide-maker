@@ -3,7 +3,7 @@
 ## Getting set up
 
 ```bash
-git clone https://github.com/heisthq/slide-maker
+git clone https://github.com/valdemarrolfsen/slide-maker
 cd slide-maker
 npm install
 npx playwright install chromium   # only needed for PDF/PNG export work
@@ -17,6 +17,39 @@ There is no build step for development. The Node side is plain ESM JavaScript
 and the viewer is TypeScript compiled by Vite on demand, so edits take effect on
 save. `npm run types` generates the published type declarations and runs
 automatically on `npm pack`.
+
+## Publishing a release
+
+The `Publish to npm` GitHub Actions workflow publishes a GitHub Release whose
+tag is exactly `v` followed by the version in `package.json`. For example, to
+publish version `0.2.0`:
+
+1. Run `npm version 0.2.0` and push the commit and `v0.2.0` tag.
+2. Create and publish a GitHub Release from the `v0.2.0` tag.
+3. Confirm that the `Publish to npm` workflow succeeds.
+
+The workflow checks the tag and package versions match, installs from
+`package-lock.json`, typechecks, verifies the package contents, and publishes
+the public package with provenance.
+
+### One-time npm setup
+
+The package must exist on npm before trusted publishing can be configured. For
+the first release only, create an npm granular access token with read/write
+package permissions and bypass 2FA enabled, then add it to the GitHub repository
+as an Actions secret named `NPM_TOKEN`. Publish the first GitHub Release, then
+configure the package's trusted publisher on npmjs.com with:
+
+- Provider: GitHub Actions
+- Organization or user: `valdemarrolfsen`
+- Repository: `slide-maker`
+- Workflow filename: `publish.yml`
+- Allowed action: `npm publish`
+
+Do not set an environment name. After a successful OIDC-based release, delete
+the `NPM_TOKEN` repository secret and set npm publishing access to require 2FA
+and disallow tokens. Subsequent releases authenticate with short-lived GitHub
+OIDC credentials and need no npm token.
 
 ## Layout
 

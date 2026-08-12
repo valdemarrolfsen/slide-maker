@@ -5,6 +5,7 @@ import * as api from './api';
 import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
+import { ChevronLeft, ChevronRight, Close, Deck, Message, Pin, Play } from './Icons';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
@@ -30,6 +31,7 @@ export function Studio() {
   const [pinMode, setPinMode] = useState(false);
   const [presenting, setPresenting] = useState(false);
   const [notes, setNotes] = useState<string | null>(null);
+  const [scale, setScale] = useState(1);
   const frameRef = useRef<HTMLDivElement>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
@@ -223,8 +225,14 @@ export function Studio() {
     <div className={`sm-studio${presenting ? ' sm-presenting' : ''}`}>
       <header className="sm-topbar">
         <div className="sm-topbar-left">
+          <span className="sm-mark">
+            <Deck />
+          </span>
           <span className="sm-deck-title">{config.title}</span>
-          <span className="sm-chip" title="Active template">
+          <span className="sm-crumb" aria-hidden="true">
+            /
+          </span>
+          <span className="sm-tag" title="Active template">
             {template ?? `${config.template} (missing)`}
           </span>
         </div>
@@ -232,18 +240,27 @@ export function Studio() {
           <span className={`sm-status${openCount ? ' sm-status-live' : ''}`}>
             {openCount ? `${openCount} open for Claude` : 'No open comments'}
           </span>
+          <span className="sm-divider" aria-hidden="true" />
           <button
             type="button"
             className={`sm-btn${pinMode ? ' sm-btn-primary' : ''}`}
             onClick={() => setPinMode((v) => !v)}
             title="Drop a comment on a specific spot"
           >
+            <Pin />
             {pinMode ? 'Click the slide' : 'Pin a note'}
           </button>
-          <button type="button" className="sm-btn" onClick={commentOnSlide}>
-            Comment on slide
+          <button type="button" className="sm-btn" onClick={commentOnSlide} title="Comment (C)">
+            <Message />
+            Comment
           </button>
-          <button type="button" className="sm-btn" onClick={() => setPresenting(true)}>
+          <button
+            type="button"
+            className="sm-btn"
+            onClick={() => setPresenting(true)}
+            title="Present (P)"
+          >
+            <Play />
             Present
           </button>
         </div>
@@ -269,8 +286,9 @@ export function Studio() {
             <Stage
               width={config.width}
               height={config.height}
-              padding={presenting ? 0 : 40}
+              padding={presenting ? 0 : 36}
               frameRef={frameRef}
+              onScaleChange={setScale}
               overlay={
                 <>
                   <Pins
@@ -290,18 +308,35 @@ export function Studio() {
 
           <footer className="sm-stagebar">
             <div className="sm-nav">
-              <button type="button" className="sm-btn sm-btn-icon" onClick={() => go(activeIndex - 1)}>
-                ←
+              <button
+                type="button"
+                className="sm-btn sm-btn-icon"
+                onClick={() => go(activeIndex - 1)}
+                disabled={activeIndex === 0}
+                title="Previous slide (←)"
+                aria-label="Previous slide"
+              >
+                <ChevronLeft />
               </button>
-              <span className="sm-counter">
-                {String(activeIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
-              </span>
-              <button type="button" className="sm-btn sm-btn-icon" onClick={() => go(activeIndex + 1)}>
-                →
+              <button
+                type="button"
+                className="sm-btn sm-btn-icon"
+                onClick={() => go(activeIndex + 1)}
+                disabled={activeIndex === slides.length - 1}
+                title="Next slide (→)"
+                aria-label="Next slide"
+              >
+                <ChevronRight />
               </button>
             </div>
+            <span className="sm-counter">
+              {String(activeIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
+            </span>
             <span className="sm-stagebar-file">{active?.file}</span>
             <span className="sm-stagebar-notes">{notes || ''}</span>
+            <span className="sm-zoom" title="Slide scale">
+              {Math.round(scale * 100)}%
+            </span>
           </footer>
         </main>
 
@@ -319,6 +354,7 @@ export function Studio() {
 
       {presenting && (
         <button type="button" className="sm-exit-present" onClick={() => setPresenting(false)}>
+          <Close />
           Exit
         </button>
       )}

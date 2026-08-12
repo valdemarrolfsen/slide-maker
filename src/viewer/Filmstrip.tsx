@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react';
 import { SlideFrame } from './SlideFrame';
 import type { Comment, DeckConfig, SlideEntry } from './types';
 
-const THUMB_WIDTH = 168;
+const THUMB_WIDTH = 176;
 
 interface FilmstripProps {
   slides: SlideEntry[];

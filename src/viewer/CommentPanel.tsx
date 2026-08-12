@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Check, Circle, Copy, Trash } from './Icons';
 import type { Comment, SlideEntry } from './types';
 
 type Filter = 'open' | 'resolved' | 'all';
@@ -111,6 +112,7 @@ export function CommentPanel({
 
       <div className="sm-panel-actions">
         <button type="button" className="sm-btn sm-btn-ghost" onClick={copyForClaude}>
+          {copied ? <Check /> : <Copy />}
           {copied ? 'Copied' : 'Copy for Claude'}
         </button>
         {counts.resolved > 0 && (
@@ -147,7 +149,10 @@ export function CommentPanel({
           >
             <div className="sm-comment-meta">
               <span className="sm-comment-slide">
-                {String(comment.slideNumber ?? 0).padStart(2, '0')} · {comment.slideFile}
+                <span className="sm-comment-no">
+                  {String(comment.slideNumber ?? 0).padStart(2, '0')}
+                </span>
+                {comment.slideFile}
               </span>
               <span className="sm-comment-time">{timeAgo(comment.createdAt)}</span>
             </div>
@@ -170,6 +175,7 @@ export function CommentPanel({
                     onResolve(comment.id);
                   }}
                 >
+                  <Check />
                   Resolve
                 </button>
               ) : (
@@ -181,18 +187,21 @@ export function CommentPanel({
                     onReopen(comment.id);
                   }}
                 >
+                  <Circle />
                   Reopen
                 </button>
               )}
               <button
                 type="button"
-                className="sm-btn sm-btn-ghost sm-btn-danger"
+                className="sm-btn sm-btn-ghost sm-btn-danger sm-btn-icon"
                 onClick={(e) => {
                   e.stopPropagation();
                   onDelete(comment.id);
                 }}
+                title="Delete note"
+                aria-label="Delete note"
               >
-                Delete
+                <Trash />
               </button>
             </div>
           </article>

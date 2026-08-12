@@ -2,6 +2,11 @@
    Studio chrome. Deliberately quiet and dark so it reads as a frame
    around the deck rather than competing with whatever template the
    slides are wearing.
+
+   The shape of it: a canvas the colour of the window, with the stage
+   and the comment list floating on it as inset panes. Depth is a step
+   on the surface ladder plus a hairline, never a drop shadow, except
+   on things that genuinely float above the page.
    ───────────────────────────────────────────────────────────────── */
 
 .sm-studio {
@@ -9,110 +14,177 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  background: var(--ui-bg);
+}
+
+/* Selecting slide text is how a comment starts, so the highlight is the
+   accent rather than the browser default. */
+.sm-studio ::selection {
+  background: rgba(94, 106, 210, 0.35);
+}
+
+/* One focus treatment for everything, drawn outside the element so it never
+   nudges a layout. */
+.sm-studio :focus-visible {
+  outline: 2px solid var(--ui-focus);
+  outline-offset: 1px;
+  border-radius: var(--ui-r-sm);
 }
 
 /* ── Top bar ───────────────────────────────────────────────────── */
 
 .sm-topbar {
   flex: 0 0 auto;
-  height: 48px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding: 0 16px;
-  border-bottom: 1px solid var(--ui-border);
-  background: var(--ui-bg-2);
+  padding: 0 10px 0 12px;
 }
 .sm-topbar-left,
 .sm-topbar-right {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   min-width: 0;
+}
+.sm-mark {
+  display: flex;
+  color: var(--ui-muted);
 }
 .sm-deck-title {
   font-size: 13px;
   font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--ui-fg);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.sm-chip {
-  padding: 3px 8px;
-  border: 1px solid var(--ui-border-2);
-  border-radius: 3px;
-  font-family: var(--ui-mono);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+/* Reads as a path: deck, then the template it is wearing. */
+.sm-crumb {
+  color: var(--ui-border-2);
+  user-select: none;
+}
+/* Named sm-tag, not sm-badge: the runtime owns .sm-badge for slide content and
+   the two stylesheets share a page. */
+.sm-tag {
+  padding: 2px 8px;
+  border: 1px solid var(--ui-border);
+  border-radius: 999px;
+  background: var(--ui-panel);
+  font-size: 11px;
   color: var(--ui-muted);
   white-space: nowrap;
 }
 .sm-status {
-  font-family: var(--ui-mono);
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  color: var(--ui-muted-2);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding-right: 4px;
+  font-size: 12px;
+  color: var(--ui-muted);
   white-space: nowrap;
 }
+.sm-status::before {
+  content: "";
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ui-muted-2);
+}
 .sm-status-live {
-  color: var(--ui-accent);
+  color: var(--ui-fg-2);
+}
+.sm-status-live::before {
+  background: var(--ui-accent);
+  box-shadow: 0 0 0 3px rgba(130, 143, 255, 0.16);
+}
+.sm-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--ui-border);
 }
 
 /* ── Buttons ───────────────────────────────────────────────────── */
 
 .sm-btn {
   appearance: none;
-  border: 1px solid var(--ui-border-2);
-  border-radius: 3px;
-  padding: 5px 10px;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r);
+  background: var(--ui-panel);
   color: var(--ui-fg-2);
   font-family: inherit;
   font-size: 12px;
-  line-height: 1.4;
-  cursor: pointer;
+  font-weight: 500;
+  line-height: 1;
   white-space: nowrap;
-  transition: background 90ms ease, border-color 90ms ease, color 90ms ease;
+  cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    border-color var(--ui-fast) var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
+}
+.sm-btn svg {
+  flex: 0 0 auto;
+  color: var(--ui-muted);
+  transition: color var(--ui-fast) var(--ui-ease);
 }
 .sm-btn:hover:not(:disabled) {
-  border-color: var(--ui-muted-2);
+  background: var(--ui-panel-2);
+  border-color: var(--ui-border-2);
   color: var(--ui-fg);
-  background: rgba(255, 255, 255, 0.04);
+}
+.sm-btn:hover:not(:disabled) svg {
+  color: var(--ui-fg-2);
 }
 .sm-btn:disabled {
   opacity: 0.4;
   cursor: default;
 }
-.sm-btn-primary {
+.sm-btn-primary,
+.sm-btn-primary svg {
   border-color: var(--ui-accent-2);
   background: var(--ui-accent-2);
   color: #fff;
 }
-.sm-btn-primary:hover:not(:disabled) {
+.sm-btn-primary:hover:not(:disabled),
+.sm-btn-primary:hover:not(:disabled) svg {
   background: var(--ui-accent);
   border-color: var(--ui-accent);
-  color: #10131a;
+  color: #fff;
 }
 .sm-btn-ghost {
+  height: 26px;
+  padding: 0 8px;
   border-color: transparent;
-  padding: 4px 8px;
+  background: transparent;
   color: var(--ui-muted);
-  font-size: 11px;
+  font-weight: 400;
 }
 .sm-btn-ghost:hover:not(:disabled) {
-  border-color: var(--ui-border-2);
+  border-color: transparent;
+  background: var(--ui-hover);
+  color: var(--ui-fg);
 }
-.sm-btn-danger:hover:not(:disabled) {
+.sm-btn-danger:hover:not(:disabled),
+.sm-btn-danger:hover:not(:disabled) svg {
+  background: rgba(235, 87, 87, 0.12);
   color: var(--ui-danger);
 }
 .sm-btn-icon {
+  width: 28px;
+  padding: 0;
+}
+.sm-btn-ghost.sm-btn-icon {
   width: 26px;
-  padding: 4px 0;
-  text-align: center;
-  font-size: 13px;
 }
 
 /* ── Body ──────────────────────────────────────────────────────── */
@@ -121,14 +193,25 @@
   flex: 1 1 auto;
   min-height: 0;
   display: grid;
-  grid-template-columns: 200px minmax(0, 1fr) 320px;
+  grid-template-columns: 224px minmax(0, 1fr) 320px;
+  gap: 8px;
+  padding: 0 8px 8px;
+}
+
+/* The two panes. Lifted one rung off the canvas and rounded, so the window
+   frame reads as chrome and the panes read as content. */
+.sm-main,
+.sm-panel {
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-lg);
+  background: var(--ui-bg-2);
+  overflow: hidden;
 }
 
 .sm-main {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  background: var(--ui-bg);
 }
 
 .sm-stage-host {
@@ -148,47 +231,60 @@
 
 .sm-filmstrip {
   overflow-y: auto;
-  padding: 12px;
+  overscroll-behavior: contain;
+  padding: 0 4px 8px 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  border-right: 1px solid var(--ui-border);
-  background: var(--ui-bg-2);
+  gap: 2px;
 }
 
 .sm-thumb {
   position: relative;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 8px;
-  padding: 0;
+  padding: 6px;
   border: none;
+  border-radius: var(--ui-r-md);
   background: none;
   cursor: pointer;
   text-align: left;
+  transition: background var(--ui-fast) var(--ui-ease);
+}
+.sm-thumb:hover {
+  background: var(--ui-hover);
+}
+.sm-thumb-on {
+  background: var(--ui-hover-2);
 }
 .sm-thumb-no {
-  padding-top: 2px;
+  flex: 0 0 16px;
   font-family: var(--ui-mono);
   font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
   color: var(--ui-muted-2);
+  transition: color var(--ui-fast) var(--ui-ease);
 }
 .sm-thumb-box {
   position: relative;
   display: block;
   overflow: hidden;
+  border-radius: var(--ui-r-sm);
   background: #fff;
-  box-shadow: 0 0 0 1px var(--ui-border);
-  transition: box-shadow 90ms ease;
+  box-shadow: 0 0 0 1px var(--ui-border-2);
+  transition: box-shadow var(--ui-fast) var(--ui-ease);
 }
 .sm-thumb:hover .sm-thumb-box {
   box-shadow: 0 0 0 1px var(--ui-muted-2);
 }
 .sm-thumb-on .sm-thumb-box {
-  box-shadow: 0 0 0 2px var(--ui-accent);
+  box-shadow:
+    0 0 0 1px var(--ui-accent-2),
+    0 0 0 3px rgba(94, 106, 210, 0.22);
 }
 .sm-thumb-on .sm-thumb-no {
-  color: var(--ui-accent);
+  color: var(--ui-fg-2);
 }
 .sm-thumb-frame {
   position: absolute;
@@ -198,17 +294,18 @@
 }
 .sm-thumb-badge {
   position: absolute;
-  top: -5px;
-  right: -5px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 4px;
-  border-radius: 8px;
+  top: 1px;
+  right: 1px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 5px;
+  border: 2px solid var(--ui-bg);
+  border-radius: 999px;
   background: var(--ui-accent-2);
   color: #fff;
-  font-family: var(--ui-mono);
   font-size: 10px;
-  line-height: 16px;
+  font-weight: 600;
+  line-height: 13px;
   text-align: center;
 }
 
@@ -216,60 +313,93 @@
 
 .sm-stagebar {
   flex: 0 0 auto;
-  height: 40px;
-  display: grid;
-  grid-template-columns: auto auto 1fr;
-  align-items: center;
-  gap: 16px;
-  padding: 0 16px;
-  border-top: 1px solid var(--ui-border);
-  background: var(--ui-bg-2);
-}
-.sm-nav {
+  height: 42px;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
+  padding: 0 10px;
+  border-top: 1px solid var(--ui-border);
+}
+/* Paging reads as one control, so the two arrows share a shell. */
+.sm-nav {
+  display: flex;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r);
+  background: var(--ui-panel);
+  overflow: hidden;
+}
+.sm-nav .sm-btn {
+  height: 26px;
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+.sm-nav .sm-btn + .sm-btn {
+  border-left: 1px solid var(--ui-border);
 }
 .sm-counter {
   font-family: var(--ui-mono);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
   color: var(--ui-fg-2);
 }
 .sm-stagebar-file {
   font-family: var(--ui-mono);
   font-size: 11px;
   color: var(--ui-muted-2);
+  white-space: nowrap;
 }
 .sm-stagebar-notes {
-  font-size: 11px;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 11.5px;
   color: var(--ui-muted);
+  text-align: right;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  justify-self: end;
-  max-width: 100%;
+}
+.sm-zoom {
+  flex: 0 0 auto;
+  padding: 2px 6px;
+  border-radius: var(--ui-r-sm);
+  background: var(--ui-hover);
+  font-family: var(--ui-mono);
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-muted-2);
 }
 
 /* ── Pins ──────────────────────────────────────────────────────── */
 
 .sm-pin {
   position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 22px;
   height: 22px;
   margin: -11px 0 0 -11px;
-  border: 1px solid var(--ui-accent);
-  border-radius: 11px 11px 11px 2px;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  /* Round, with one square corner pointing at what the note is about. */
+  border-radius: 999px 999px 999px 3px;
   background: var(--ui-accent-2);
   color: #fff;
-  font-family: var(--ui-mono);
+  font-family: inherit;
   font-size: 10px;
+  font-weight: 600;
   line-height: 1;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+  /* Tight, because a pin sits on a bright slide where a wide shadow smudges. */
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.32);
+  transition: background var(--ui-fast) var(--ui-ease);
+}
+.sm-pin:hover {
+  background: var(--ui-accent);
 }
 .sm-pin-resolved {
-  background: var(--ui-panel);
+  background: var(--ui-panel-2);
   border-color: var(--ui-border-2);
   color: var(--ui-muted);
 }
@@ -282,19 +412,25 @@
 
 .sm-composer {
   position: absolute;
-  width: 280px;
+  width: 288px;
   padding: 10px;
   border: 1px solid var(--ui-border-2);
-  border-radius: 4px;
+  border-radius: var(--ui-r-lg);
   background: var(--ui-panel);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+  /* Its own shadow rather than the shared one: this floats over a bright
+     slide, where the wider drop turns into a smear. */
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 10px 28px rgba(0, 0, 0, 0.4);
   z-index: 5;
 }
 .sm-composer-quote {
   margin-bottom: 8px;
-  padding-left: 8px;
-  border-left: 2px solid var(--ui-accent);
-  font-size: 11px;
+  padding: 5px 8px;
+  border-left: 2px solid var(--ui-accent-2);
+  border-radius: 0 var(--ui-r-sm) var(--ui-r-sm) 0;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 11.5px;
   line-height: 1.45;
   color: var(--ui-muted);
   /* A long selection should hint at its length, not fill the popover. */
@@ -304,20 +440,28 @@
   overflow: hidden;
 }
 .sm-composer-input {
+  display: block;
   width: 100%;
-  padding: 8px;
+  padding: 8px 10px;
   border: 1px solid var(--ui-border);
-  border-radius: 3px;
-  background: var(--ui-bg);
+  border-radius: var(--ui-r-md);
+  background: var(--ui-bg-2);
   color: var(--ui-fg);
   font-family: inherit;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.5;
   resize: vertical;
+  transition:
+    border-color var(--ui-fast) var(--ui-ease),
+    box-shadow var(--ui-fast) var(--ui-ease);
+}
+.sm-composer-input::placeholder {
+  color: var(--ui-muted-2);
 }
 .sm-composer-input:focus {
   outline: none;
   border-color: var(--ui-accent-2);
+  box-shadow: 0 0 0 3px rgba(94, 106, 210, 0.2);
 }
 .sm-composer-actions {
   display: flex;
@@ -329,7 +473,7 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 10px;
+  font-size: 11px;
   color: var(--ui-muted-2);
 }
 .sm-composer-buttons {
@@ -343,16 +487,22 @@
   display: flex;
   flex-direction: column;
   min-height: 0;
-  border-left: 1px solid var(--ui-border);
-  background: var(--ui-bg-2);
 }
 .sm-panel-head {
   flex: 0 0 auto;
-  padding: 10px 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 8px 0;
 }
 .sm-tabs {
+  flex: 1 1 auto;
   display: flex;
-  gap: 4px;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-md);
+  background: var(--ui-bg);
 }
 .sm-tab {
   flex: 1 1 0;
@@ -360,26 +510,31 @@
   align-items: center;
   justify-content: center;
   gap: 5px;
-  padding: 5px 6px;
-  border: 1px solid transparent;
-  border-radius: 3px;
+  height: 24px;
+  padding: 0 6px;
+  border: none;
+  border-radius: var(--ui-r-sm);
   background: none;
   color: var(--ui-muted);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 11.5px;
+  font-weight: 500;
   cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
 }
 .sm-tab:hover {
   color: var(--ui-fg-2);
 }
 .sm-tab-on {
-  border-color: var(--ui-border-2);
-  background: var(--ui-panel);
+  background: var(--ui-panel-2);
   color: var(--ui-fg);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 .sm-tab-count {
-  font-family: var(--ui-mono);
   font-size: 10px;
+  font-variant-numeric: tabular-nums;
   color: var(--ui-muted-2);
 }
 .sm-tab-on .sm-tab-count {
@@ -389,14 +544,15 @@
 .sm-panel-actions {
   flex: 0 0 auto;
   display: flex;
-  gap: 4px;
-  padding: 8px 12px;
+  gap: 2px;
+  padding: 8px;
   border-bottom: 1px solid var(--ui-border);
 }
 
 .sm-panel-list {
   flex: 1 1 auto;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px;
   display: flex;
   flex-direction: column;
@@ -404,42 +560,63 @@
 }
 
 .sm-comment {
-  padding: 10px;
+  padding: 9px 10px 8px;
   border: 1px solid var(--ui-border);
-  border-radius: 4px;
+  border-radius: var(--ui-r-md);
   background: var(--ui-panel);
   cursor: pointer;
+  transition:
+    background var(--ui-fast) var(--ui-ease),
+    border-color var(--ui-fast) var(--ui-ease),
+    box-shadow var(--ui-fast) var(--ui-ease);
 }
 .sm-comment:hover {
+  background: var(--ui-panel-2);
   border-color: var(--ui-border-2);
 }
 .sm-comment-active {
-  border-color: var(--ui-accent);
+  border-color: var(--ui-accent-2);
+  box-shadow: 0 0 0 1px var(--ui-accent-2);
 }
 .sm-comment-resolved {
   opacity: 0.55;
 }
 .sm-comment-meta {
   display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
-  font-family: var(--ui-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--ui-muted-2);
 }
 .sm-comment-slide {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-family: var(--ui-mono);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.sm-comment-no {
+  flex: 0 0 auto;
+  padding: 1px 5px;
+  border-radius: var(--ui-r-sm);
+  background: var(--ui-hover);
+  font-variant-numeric: tabular-nums;
+  color: var(--ui-fg-2);
 }
 .sm-comment-time {
   flex: 0 0 auto;
 }
 .sm-comment-quote {
   margin-top: 8px;
-  padding-left: 8px;
-  border-left: 2px solid var(--ui-accent);
-  font-size: 11px;
+  padding: 4px 8px;
+  border-left: 2px solid var(--ui-accent-2);
+  border-radius: 0 var(--ui-r-sm) var(--ui-r-sm) 0;
+  background: rgba(255, 255, 255, 0.03);
+  font-size: 11.5px;
   line-height: 1.45;
   color: var(--ui-muted);
   display: -webkit-box;
@@ -449,54 +626,95 @@
 }
 .sm-comment-body {
   margin: 8px 0 0;
-  font-size: 12px;
+  font-size: 12.5px;
   line-height: 1.5;
   color: var(--ui-fg);
 }
 .sm-comment-resolution {
   margin: 8px 0 0;
-  font-size: 11px;
+  font-size: 11.5px;
   line-height: 1.5;
   color: var(--ui-muted);
 }
 .sm-comment-resolution span {
-  font-family: var(--ui-mono);
+  margin-right: 4px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: rgba(94, 106, 210, 0.16);
   font-size: 10px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-weight: 500;
   color: var(--ui-accent);
 }
+/* Held back rather than hidden. Reserving the row keeps a list from twitching
+   as the cursor crosses it, and dimming keeps the eye on the notes. */
 .sm-comment-actions {
   display: flex;
   gap: 2px;
-  margin-top: 6px;
+  margin: 6px 0 -2px -8px;
+  opacity: 0.5;
+  transition: opacity var(--ui-fast) var(--ui-ease);
+}
+.sm-comment:hover .sm-comment-actions,
+.sm-comment:focus-within .sm-comment-actions,
+.sm-comment-active .sm-comment-actions {
+  opacity: 1;
 }
 
 /* ── Empty states ──────────────────────────────────────────────── */
 
 .sm-empty {
-  padding: 24px 16px;
+  padding: 28px 18px;
   text-align: center;
 }
 .sm-empty-title {
   margin: 0;
   font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
   color: var(--ui-fg-2);
 }
 .sm-empty-body {
   margin: 8px 0 0;
-  font-size: 11px;
-  line-height: 1.6;
+  font-size: 11.5px;
+  line-height: 1.7;
   color: var(--ui-muted-2);
 }
 .sm-empty-body code {
+  padding: 1px 4px;
+  border-radius: var(--ui-r-sm);
+  background: var(--ui-hover);
   font-family: var(--ui-mono);
-  font-size: 10px;
+  font-size: 10.5px;
   color: var(--ui-fg-2);
 }
 .sm-studio-empty {
   align-items: center;
   justify-content: center;
+}
+
+/* ── Scrollbars ────────────────────────────────────────────────── */
+
+.sm-filmstrip,
+.sm-panel-list {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ui-border-2) transparent;
+}
+.sm-filmstrip::-webkit-scrollbar,
+.sm-panel-list::-webkit-scrollbar {
+  width: 10px;
+}
+.sm-filmstrip::-webkit-scrollbar-thumb,
+.sm-panel-list::-webkit-scrollbar-thumb {
+  border: 3px solid transparent;
+  border-radius: 999px;
+  background: var(--ui-border-2);
+  /* Clipped to the padding box so the transparent border reads as a gutter. */
+  background-clip: padding-box;
+}
+.sm-filmstrip::-webkit-scrollbar-thumb:hover,
+.sm-panel-list::-webkit-scrollbar-thumb:hover {
+  background: var(--ui-muted-2);
+  background-clip: padding-box;
 }
 
 /* ── Presenting ────────────────────────────────────────────────── */
@@ -509,46 +727,68 @@
 }
 .sm-presenting .sm-body {
   grid-template-columns: 1fr;
+  gap: 0;
+  padding: 0;
+}
+.sm-presenting .sm-main {
+  border: none;
+  border-radius: 0;
+  background: transparent;
 }
 .sm-presenting .sm-stage-box {
   box-shadow: none;
 }
 .sm-presenting {
-  background: #0d0d0c;
+  background: #000;
 }
 
 .sm-exit-present {
   position: fixed;
   top: 16px;
   right: 16px;
-  padding: 5px 12px;
-  border: 1px solid var(--ui-border-2);
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.5);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  border-radius: var(--ui-r);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--ui-muted);
-  font-family: var(--ui-mono);
-  font-size: 11px;
+  font-family: inherit;
+  font-size: 12px;
   cursor: pointer;
   opacity: 0;
-  transition: opacity 140ms ease;
+  transition:
+    opacity 140ms var(--ui-ease),
+    color var(--ui-fast) var(--ui-ease);
 }
-.sm-exit-present:hover,
+.sm-exit-present:hover {
+  color: var(--ui-fg);
+}
+.sm-exit-present:focus-visible,
 .sm-presenting:hover .sm-exit-present {
   opacity: 1;
 }
 
 /* ── Narrow windows ────────────────────────────────────────────── */
 
-@media (max-width: 1180px) {
+@media (max-width: 1240px) {
   .sm-body {
-    grid-template-columns: 150px minmax(0, 1fr) 280px;
+    grid-template-columns: 224px minmax(0, 1fr) 292px;
   }
 }
-@media (max-width: 940px) {
+@media (max-width: 1040px) {
   .sm-body {
-    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-columns: minmax(0, 1fr) 292px;
   }
   .sm-filmstrip {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sm-studio * {
+    transition-duration: 0ms !important;
   }
 }

@@ -5,19 +5,47 @@
    ───────────────────────────────────────────────────────────────── */
 
 :root {
-  --ui-bg: #121211;
-  --ui-bg-2: #1a1a18;
-  --ui-panel: #201f1d;
-  --ui-fg: #f2f2f0;
-  --ui-fg-2: #c9c8c4;
-  --ui-muted: #8c8b85;
-  --ui-muted-2: #6d6c67;
-  --ui-border: #2e2d2a;
-  --ui-border-2: #3a3936;
-  --ui-accent: #6fa4f5;
-  --ui-accent-2: #4080eb;
-  --ui-danger: #e06a5a;
-  --ui-sans: ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* Surfaces climb a ladder of near-blacks rather than casting shadows.
+     Depth comes from the step plus a hairline, which is what lets a dark UI
+     stay quiet next to a bright slide. */
+  --ui-bg: #08090a;
+  --ui-bg-2: #0f1011;
+  --ui-panel: #141516;
+  --ui-panel-2: #191a1b;
+
+  /* Four steps of ink, each one a deliberate rung of emphasis. */
+  --ui-fg: #f7f8f8;
+  --ui-fg-2: #d0d6e0;
+  --ui-muted: #8a8f98;
+  --ui-muted-2: #62666d;
+
+  --ui-border: #23252a;
+  --ui-border-2: #34343a;
+
+  /* One chromatic accent for the whole studio. It marks what is live: the
+     current slide, an open note, the primary action. Spending it anywhere
+     else would stop it meaning anything. */
+  --ui-accent: #828fff;
+  --ui-accent-2: #5e6ad2;
+  --ui-focus: rgba(94, 106, 210, 0.6);
+  --ui-danger: #eb5757;
+
+  /* Translucent white, so a hover reads identically on every rung. */
+  --ui-hover: rgba(255, 255, 255, 0.05);
+  --ui-hover-2: rgba(255, 255, 255, 0.09);
+
+  --ui-r-sm: 4px;
+  --ui-r: 6px;
+  --ui-r-md: 8px;
+  --ui-r-lg: 12px;
+
+  --ui-shadow: 0 1px 2px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.55);
+  --ui-fast: 110ms;
+  --ui-ease: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Inter first for anyone who has it, then the platform UI face. */
+  --ui-sans: "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
   --ui-mono: ui-monospace, SFMono-Regular, Menlo, "JetBrains Mono", monospace;
 }
 
@@ -41,17 +69,20 @@ body {
 }
 
 kbd {
-  display: inline-block;
-  min-width: 16px;
-  padding: 1px 4px;
-  border: 1px solid var(--ui-border-2);
-  border-radius: 3px;
-  background: var(--ui-bg-2);
-  font-family: var(--ui-mono);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border: 1px solid var(--ui-border);
+  border-radius: var(--ui-r-sm);
+  background: var(--ui-panel);
+  font-family: var(--ui-sans);
   font-size: 10px;
-  line-height: 14px;
-  text-align: center;
-  color: var(--ui-fg-2);
+  font-weight: 500;
+  line-height: 1;
+  color: var(--ui-muted);
 }
 
 /* ── Stage ─────────────────────────────────────────────────────── */
@@ -69,10 +100,12 @@ kbd {
 .sm-stage-box {
   position: relative;
   /* A hairline ring plus a soft drop so a white slide separates from the
-     studio background without a heavy border competing with the design. */
+     studio background without a heavy border competing with the design.
+     The corners stay square: a radius here would clip slide content and the
+     export would no longer match what is on screen. */
   box-shadow:
-    0 0 0 1px var(--ui-border),
-    0 24px 60px rgba(0, 0, 0, 0.45);
+    0 0 0 1px var(--ui-border-2),
+    0 20px 50px rgba(0, 0, 0, 0.5);
 }
 
 .sm-stage-frame {
@@ -95,24 +128,28 @@ kbd {
 /* ── Broken slide ──────────────────────────────────────────────── */
 
 .sm-error-slide {
-  --sm-bg: #1a1412;
-  --sm-fg: #f6d9d2;
-  --sm-border: #4a2a22;
+  --sm-bg: #150f10;
+  --sm-fg: #f3d7d7;
+  --sm-border: #43262a;
   justify-content: center;
   gap: 16px;
 }
 .sm-error-title {
-  font-family: var(--ui-mono);
-  font-size: 16px;
-  color: #e08a76;
+  font-family: var(--ui-sans);
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: #f08c8c;
 }
 .sm-error-body {
-  padding: 16px;
+  padding: 16px 18px;
   border: 1px solid var(--sm-border);
+  border-radius: var(--ui-r-md);
+  background: rgba(0, 0, 0, 0.25);
   font-family: var(--ui-mono);
   font-size: 13px;
   line-height: 1.6;
-  color: #f6d9d2;
+  color: #f3d7d7;
   white-space: pre-wrap;
   overflow: auto;
   max-height: 60%;
@@ -127,7 +164,7 @@ kbd {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  background: #0d0d0c;
+  background: #000;
 }
 
 .sm-present-slide {
@@ -159,15 +196,20 @@ kbd {
 .sm-present-hint {
   position: fixed;
   bottom: 16px;
-  font-family: var(--ui-mono);
+  padding: 5px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--ui-r);
+  background: rgba(255, 255, 255, 0.04);
+  font-family: var(--ui-sans);
   font-size: 11px;
-  letter-spacing: 0.1em;
-  color: var(--ui-muted-2);
+  color: var(--ui-muted);
   user-select: none;
   pointer-events: none;
 }
 .sm-present-counter {
   right: 20px;
+  font-family: var(--ui-mono);
+  font-variant-numeric: tabular-nums;
 }
 .sm-present-hint {
   left: 20px;

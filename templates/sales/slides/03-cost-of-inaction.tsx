@@ -26,7 +26,6 @@ export default function CostOfInaction() {
           <div className="sales-cost-next"><small>WHAT CHANGES</small><h3>Put the next best action beside the signal—not inside another dashboard.</h3><ul><li><b>Detect</b><span>One governed view across CRM, product, and support</span></li><li><b>Decide</b><span>Evidence and playbook arrive with a named owner</span></li><li><b>Act</b><span>Managers inspect outcomes instead of rebuilding context</span></li></ul></div>
         </Column>
       </Columns>
-      <div className="sales-cost-summary"><div><small>PROPOSED PROOF</small><b>Start with retention-to-expansion signals for one 25-user team.</b></div><span><b>30 days</b><small>to go live</small></span><span><b>&lt;4 days</b><small>action threshold</small></span><strong>Measure before expanding →</strong></div>
       <Note>Illustrative baseline using CRM stage history, product events, and interview estimates. Validate with the buyer before presenting externally.</Note>
     </Slide>
   );

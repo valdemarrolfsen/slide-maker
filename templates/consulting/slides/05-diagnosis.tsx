@@ -36,12 +36,6 @@ export default function Diagnosis() {
           </div>
         </Column>
       </Columns>
-      <div className="consulting-metric-strip">
-        <div><b>80%</b>of leakage sits in the top three drivers</div>
-        <div><b>$18m</b>capacity released from the initiative tail</div>
-        <div><b>19</b>low-value SKUs identified for exit</div>
-        <div><b>90 days</b>to validate the first growth propositions</div>
-      </div>
       <Note>Northstar SKU P&amp;L; promotion post-event analysis; initiative census; public peer benchmarks. Leakage values are non-additive until overlap is removed.</Note>
     </Slide>
   );

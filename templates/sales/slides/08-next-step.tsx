@@ -1,2 +1,15 @@
-import { Slide, Head, Eyebrow, Title, Grid, Cell, Kicker, CardTitle, Line } from 'slide-maker/runtime';
-export default function NextStep() { return <Slide dark grid><Head><Eyebrow>Next step</Eyebrow><Title>Confirm the pilot and leave with a start date</Title></Head><Grid cols={3} grow><Cell pad="lg"><Kicker accent>Scope</Kicker><CardTitle>Choose the team</CardTitle><Line>Name the first workflow and the users inside the pilot.</Line></Cell><Cell pad="lg"><Kicker accent>People</Kicker><CardTitle>Assign owners</CardTitle><Line>One business owner, one technical owner, one decision maker.</Line></Cell><Cell pad="lg"><Kicker accent>Date</Kicker><CardTitle>Book kickoff</CardTitle><Line>Set the working session and the evidence review before leaving.</Line></Cell></Grid></Slide>; }
+import { Slide, Head, Eyebrow, Title } from 'slide-maker/runtime';
+
+export default function NextStep() {
+  return (
+    <Slide dark className="sales-slide sales-close" label="Pulse × Acme Revenue">
+      <Head><Eyebrow>Proposed next step</Eyebrow><Title wide>Leave today with the pilot team, success threshold, and start date agreed.</Title></Head>
+      <div className="sales-close-steps">
+        <article className="sales-close-step"><b>01 · SCOPE</b><h3>Choose the first team</h3><p>Twenty-five users, one customer segment, and the retention-to-expansion workflow.</p></article>
+        <article className="sales-close-step"><b>02 · EVIDENCE</b><h3>Sign the success metric</h3><p>Reduce time-to-action below four days with at least 70% weekly adoption.</p></article>
+        <article className="sales-close-step"><b>03 · PEOPLE</b><h3>Name both owners</h3><p>One Acme operating lead and one Pulse solution lead with weekly decision authority.</p></article>
+      </div>
+      <div className="sales-cta"><b>Recommended kickoff · Monday, 14 September</b><span>Confirm 60-minute scoping session →</span></div>
+    </Slide>
+  );
+}

@@ -107,6 +107,7 @@ change.
 | `granite` | Working sessions and partner workshops. Warm neutrals, hairline rules, mono labels. |
 | `consulting` | Strategy reports. Dense evidence, serif action titles, analytical charts and tables. |
 | `portfolio` | Creative portfolios. Warm editorial restraint, oversized type and image-led layouts. |
+| `sales` | Product-led B2B selling. Violet accents, UI mockups, proof charts and modular commercial pages. |
 | `noir` | Stage talks. Dark ground, oversized headlines, one idea per slide. |
 | `editorial` | Decks that argue a position. Serif headlines on warm paper, wide measures. |
 | `slate` | Clients and boards. Cool greys, soft corners, tolerant of dense slides. |

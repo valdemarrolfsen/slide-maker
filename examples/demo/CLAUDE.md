@@ -12,20 +12,21 @@ Also not yours: the slide-maker package, its build, and anything outside this
 folder. If a slide will not render for a reason you cannot fix in a slide file,
 say so and let the user look.
 
-## Two words that mean different things
+## Three concepts
+
+A **template** is the complete starter presentation. This deck uses `blank`.
 
 A **style** is the design system the whole deck wears: colours, type, spacing.
 The deck has exactly one, set in `deck.json`.
 
-A **template** is a ready-made slide layout, written against the same runtime
-components you write with. Templates carry no colour of their own, so any
-template renders in any style. They are a starting point for a slide, not a
-constraint on it, and the deck can use as many or as few as suits it.
+A **default slide** is a ready-made layout written against the runtime. Default
+slides carry no colour, render in any style, and are starting points rather than
+constraints.
 
 ## Working loop
 
 1. Run `deck_overview` to see the style, the running order and any waiting comments.
-2. Run `list_templates` before you write anything. It is the fastest way to
+2. Run `list_default_slides` before you write anything. It is the fastest way to
    decide what each slide should be.
 3. Write or edit slide files under `slides/`.
 4. Run `render_slide` to look at what you produced. Do this before saying a slide is done:
@@ -36,29 +37,29 @@ constraint on it, and the deck can use as many or as few as suits it.
 If the MCP server is not connected, work from disk instead: slide sources are in
 `slides/`, settings in `deck.json`, comments in `.slide-maker/comments.json`.
 
-## Start from a template
+## Start from a default slide
 
 There is a library of ready-made slides. **Look at it before building a layout
-by hand.** `list_templates` gives you the whole catalogue with a note on when
-each shape is the right one, and `read_template` gives you the JSX to copy into
+by hand.** `list_default_slides` gives you the whole catalogue with a note on when
+each shape is the right one, and `read_default_slide` gives you the JSX to copy into
 a new file under `slides/` and fill with real content.
 
 Reach for it constantly, not once. Planning a deck is largely choosing which
-template each slide should be: a `cover`, then `agenda`, then a `section`
+default slide each slide should use: a `cover`, then `agenda`, then a `section`
 divider, `three-up` for the pillars, `metrics` for the numbers, `closing` for
-the ask. Copying a template and replacing its content is faster than composing
+the ask. Copying a default slide and replacing its content is faster than composing
 from scratch, and it lands closer to how the style expects to be used, because
-every template has been checked in all of them.
+every default slide has been checked in all of them.
 
-Deviating is fine. A template is a starting point, and `blank` exists for the
+Deviating is fine. A default slide is a starting point, and `blank` exists for the
 slides that do not resemble any of them. But check the library first, and say
-which template a slide came from when you report back, so the user knows what
+which default slide a slide came from when you report back, so the user knows what
 they are looking at.
 
 ### Slides the user added
 
 The studio has an **Add slide** gallery next to the style name, which drops a
-template into `slides/` with its example copy still in it. A slide you did not
+default slide into `slides/` with its example copy still in it. A slide you did not
 write, still carrying that copy, is a slide the user has asked for by pointing
 at a shape: they picked the layout, and the words are yours to write. Replace
 the content, keep the structure, and ask what the slide is meant to say if the

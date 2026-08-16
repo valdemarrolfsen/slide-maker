@@ -1,6 +1,7 @@
 {
   "title": "slide-maker demo",
   "author": "",
+  "template": "blank",
   "style": "granite",
   "width": 1280,
   "height": 720,

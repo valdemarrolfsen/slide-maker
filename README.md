@@ -17,8 +17,8 @@ pnpm dlx slide-maker start
 The studio opens in your default browser when it is ready. Use
 `slide-maker start --no-open` when you only want to start the server.
 
-`init` asks which style the deck should wear. Then open Claude Code in the same
-directory and start briefing it.
+`init` asks which complete template deck to start from, then offers its default
+style. Open Claude Code in the same directory and start briefing it.
 
 ---
 
@@ -73,28 +73,32 @@ Three ways to leave a comment:
 If you have not wired up MCP, **Copy for Claude** in the panel puts every open
 comment on your clipboard as a markdown brief. Paste it into the terminal.
 
-## Styles and templates
+## Templates, styles, and default slides
 
-Two different things, and the difference is the whole design.
+The three concepts solve different parts of starting and extending a presentation.
+
+A **template** is a complete starter deck: a suggested storyline, real starter
+slides, a default style, and a curated set of layouts for adding more slides.
 
 A **style** is a design system. Slides never state a colour or a font: they
 compose semantic components, and the style decides what those look like, so
 switching style restyles the whole deck without editing a single slide. A deck
 wears exactly one.
 
-A **template** is a ready-made slide. It is written against the same components
-you write with, carries no colour of its own, and therefore renders in any
-style. It is a starting point, not a constraint.
+A **default slide** is one reusable slide layout. It carries no colour of its
+own, renders in every style, and is a starting point rather than a constraint.
 
 ```bash
 slide-maker styles             # list the design systems
 slide-maker use noir           # switch the deck to one
-slide-maker templates          # list the slide layouts
+slide-maker templates          # list complete starter decks
+slide-maker default-slides     # list reusable slide layouts
+slide-maker browse consulting  # preview a template safely
 ```
 
-Both are also in the studio's top bar: a style picker next to the deck title,
-and an **Add slide** gallery next to that. The deck reloads immediately either
-way.
+The Studio top bar has a style picker and an **Add slide** gallery for the
+current template's default slides. The deck reloads immediately after either
+change.
 
 ### The styles
 
@@ -109,41 +113,37 @@ way.
 Fork one by copying it into `styles/` inside your deck. A local style shadows a
 built-in of the same name.
 
-### The template library
+### The template decks
 
-| Template | The slide it makes |
+| Template | Storyline |
 | --- | --- |
-| `blank` | A heading block and nothing else |
-| `cover` | Opening slide: occasion, title, claim, presenter |
-| `agenda` | Numbered running order with timings |
-| `section` | Divider between parts of the deck |
-| `statement` | One sentence, centred, with the caveat as a footnote |
-| `bullets` | Three points, each leading with the claim in bold |
-| `three-up` | Three numbered cells on the hairline grid |
-| `comparison` | Before and after, side by side |
-| `metrics` | Three figures with captions saying what they mean |
-| `timeline` | Four phases running left to right |
-| `checklist` | Dense status table with a summary strip |
-| `spec` | An argument on the left, a facts panel on the right |
-| `quote` | A pull quote with an attribution |
-| `code` | A code block with commentary and one highlighted line |
-| `closing` | The decision being asked for, on the inverted palette |
+| `blank` | One cover and no prescribed narrative |
+| `consulting` | Answer first, situation, diagnosis, recommendation, roadmap, decision |
+| `portfolio` | Profile and selected work told through complete case studies |
+| `sales` | Buyer pain, cost of inaction, solution, proof, plan, investment, next step |
+| `raise-capital` | Purpose, problem, solution, why now, market, traction, model, team, ask |
+| `technical-presentation` | Problem, constraints, architecture, interface, evidence, rollout, decisions |
+
+Every template recommends a style, which you can override during initialization
+or later from the CLI or Studio. `slide-maker browse <template>` opens a
+disposable Studio preview, so browsing never modifies the bundled source deck.
+
+### The default-slide library
 
 Add one to a deck from the studio. The **Add slide** button next to the style
-name opens a gallery of every layout, each previewed as a live thumbnail in
-your deck's own style, so you pick a shape by looking at it rather than by
-guessing from a name. Clicking one appends it as a new slide and takes you
+name opens a gallery of the layouts selected by the current template, each
+previewed as a live thumbnail in your deck's own style, so you pick a shape by
+looking at it rather than guessing from a name. Clicking one appends it as a new slide and takes you
 there. Then tell Claude what it should actually say: picking the shape yourself
 and leaving the words to Claude is usually faster than describing a layout in
 prose.
 
 Claude reaches for the same library on its own. The deck's `CLAUDE.md` and the
-MCP server both point at it, and `read_template` hands over the JSX, so "a slide
+MCP server both point at it, and `read_default_slide` hands over the JSX, so "a slide
 with three pillars" starts from `three-up` rather than from nothing.
 
-Fork a template by copying it into `templates/` inside your deck. A local
-template shadows a built-in of the same name, so a house cover slide is a
-`templates/cover/` away.
+Fork a default slide by copying it into `default_slides/` inside your deck. A
+local default slide shadows a built-in of the same name.
 
 ## Starting a deck
 
@@ -151,13 +151,13 @@ template shadows a built-in of the same name, so a house cover slide is a
 slide-maker init my-deck
 ```
 
-It asks one question: which style. The deck starts with a cover slide, and
-which template each slide after that wants is a question for while you are
-writing it, not before.
+It asks which template deck to start from, then offers that template's default
+style. An explicit style always wins.
 
 ```bash
-slide-maker init my-deck --style noir     # skip the prompt
-slide-maker init my-deck --yes            # take the default
+slide-maker init my-deck --template consulting
+slide-maker init my-deck --template sales --style noir
+slide-maker init my-deck --yes            # blank template, granite style
 ```
 
 ## Writing slides
@@ -262,7 +262,7 @@ The server exposes:
 | `list_comments` | Your feedback, with file paths and quoted text |
 | `resolve_comment` | Clear a note once it is addressed |
 | `list_styles` / `set_style` | Pick and switch the design system |
-| `list_templates` / `read_template` | Find a ready-made layout and read its JSX to copy |
+| `list_default_slides` / `read_default_slide` | Find a reusable layout and read its JSX to copy |
 | `render_slide` | Render to PNG, so Claude can check its own work |
 | `deck_files` | Where things live, and what to name the next slide |
 
@@ -288,7 +288,9 @@ slide-maker build [dir]        export a static site
 slide-maker export [dir]       render to PDF or PNG
 slide-maker styles             list the design systems
 slide-maker use <style>        switch style
-slide-maker templates          list the slide layouts
+slide-maker templates          list complete starter decks
+slide-maker default-slides     list reusable slide layouts
+slide-maker browse [template]  preview a template deck
 slide-maker comments           read feedback from the terminal
 slide-maker comments resolve <id>
 slide-maker mcp [dir]          run the MCP server over stdio
@@ -298,13 +300,13 @@ slide-maker mcp [dir]          run the MCP server over stdio
 
 ```
 my-deck/
-  deck.json            title, style, canvas size
+  deck.json            title, template, style, canvas size
   slides/
     01-cover.tsx       order comes from the filename
     02-agenda.tsx
   assets/              served from the root
   styles/              optional local design systems
-  templates/           optional local slide layouts
+  default_slides/      optional local reusable layouts
   CLAUDE.md            how Claude should work with this deck
   .mcp.json            MCP registration
   .slide-maker/        comments and view state, gitignored
@@ -328,9 +330,8 @@ export and for `render_slide`.
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). New styles and templates are especially
-welcome: a style is a `style.json` and a `style.css`, a template is a
-`template.json` and a `slide.tsx`, and the runtime does the rest.
+See [CONTRIBUTING.md](CONTRIBUTING.md). New styles, default slides, and complete
+template decks are especially welcome.
 
 ## License
 

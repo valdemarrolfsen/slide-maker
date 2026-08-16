@@ -36,6 +36,7 @@
     "src",
     "types",
     "styles",
+    "default_slides",
     "templates",
     "README.md",
     "LICENSE"

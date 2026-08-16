@@ -57,14 +57,15 @@ OIDC credentials and need no npm token.
 bin/                CLI entry point
 src/
   cli/              commands, the prompt, and the files `init` scaffolds
-  core/             deck config, slide discovery, comments, style and template registries
+  core/             deck config, slide discovery, comments, style and library registries
   vite/             Vite config factory and the deck plugin
   viewer/           the studio and the standalone presentation, in React
   runtime/          the component library slides import, and its stylesheet
   render/           headless rendering for PDF, PNG and the MCP tool
   mcp/              the MCP server
 styles/             built-in design systems
-templates/          built-in slide layouts
+default_slides/     built-in reusable slide layouts
+templates/          built-in complete starter decks
 examples/demo/      a scratch deck for development
 ```
 
@@ -73,8 +74,8 @@ examples/demo/      a scratch deck for development
 **The runtime owns structure, the style owns looks.** If you find yourself
 adding a colour or a font size to `src/runtime/`, it probably belongs in a style
 as a token instead. If a style needs a new structural element, add it to the
-runtime and let every style dress it. Templates follow the same rule from the
-other side: a template that states a colour can no longer be shown in every
+runtime and let every style dress it. Default slides follow the same rule from the
+other side: a default slide that states a colour can no longer be shown in every
 style, which is the point of having a library.
 
 **Slides never scroll.** The canvas is fixed and scaled with a transform. This
@@ -114,31 +115,31 @@ Two things to watch:
   `--sm-head-min` and `--sm-head-gap` or long headings will crowd the content
   underneath. `noir` is the worked example.
 
-Test a style against the template library, which is what it is for. Copy the
-templates into a scratch deck, point it at the style, and render every slide:
+Test a style against the default-slide library. Copy the layouts into a scratch
+deck, point it at the style, and render every slide:
 
 ```bash
 node bin/slide-maker.js init /tmp/style-check --style mystyle --yes
-for t in templates/*/; do cp "$t/slide.tsx" "/tmp/style-check/slides/$(basename $t).tsx"; done
+for t in default_slides/*/; do cp "$t/slide.tsx" "/tmp/style-check/slides/$(basename $t).tsx"; done
 node bin/slide-maker.js export /tmp/style-check -f png -o out
 ```
 
 Look at all fifteen images. A style that has only been checked on a cover slide
 is a style that has not been checked.
 
-## Writing a template
+## Writing a default slide
 
-A template is a directory under `templates/` with two files:
+A default slide is a directory under `default_slides/` with two files:
 
 ```
-templates/mylayout/
-  template.json     label, description, tags, order, and guidance for Claude
+default_slides/mylayout/
+  default_slide.json label, description, tags, order, and guidance for Claude
   slide.tsx         one slide, default-exported, built from runtime components
 ```
 
-The rule that makes the library work: **a template states no colour, no font and
+The rule that makes the library work: **a default slide states no colour, no font and
 no type size.** Compose from `slide-maker/runtime` and nothing else, and reach
-for an inline `style` only for one-off spacing. Anything else and the template
+for an inline `style` only for one-off spacing. Anything else and the default slide
 stops rendering honestly in five styles.
 
 Write the placeholder content as though it were a real slide. Nobody edits
@@ -146,7 +147,7 @@ Write the placeholder content as though it were a real slide. Nobody edits
 the layout is the shape they need.
 
 The `guidance` field is the one that earns its keep. Claude reads it through
-`list_templates` when deciding what a slide should be, so write it as advice on
+`list_default_slides` when deciding what a slide should be, so write it as advice on
 when this shape is the right one and when it is not, rather than as a
 description of what is on it.
 
@@ -159,6 +160,15 @@ slide gallery and switch styles from the picker beside it: the previews are
 live, so the whole library restyles as you go. Then add the slide and look at
 it full size. Dense layouts are the ones that break, usually in `noir`, which
 has the largest type scale.
+
+## Writing a template deck
+
+A template is a directory under `templates/` with a `template.json` and a
+complete `slides/` directory. The manifest provides `label`, `description`,
+`tags`, `order`, `defaultStyle`, `default_slides`, and guidance for the agent.
+Starter slides should form a coherent audience-specific argument, use realistic
+placeholder copy, and stay entirely within runtime components so users can
+override the style at initialization or later.
 
 ## Adding a runtime component
 

@@ -1,0 +1,9 @@
+{
+  "label": "Consulting recommendation",
+  "description": "An executive-ready answer-first deck: situation, evidence, recommendation, plan, and decision.",
+  "tags": ["consulting", "strategy", "executive"],
+  "order": 10,
+  "defaultStyle": "slate",
+  "default_slides": ["cover", "agenda", "section", "statement", "three-up", "comparison", "metrics", "timeline", "checklist", "spec", "closing"],
+  "guidance": "Write action titles so the storyline can be understood by reading titles alone. Lead with the answer, support it with MECE evidence, and end with an owned decision."
+}

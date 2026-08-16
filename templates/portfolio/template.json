@@ -1,0 +1,9 @@
+{
+  "label": "Portfolio showcase",
+  "description": "A narrative case-study deck for designers, creators, agencies, and independent professionals.",
+  "tags": ["portfolio", "creative", "case-study"],
+  "order": 20,
+  "defaultStyle": "editorial",
+  "default_slides": ["cover", "section", "statement", "three-up", "comparison", "metrics", "timeline", "quote", "closing", "blank"],
+  "guidance": "Show the work through a small number of complete case studies. For each: context, your role, key decision, artifact, and measured result. Make contribution and constraints explicit."
+}

@@ -1,0 +1,2 @@
+import { Slide, Head, Eyebrow, Title, Fill, Quote, Track } from 'slide-maker/runtime';
+export default function WhatWeHeard() { return <Slide><Head><Eyebrow>What we heard</Eyebrow><Title>The problem is not speed alone—it is uncertainty</Title></Head><Fill><Quote cite="Buyer role · Discovery interview">We can absorb a delay. What hurts is not knowing who owns the request or when we can make a promise to the customer.</Quote></Fill><Track>Discovery interviews · Replace with the buyer’s exact language</Track></Slide>; }

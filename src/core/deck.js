@@ -14,6 +14,8 @@ export const CONFIG_FILE = 'deck.json';
 export const defaults = {
   title: 'Untitled deck',
   author: '',
+  /** Full-deck template this presentation started from. */
+  template: 'blank',
   /** Name of the design system the deck wears. See src/core/styles.js. */
   style: 'granite',
   /** Slide canvas in CSS pixels. 1280x720 is 16:9 and maps cleanly to a
@@ -54,9 +56,8 @@ export async function readConfig(deckDir) {
 /**
  * Brings an older deck.json forward.
  *
- * `template` used to mean what `style` means now, and "template" has since been
- * taken by the slide library. Decks on disk outlive a rename, so the old key is
- * still read rather than leaving a deck silently unstyled.
+ * Before v0.2, `template` meant what `style` means now. New configs always have
+ * both keys, so a lone template matching the old shape can still be migrated.
  */
 function migrate(parsed) {
   if (parsed.style === undefined && typeof parsed.template === 'string') {

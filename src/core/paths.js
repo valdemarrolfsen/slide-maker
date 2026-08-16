@@ -7,7 +7,10 @@ export const packageRoot = path.resolve(fileURLToPath(new URL('../..', import.me
 /** Directory holding the built-in styles, one design system per subdirectory. */
 export const builtinStylesDir = path.join(packageRoot, 'styles');
 
-/** Directory holding the built-in template slides. */
+/** Directory holding the built-in reusable slide layouts. */
+export const builtinDefaultSlidesDir = path.join(packageRoot, 'default_slides');
+
+/** Directory holding the built-in full-deck templates. */
 export const builtinTemplatesDir = path.join(packageRoot, 'templates');
 
 /** The runtime module, aliased into every deck so slides resolve it wherever

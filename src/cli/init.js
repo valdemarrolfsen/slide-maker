@@ -4,21 +4,12 @@ import path from 'node:path';
 import { resolveDeckDir } from '../core/paths.js';
 import { CONFIG_FILE } from '../core/deck.js';
 import { listStyles } from '../core/styles.js';
-import { readTemplateSource, resolveTemplate } from '../core/templates.js';
+import { listTemplates } from '../core/templates.js';
 import { color, fail, ok, info } from '../core/log.js';
 import { canPrompt, select } from './prompt.js';
 import { GITIGNORE, deckClaudeMd, deckConfig, deckTsconfig, mcpEntry } from './scaffold.js';
 
-const DEFAULT_STYLE = 'granite';
-
-/**
- * The template a new deck's first slide comes from.
- *
- * Not a choice at scaffold time: which layout a slide wants is a question you
- * answer while writing it, not before there is anything to write. A deck that
- * keeps its own `templates/cover` gets that one instead.
- */
-const STARTER_TEMPLATE = 'cover';
+const DEFAULT_TEMPLATE = 'blank';
 
 async function writeIfAbsent(file, contents, written, skipped) {
   if (fs.existsSync(file)) {
@@ -28,6 +19,24 @@ async function writeIfAbsent(file, contents, written, skipped) {
   await fsp.mkdir(path.dirname(file), { recursive: true });
   await fsp.writeFile(file, contents, 'utf8');
   written.push(file);
+}
+
+async function copyTreeIfAbsent(sourceDir, targetDir, written, skipped) {
+  let entries = [];
+  try {
+    entries = await fsp.readdir(sourceDir, { withFileTypes: true });
+  } catch {
+    return;
+  }
+  for (const entry of entries) {
+    const source = path.join(sourceDir, entry.name);
+    const target = path.join(targetDir, entry.name);
+    if (entry.isDirectory()) {
+      await copyTreeIfAbsent(source, target, written, skipped);
+    } else if (entry.isFile()) {
+      await writeIfAbsent(target, await fsp.readFile(source), written, skipped);
+    }
+  }
 }
 
 /**
@@ -59,8 +68,33 @@ async function writeMcpConfig(deckDir, written, skipped) {
   written.push(file);
 }
 
-/** Resolves the deck's style, asking only when the command line did not say. */
-async function chooseStyle(styles, given, interactive) {
+async function chooseTemplate(templates, given, interactive) {
+  if (given) {
+    const match = templates.find((template) => template.name === given);
+    if (!match) {
+      fail(`No template named "${given}".`, `Available: ${templates.map((t) => t.name).join(', ')}`);
+    }
+    return match;
+  }
+  if (!interactive) return templates.find((template) => template.name === DEFAULT_TEMPLATE) || templates[0];
+
+  console.log('');
+  const name = await select({
+    message: 'Template',
+    hint: 'a complete starting deck, or blank',
+    initial: Math.max(0, templates.findIndex((template) => template.name === DEFAULT_TEMPLATE)),
+    choices: templates.map((template) => ({
+      value: template.name,
+      label: template.label,
+      note: template.description,
+    })),
+  });
+  if (name === null) fail('Cancelled.', 'Pass --template <name> to skip the prompt.');
+  return templates.find((template) => template.name === name);
+}
+
+/** Resolves the deck's style, defaulting to the template's recommendation. */
+async function chooseStyle(styles, given, interactive, defaultStyle) {
   if (given) {
     const match = styles.find((style) => style.name === given);
     if (!match) {
@@ -70,7 +104,7 @@ async function chooseStyle(styles, given, interactive) {
   }
 
   if (!interactive) {
-    return styles.find((style) => style.name === DEFAULT_STYLE) || styles[0];
+    return styles.find((style) => style.name === defaultStyle) || styles[0];
   }
 
   console.log('');
@@ -79,7 +113,7 @@ async function chooseStyle(styles, given, interactive) {
     hint: 'the design the whole deck wears',
     initial: Math.max(
       0,
-      styles.findIndex((style) => style.name === DEFAULT_STYLE),
+      styles.findIndex((style) => style.name === defaultStyle),
     ),
     choices: styles.map((style) => ({
       value: style.name,
@@ -104,13 +138,13 @@ export async function initCommand(target, options) {
     );
   }
 
-  const styles = await listStyles(deckDir);
+  const [styles, templates] = await Promise.all([listStyles(deckDir), listTemplates()]);
   if (!styles.length) fail('No styles are installed.', 'The package looks incomplete.');
+  if (!templates.length) fail('No templates are installed.', 'The package looks incomplete.');
 
-  const starter = await resolveTemplate(deckDir, STARTER_TEMPLATE);
-  if (!starter) fail('The template library is missing.', 'The package looks incomplete.');
-
-  const style = await chooseStyle(styles, options.style, canPrompt() && !options.yes);
+  const interactive = canPrompt() && !options.yes;
+  const template = await chooseTemplate(templates, options.template, interactive);
+  const style = await chooseStyle(styles, options.style, interactive, template.defaultStyle);
 
   const title = options.title || toTitle(name);
   const written = [];
@@ -118,7 +152,12 @@ export async function initCommand(target, options) {
 
   await fsp.mkdir(deckDir, { recursive: true });
 
-  const config = deckConfig({ title, style: style.name, author: options.author || '' });
+  const config = deckConfig({
+    title,
+    template: template.name,
+    style: style.name,
+    author: options.author || '',
+  });
   await writeIfAbsent(
     path.join(deckDir, CONFIG_FILE),
     `${JSON.stringify(config, null, 2)}\n`,
@@ -126,12 +165,8 @@ export async function initCommand(target, options) {
     skipped,
   );
 
-  await writeIfAbsent(
-    path.join(deckDir, 'slides', `01-${starter.stem}.tsx`),
-    await readTemplateSource(starter),
-    written,
-    skipped,
-  );
+  await copyTreeIfAbsent(template.slidesDir, path.join(deckDir, 'slides'), written, skipped);
+  await copyTreeIfAbsent(template.assetsDir, path.join(deckDir, 'assets'), written, skipped);
 
   await writeIfAbsent(path.join(deckDir, 'assets', '.gitkeep'), '', written, skipped);
   await writeIfAbsent(path.join(deckDir, '.gitignore'), GITIGNORE, written, skipped);
@@ -143,7 +178,7 @@ export async function initCommand(target, options) {
   );
   await writeIfAbsent(
     path.join(deckDir, 'CLAUDE.md'),
-    deckClaudeMd({ title, style: style.name }),
+    deckClaudeMd({ title, template: template.name, style: style.name }),
     written,
     skipped,
   );
@@ -154,6 +189,7 @@ export async function initCommand(target, options) {
 
   console.log('');
   ok(`Created "${title}" in ${color.cyan(path.relative(process.cwd(), deckDir) || '.')}`);
+  console.log(`  ${color.dim('template')} ${template.label}   ${color.dim('style')} ${style.label}`);
   for (const file of written) {
     console.log(`  ${color.dim('+')} ${path.relative(deckDir, file)}`);
   }

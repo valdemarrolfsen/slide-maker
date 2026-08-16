@@ -1,0 +1,9 @@
+{
+  "label": "Raise capital",
+  "description": "An investor pitch from company purpose through problem, market, traction, model, team, and ask.",
+  "tags": ["fundraising", "startup", "investor"],
+  "order": 40,
+  "defaultStyle": "noir",
+  "default_slides": ["cover", "section", "statement", "bullets", "three-up", "comparison", "metrics", "timeline", "spec", "quote", "closing"],
+  "guidance": "Build a credible investment case, not a product tour. Make the problem urgent, the market specific, traction comparable, economics legible, team advantage relevant, and the use of funds milestone-driven."
+}

@@ -6,6 +6,8 @@ import { buildCommand } from './build.js';
 import { exportCommand } from './export.js';
 import { stylesCommand, useStyleCommand } from './styles.js';
 import { templatesCommand } from './templates.js';
+import { defaultSlidesCommand } from './default-slides.js';
+import { browseCommand } from './browse.js';
 import { clearCommentsCommand, commentsCommand, resolveCommentCommand } from './comments.js';
 import { resolveDeckDir } from '../core/paths.js';
 import { error } from '../core/log.js';
@@ -25,6 +27,7 @@ export function createCli() {
     .command('init')
     .argument('[dir]', 'where to create the deck', '.')
     .description('scaffold a deck and wire it up to Claude Code')
+    .option('-t, --template <name>', 'complete starter deck, prompts if omitted')
     .option('-s, --style <name>', 'design system for the deck, prompts if omitted')
     .option('--title <title>', 'deck title, defaults to the directory name')
     .option('--author <name>', 'deck author')
@@ -72,9 +75,25 @@ export function createCli() {
 
   program
     .command('templates')
-    .description('list the slide templates in the library')
-    .option('-d, --deck <dir>', 'deck directory', '.')
+    .description('list the complete starter decks')
     .action(templatesCommand);
+
+  program
+    .command('default-slides')
+    .alias('default_slides')
+    .description('list the reusable slide layouts')
+    .option('-d, --deck <dir>', 'deck directory', '.')
+    .action(defaultSlidesCommand);
+
+  program
+    .command('browse')
+    .argument('[template]', 'template deck to preview')
+    .description('browse a template deck in the studio')
+    .option('-s, --style <name>', 'preview with a different style')
+    .option('-p, --port <port>', 'port to listen on', '5170')
+    .option('--host [host]', 'expose the server on the network')
+    .option('--no-open', 'do not open a browser on start')
+    .action(browseCommand);
 
   const comments = program.command('comments').description('read and clear deck feedback');
 

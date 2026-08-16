@@ -27,11 +27,11 @@ export function setStyle(name: string) {
   });
 }
 
-/** Appends a slide to the deck, copied from a template. */
-export function addSlide(template: string) {
+/** Appends a slide to the deck from its template's default-slide set. */
+export function addSlide(defaultSlide: string) {
   return request<{ file: string }>(`${BASE}/slides`, {
     method: 'POST',
-    body: JSON.stringify({ template }),
+    body: JSON.stringify({ defaultSlide }),
   });
 }
 

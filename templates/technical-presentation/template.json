@@ -1,0 +1,9 @@
+{
+  "label": "Technical presentation",
+  "description": "An engineering talk from problem and constraints through architecture, interface, proof, rollout, and decisions.",
+  "tags": ["engineering", "architecture", "technical"],
+  "order": 50,
+  "defaultStyle": "terminal",
+  "default_slides": ["cover", "agenda", "section", "statement", "bullets", "three-up", "comparison", "metrics", "timeline", "checklist", "spec", "code", "closing"],
+  "guidance": "Design for a mixed technical audience. State constraints before architecture, explain boundaries and failure modes, show one real interface, quantify trade-offs, and finish with rollout and open decisions."
+}

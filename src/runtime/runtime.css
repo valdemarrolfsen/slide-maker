@@ -413,6 +413,104 @@
   color: var(--sm-muted);
 }
 
+.sm-chart-title {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--sm-fg);
+}
+.sm-bar-chart,
+.sm-line-chart {
+  min-width: 0;
+}
+.sm-bar-chart-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sm-bar-row {
+  display: grid;
+  grid-template-columns: 112px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.sm-bar-label { color: var(--sm-muted); }
+.sm-bar-track {
+  height: 12px;
+  background: var(--sm-panel);
+}
+.sm-bar-fill { height: 100%; background: var(--sm-accent); }
+.sm-bar-fill.sm-tone-strong { background: var(--sm-fg-2); }
+.sm-bar-fill.sm-tone-muted { background: var(--sm-muted-2); }
+.sm-bar-value {
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  text-align: right;
+  color: var(--sm-fg-2);
+}
+.sm-line-chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.sm-chart-gridline {
+  stroke: var(--sm-border);
+  stroke-width: 1;
+}
+.sm-line-series {
+  fill: none;
+  stroke: var(--sm-accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.sm-line-series.sm-tone-strong { stroke: var(--sm-fg-2); }
+.sm-line-series.sm-tone-muted { stroke: var(--sm-muted-2); }
+.sm-line-chart text {
+  fill: var(--sm-muted-2);
+  font-family: var(--sm-mono);
+  font-size: 8px;
+}
+.sm-chart-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  font-family: var(--sm-mono);
+  font-size: 9px;
+  color: var(--sm-muted);
+}
+.sm-chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sm-chart-legend i { width: 12px; height: 2px; background: currentColor; }
+.sm-data-table {
+  border-top: var(--sm-hairline) solid var(--sm-fg-2);
+  border-bottom: var(--sm-hairline) solid var(--sm-fg-2);
+}
+.sm-data-table-head,
+.sm-data-table-row {
+  display: grid;
+}
+.sm-data-table-head {
+  background: var(--sm-panel);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sm-fg);
+}
+.sm-data-table-row {
+  border-top: var(--sm-hairline) solid var(--sm-border);
+  font-size: 10.5px;
+  color: var(--sm-muted);
+}
+.sm-data-table-head > div,
+.sm-data-table-row > div {
+  padding: 7px 9px;
+  border-right: var(--sm-hairline) solid var(--sm-border);
+}
+.sm-data-table-head > div:last-child,
+.sm-data-table-row > div:last-child { border-right: none; }
+.sm-data-table-row > div:first-child { font-weight: 600; color: var(--sm-fg-2); }
+
 .sm-rows {
   border: var(--sm-hairline) solid var(--sm-border);
   border-radius: var(--sm-radius);

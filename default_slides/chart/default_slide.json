@@ -1,0 +1,7 @@
+{
+  "label": "Charts",
+  "description": "A paired bar and line chart for comparing a current snapshot with a trend over time.",
+  "tags": ["data", "chart", "analysis", "consulting"],
+  "order": 92,
+  "guidance": "Use an action title that states the finding, not the chart topic. Label units and periods, keep series to a minimum, and cite the source in the note. Use the accent only for the series the audience should follow."
+}

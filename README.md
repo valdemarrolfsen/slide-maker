@@ -105,6 +105,8 @@ change.
 | Style | For |
 | --- | --- |
 | `granite` | Working sessions and partner workshops. Warm neutrals, hairline rules, mono labels. |
+| `consulting` | Strategy reports. Dense evidence, serif action titles, analytical charts and tables. |
+| `portfolio` | Creative portfolios. Warm editorial restraint, oversized type and image-led layouts. |
 | `noir` | Stage talks. Dark ground, oversized headlines, one idea per slide. |
 | `editorial` | Decks that argue a position. Serif headlines on warm paper, wide measures. |
 | `slate` | Clients and boards. Cool greys, soft corners, tolerant of dense slides. |
@@ -199,7 +201,7 @@ export default function Approach() {
 | Structure | `Grid` + `Cell`, `Columns` + `Column`, `Card` |
 | Inside a cell | `Kicker`, `CardTitle`, `Line` |
 | Lists | `Ticks` + `Tick`, `Steps` + `Step` |
-| Data | `Stat`, `Rows` + `Row`, `Checklist` + `ChecklistRow` |
+| Data | `Stat`, `BarChart`, `LineChart`, `DataTable`, `Rows` + `Row`, `Checklist` + `ChecklistRow` |
 | Media | `Figure`, `Code` + `Hl`, `Quote` |
 | Trim | `Note`, `Badge`, `Track` |
 

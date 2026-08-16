@@ -54,6 +54,10 @@ plus `slide.tsx`. Default slides carry no colour, so any of them renders in any
 style. Claude reads them through `list_default_slides` and
 `read_default_slide`; Studio previews the current template's curated subset.
 
+Analytical layouts can use the runtime's `BarChart`, `LineChart`, and
+`DataTable` components. Keep the data and structure in JSX; let the active
+style own their visual treatment.
+
 The previews are the default-slide components rendered small, not screenshots. That
 works because the studio has already loaded the deck's stylesheet, so anything
 mounted in the page wears it: the gallery restyles with the deck for free, and

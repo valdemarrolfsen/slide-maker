@@ -1,5 +1,29 @@
-import { Slide, Head, Eyebrow, Title, Fill, Columns, Column, Lede, Ticks, Tick, Rows, Row } from 'slide-maker/runtime';
+import { Slide, Head, Eyebrow, Title, Columns, Column, BarChart, DataTable, Note } from 'slide-maker/runtime';
 
 export default function Recommendation() {
-  return <Slide><Head><Eyebrow>Recommendation</Eyebrow><Title>Concentrate investment where advantage compounds</Title></Head><Fill><Columns ratio="1.15fr 1fr" gap={48}><Column><Lede>State the answer in one decisive sentence, including the trade-off it requires.</Lede><Ticks><Tick>Focus on the priority segment and its highest-value use case.</Tick><Tick>Build the two capabilities that competitors cannot easily copy.</Tick><Tick>Stop work that does not advance the chosen position.</Tick></Ticks></Column><Column><Rows title="Decision frame"><Row k="Value">Expected outcome and range</Row><Row k="Investment">People, capital, and time</Row><Row k="Owner">One accountable executive</Row><Row k="First gate">Date and proof point</Row><Row k="Key risk">What must be true</Row></Rows></Column></Columns></Fill></Slide>;
+  return (
+    <Slide label="Northstar Foods · Growth strategy">
+      <Head><Eyebrow>Recommendation</Eyebrow><Title wide>Reallocating resources toward two priority plays creates a credible path to $145m incremental revenue</Title></Head>
+      <Columns ratio="0.88fr 1.12fr" gap={26} style={{ flex: 1 }}>
+        <Column>
+          <BarChart title="Illustrative 2028 revenue bridge, $m" max={150} data={[
+            { label: 'Core momentum', value: 22, display: '+22', tone: 'muted' },
+            { label: 'Functional snacks', value: 68, display: '+68', tone: 'accent' },
+            { label: 'Premium convenience', value: 54, display: '+54', tone: 'accent' },
+            { label: 'Portfolio exits', value: -18, display: '–18', tone: 'strong' },
+            { label: 'Net impact', value: 126, display: '+126', tone: 'strong' },
+          ]} />
+        </Column>
+        <Column>
+          <DataTable columns={['Move', 'Now', 'Next 90 days', 'Success measure']} rows={[
+            ['Portfolio', 'Nine subsegments funded', 'Select two plays and stop six initiatives', '≥70% resources on priority plays'],
+            ['Channels', 'One proposition everywhere', 'Co-design two pilots with priority accounts', '≥15% sell-through uplift'],
+            ['Operating model', 'Functional hand-offs', 'Stand up one category pod with P&L owner', 'Cycle time below nine months'],
+            ['Governance', 'Annual allocation', 'Install monthly evidence gates', '100% initiatives with stop rule'],
+          ]} />
+        </Column>
+      </Columns>
+      <Note>Model uses category growth, expected share capture, realized price/mix, and explicit cannibalization. It excludes acquisitions and geographic expansion.</Note>
+    </Slide>
+  );
 }

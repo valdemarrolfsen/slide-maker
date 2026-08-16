@@ -414,6 +414,115 @@ export function Stat({ value, label, accent, size = 'default', className, style 
   );
 }
 
+export interface BarDatum {
+  label: ReactNode;
+  value: number;
+  display?: ReactNode;
+  tone?: 'accent' | 'strong' | 'muted';
+}
+
+/** Compact horizontal bars for comparisons, rankings, and survey results. */
+export function BarChart({
+  data,
+  max,
+  title,
+  className,
+  style,
+}: Omit<Base, 'children'> & { data: BarDatum[]; max?: number; title?: ReactNode }) {
+  const ceiling = max || Math.max(1, ...data.map((item) => Math.abs(item.value)));
+  return (
+    <div className={cx('sm-bar-chart', className)} style={style}>
+      {title && <div className="sm-chart-title">{title}</div>}
+      <div className="sm-bar-chart-body">
+        {data.map((item, index) => (
+          <div className="sm-bar-row" key={index}>
+            <div className="sm-bar-label">{item.label}</div>
+            <div className="sm-bar-track">
+              <div
+                className={cx('sm-bar-fill', `sm-tone-${item.tone || 'accent'}`)}
+                style={{ width: `${Math.min(100, (Math.abs(item.value) / ceiling) * 100)}%` }}
+              />
+            </div>
+            <div className="sm-bar-value">{item.display ?? item.value}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export interface LineSeries {
+  name: string;
+  values: number[];
+  tone?: 'accent' | 'strong' | 'muted';
+}
+
+/** Small multi-series line chart with shared, automatically scaled axes. */
+export function LineChart({
+  series,
+  labels = [],
+  title,
+  className,
+  style,
+}: Omit<Base, 'children'> & {
+  series: LineSeries[];
+  labels?: string[];
+  title?: ReactNode;
+}) {
+  const values = series.flatMap((item) => item.values);
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  const span = high - low || 1;
+  const points = (items: number[]) =>
+    items
+      .map((value, index) => {
+        const x = items.length === 1 ? 20 : 20 + (index / (items.length - 1)) * 360;
+        const y = 154 - ((value - low) / span) * 124;
+        return `${x},${y}`;
+      })
+      .join(' ');
+  return (
+    <div className={cx('sm-line-chart', className)} style={style}>
+      {title && <div className="sm-chart-title">{title}</div>}
+      <svg viewBox="0 0 400 180" role="img" aria-label={typeof title === 'string' ? title : 'Line chart'}>
+        {[30, 61, 92, 123, 154].map((y) => <line key={y} x1="20" y1={y} x2="380" y2={y} className="sm-chart-gridline" />)}
+        {series.map((item, index) => (
+          <polyline key={item.name} points={points(item.values)} className={cx('sm-line-series', `sm-tone-${item.tone || (index ? 'strong' : 'accent')}`)} />
+        ))}
+        {labels.map((label, index) => {
+          const x = labels.length === 1 ? 20 : 20 + (index / (labels.length - 1)) * 360;
+          return <text key={label} x={x} y="176" textAnchor={index === 0 ? 'start' : index === labels.length - 1 ? 'end' : 'middle'}>{label}</text>;
+        })}
+      </svg>
+      <div className="sm-chart-legend">
+        {series.map((item, index) => <span key={item.name} className={cx(`sm-tone-${item.tone || (index ? 'strong' : 'accent')}`)}><i />{item.name}</span>)}
+      </div>
+    </div>
+  );
+}
+
+/** Dense multi-column evidence table for analytical and reference slides. */
+export function DataTable({
+  columns,
+  rows,
+  className,
+  style,
+}: Omit<Base, 'children'> & { columns: ReactNode[]; rows: ReactNode[][] }) {
+  const grid = { gridTemplateColumns: `repeat(${columns.length}, minmax(0, 1fr))` };
+  return (
+    <div className={cx('sm-data-table', className)} style={style}>
+      <div className="sm-data-table-head" style={grid}>
+        {columns.map((column, index) => <div key={index}>{column}</div>)}
+      </div>
+      {rows.map((row, rowIndex) => (
+        <div className="sm-data-table-row" style={grid} key={rowIndex}>
+          {row.map((cell, cellIndex) => <div key={cellIndex}>{cell}</div>)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** Key/value panel, for metadata and specification blocks. */
 export function Rows({ title, className, style, children }: Base & { title?: ReactNode }) {
   return (

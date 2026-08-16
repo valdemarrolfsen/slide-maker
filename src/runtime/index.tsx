@@ -523,6 +523,159 @@ export function DataTable({
   );
 }
 
+export interface StackedBarSegment {
+  label: string;
+  value: number;
+  display?: ReactNode;
+  tone?: 'accent' | 'strong' | 'muted' | 'light';
+}
+
+export interface StackedBarRow {
+  label: ReactNode;
+  segments: StackedBarSegment[];
+  total?: ReactNode;
+}
+
+/** Composition bars with direct labels, useful for mix shifts and growth pools. */
+export function StackedBarChart({
+  rows,
+  title,
+  className,
+  style,
+}: Omit<Base, 'children'> & { rows: StackedBarRow[]; title?: ReactNode }) {
+  return (
+    <div className={cx('sm-stacked-chart', className)} style={style}>
+      {title && <div className="sm-chart-title">{title}</div>}
+      <div className="sm-stacked-body">
+        {rows.map((row, rowIndex) => {
+          const total = Math.max(1, row.segments.reduce((sum, segment) => sum + segment.value, 0));
+          return (
+            <div className="sm-stacked-row" key={rowIndex}>
+              <div className="sm-stacked-label">{row.label}</div>
+              <div className="sm-stacked-bar">
+                {row.segments.map((segment, segmentIndex) => (
+                  <div
+                    className={cx('sm-stacked-segment', `sm-tone-${segment.tone || 'muted'}`)}
+                    style={{ width: `${(segment.value / total) * 100}%` }}
+                    key={segmentIndex}
+                  >
+                    {segment.value / total >= 0.09 && <span>{segment.display ?? segment.value}</span>}
+                  </div>
+                ))}
+              </div>
+              <div className="sm-stacked-total">{row.total}</div>
+            </div>
+          );
+        })}
+      </div>
+      <div className="sm-stacked-legend">
+        {Array.from(new Map(rows.flatMap((row) => row.segments).map((segment) => [segment.label, segment])).values()).map((segment) => (
+          <span className={cx(`sm-tone-${segment.tone || 'muted'}`)} key={segment.label}><i />{segment.label}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export interface WaterfallDatum {
+  label: string;
+  value: number;
+  display?: ReactNode;
+  kind?: 'total' | 'change';
+  tone?: 'accent' | 'strong' | 'muted' | 'light';
+}
+
+/** Contribution bridge with floating change bars and explicit total columns. */
+export function WaterfallChart({
+  data,
+  title,
+  className,
+  style,
+}: Omit<Base, 'children'> & { data: WaterfallDatum[]; title?: ReactNode }) {
+  let running = 0;
+  const bars = data.map((item) => {
+    const start = item.kind === 'total' ? 0 : running;
+    const end = item.kind === 'total' ? item.value : running + item.value;
+    running = end;
+    return { ...item, start, end };
+  });
+  const values = bars.flatMap((bar) => [bar.start, bar.end, 0]);
+  const low = Math.min(...values);
+  const high = Math.max(...values);
+  const span = high - low || 1;
+  const y = (value: number) => 18 + ((high - value) / span) * 174;
+  const width = 560;
+  const slot = width / Math.max(1, bars.length);
+  const barWidth = Math.min(48, slot * 0.56);
+
+  return (
+    <div className={cx('sm-waterfall', className)} style={style}>
+      {title && <div className="sm-chart-title">{title}</div>}
+      <svg viewBox={`0 0 ${width} 240`} role="img" aria-label={typeof title === 'string' ? title : 'Waterfall chart'}>
+        <line x1="0" y1={y(0)} x2={width} y2={y(0)} className="sm-waterfall-axis" />
+        {bars.map((bar, index) => {
+          const x = index * slot + (slot - barWidth) / 2;
+          const top = Math.min(y(bar.start), y(bar.end));
+          const height = Math.max(2, Math.abs(y(bar.start) - y(bar.end)));
+          const labelY = bar.end >= bar.start ? top - 7 : top + height + 13;
+          return (
+            <g key={bar.label}>
+              {index > 0 && bar.kind !== 'total' && (
+                <line x1={(index - 1) * slot + (slot + barWidth) / 2} y1={y(bar.start)} x2={x} y2={y(bar.start)} className="sm-waterfall-connector" />
+              )}
+              <rect x={x} y={top} width={barWidth} height={height} className={cx('sm-waterfall-bar', `sm-tone-${bar.tone || (bar.value < 0 ? 'muted' : 'accent')}`)} />
+              <text x={x + barWidth / 2} y={labelY} textAnchor="middle" className="sm-waterfall-value">{bar.display ?? bar.value}</text>
+              <text x={x + barWidth / 2} y="218" textAnchor="middle" className="sm-waterfall-label">{bar.label}</text>
+            </g>
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
+
+export interface MatrixDatum {
+  label: ReactNode;
+  x: number;
+  y: number;
+  size?: number;
+  tone?: 'accent' | 'strong' | 'muted' | 'light';
+}
+
+/** Two-axis opportunity map. Coordinates are percentages from zero to one hundred. */
+export function BubbleMatrix({
+  data,
+  xLabel,
+  yLabel,
+  title,
+  className,
+  style,
+}: Omit<Base, 'children'> & { data: MatrixDatum[]; xLabel: ReactNode; yLabel: ReactNode; title?: ReactNode }) {
+  return (
+    <div className={cx('sm-bubble-matrix', className)} style={style}>
+      {title && <div className="sm-chart-title">{title}</div>}
+      <div className="sm-matrix-y">{yLabel}</div>
+      <div className="sm-matrix-plot">
+        <i className="sm-matrix-v" /><i className="sm-matrix-h" />
+        <span className="sm-matrix-high">HIGH</span><span className="sm-matrix-low">LOW</span>
+        {data.map((item, index) => {
+          const size = item.size || 38;
+          return (
+            <div
+              className={cx('sm-matrix-bubble', `sm-tone-${item.tone || 'muted'}`)}
+              style={{ left: `${item.x}%`, bottom: `${item.y}%`, width: size, height: size }}
+              key={index}
+            >
+              {item.label}
+            </div>
+          );
+        })}
+      </div>
+      <div className="sm-matrix-x">{xLabel}</div>
+    </div>
+  );
+}
+
 /** Key/value panel, for metadata and specification blocks. */
 export function Rows({ title, className, style, children }: Base & { title?: ReactNode }) {
   return (

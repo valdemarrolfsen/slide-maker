@@ -6,9 +6,9 @@ export default function CoverSlide() {
       dark
       grid={false}
       eyebrow="Northstar Foods · Growth strategy"
-      title={<>Winning the next<br />growth horizon</>}
-      lede="A focused shift toward high-value channels can restore profitable growth within 24 months."
-      footerLabel="Confidential"
+      title={<>Rewiring Northstar<br />for the next growth curve</>}
+      lede="A fact-based plan to concentrate the portfolio, redirect commercial investment, and restore profitable growth"
+      footerLabel="CONFIDENTIAL"
       footer="Executive steering committee · 18 August 2026"
     />
   );

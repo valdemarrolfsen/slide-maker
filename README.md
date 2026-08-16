@@ -201,7 +201,7 @@ export default function Approach() {
 | Structure | `Grid` + `Cell`, `Columns` + `Column`, `Card` |
 | Inside a cell | `Kicker`, `CardTitle`, `Line` |
 | Lists | `Ticks` + `Tick`, `Steps` + `Step` |
-| Data | `Stat`, `BarChart`, `LineChart`, `DataTable`, `Rows` + `Row`, `Checklist` + `ChecklistRow` |
+| Data | `Stat`, `BarChart`, `LineChart`, `StackedBarChart`, `WaterfallChart`, `BubbleMatrix`, `DataTable`, `Rows` + `Row`, `Checklist` + `ChecklistRow` |
 | Media | `Figure`, `Code` + `Hl`, `Quote` |
 | Trim | `Note`, `Badge`, `Track` |
 

@@ -1,0 +1,7 @@
+{
+  "label": "Value bridge",
+  "description": "A waterfall bridge and compact sensitivity table for explaining how a recommendation creates financial value.",
+  "tags": ["consulting", "finance", "waterfall", "value-case", "data"],
+  "order": 95,
+  "guidance": "Reconcile exactly from the baseline to the end state. Separate true drivers from enabling investment, make the period and unit explicit, and show a downside case so the decision does not depend on a single forecast."
+}

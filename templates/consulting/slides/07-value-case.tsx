@@ -2,7 +2,7 @@ import { Slide, Head, Eyebrow, Title, Columns, Column, WaterfallChart, DataTable
 
 export default function ValueCase() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-economics" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>05 · What it is worth</Eyebrow>
         <Title wide>The program can add $23m of EBITDA by 2028, with more than half delivered through mix and pricing</Title>
@@ -28,8 +28,20 @@ export default function ValueCase() {
             ['Upside', '+$158m', '+$34m', '+460 bps'],
           ]} />
           <div className="consulting-insight" style={{ marginTop: 18 }}><b>The strategic direction is robust:</b> the downside case remains value-accretive and self-funding; the principal uncertainty is pace, not whether to act.</div>
+          <div className="consulting-assumptions">
+            <div className="consulting-assumption"><span>Value realization</span><b>60%</b></div>
+            <div className="consulting-assumption"><span>Incremental investment</span><b>$9m</b></div>
+            <div className="consulting-assumption"><span>Peak cash exposure</span><b>&lt;$5m</b></div>
+            <div className="consulting-assumption"><span>Payback from launch</span><b>19 months</b></div>
+          </div>
         </Column>
       </Columns>
+      <div className="consulting-metric-strip">
+        <div><b>+$11m</b>EBITDA remains in the downside case</div>
+        <div><b>&lt;$5m</b>peak irreversible cash exposure</div>
+        <div><b>19 months</b>payback from first scaled launch</div>
+        <div><b>60%</b>realization assumption in the base case</div>
+      </div>
       <Note>Team value model based on 2026 actuals. Base case assumes 60% initiative realization, explicit cannibalization, and no benefit from acquisitions or geographic expansion.</Note>
     </Slide>
   );

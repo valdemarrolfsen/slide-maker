@@ -603,7 +603,7 @@ export function WaterfallChart({
   const low = Math.min(...values);
   const high = Math.max(...values);
   const span = high - low || 1;
-  const y = (value: number) => 18 + ((high - value) / span) * 174;
+  const y = (value: number) => 18 + ((high - value) / span) * 226;
   const width = 560;
   const slot = width / Math.max(1, bars.length);
   const barWidth = Math.min(48, slot * 0.56);
@@ -611,7 +611,7 @@ export function WaterfallChart({
   return (
     <div className={cx('sm-waterfall', className)} style={style}>
       {title && <div className="sm-chart-title">{title}</div>}
-      <svg viewBox={`0 0 ${width} 240`} role="img" aria-label={typeof title === 'string' ? title : 'Waterfall chart'}>
+      <svg viewBox={`0 0 ${width} 300`} role="img" aria-label={typeof title === 'string' ? title : 'Waterfall chart'}>
         <line x1="0" y1={y(0)} x2={width} y2={y(0)} className="sm-waterfall-axis" />
         {bars.map((bar, index) => {
           const x = index * slot + (slot - barWidth) / 2;
@@ -625,7 +625,7 @@ export function WaterfallChart({
               )}
               <rect x={x} y={top} width={barWidth} height={height} className={cx('sm-waterfall-bar', `sm-tone-${bar.tone || (bar.value < 0 ? 'muted' : 'accent')}`)} />
               <text x={x + barWidth / 2} y={labelY} textAnchor="middle" className="sm-waterfall-value">{bar.display ?? bar.value}</text>
-              <text x={x + barWidth / 2} y="218" textAnchor="middle" className="sm-waterfall-label">{bar.label}</text>
+              <text x={x + barWidth / 2} y="278" textAnchor="middle" className="sm-waterfall-label">{bar.label}</text>
             </g>
           );
         })}

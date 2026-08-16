@@ -7,7 +7,7 @@ const leaks = [
 
 export default function Diagnosis() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-diagnosis" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>03 · Why performance lags</Eyebrow>
         <Title wide>Northstar’s growth engine leaks at three points—portfolio complexity is the largest and most controllable</Title>
@@ -28,8 +28,20 @@ export default function Diagnosis() {
         <Column>
           <div className="consulting-insight"><b>Implication:</b> simplification is not a cost program. It is the prerequisite for redirecting senior attention, innovation capacity, and trade investment toward the growth plays.</div>
           <div className="consulting-insight" style={{ marginTop: 12 }}><b>Near-term move:</b> stop twelve initiatives and 19 tail SKUs now; protect the three priority launches already past consumer proof.</div>
+          <div className="consulting-benchmarks">
+            <div className="consulting-benchmark"><span>OPERATING METRIC</span><span>NORTHSTAR</span><span>PEER</span></div>
+            <div className="consulting-benchmark"><span>Launch cycle</span><span>14 mo.</span><span>8 mo.</span></div>
+            <div className="consulting-benchmark"><span>Innovation hit rate</span><span>22%</span><span>41%</span></div>
+            <div className="consulting-benchmark"><span>Digital sales mix</span><span>7%</span><span>18%</span></div>
+          </div>
         </Column>
       </Columns>
+      <div className="consulting-metric-strip">
+        <div><b>80%</b>of leakage sits in the top three drivers</div>
+        <div><b>$18m</b>capacity released from the initiative tail</div>
+        <div><b>19</b>low-value SKUs identified for exit</div>
+        <div><b>90 days</b>to validate the first growth propositions</div>
+      </div>
       <Note>Northstar SKU P&amp;L; promotion post-event analysis; initiative census; public peer benchmarks. Leakage values are non-additive until overlap is removed.</Note>
     </Slide>
   );

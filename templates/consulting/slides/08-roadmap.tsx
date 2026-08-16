@@ -5,7 +5,7 @@ const row = (label: string, cells: ReactNode[]) => <div className="consulting-ga
 
 export default function Roadmap() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-roadmap" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>06 · How to deliver</Eyebrow>
         <Title wide>A 12-month mobilization front-loads proof points while keeping irreversible investment below $5m</Title>

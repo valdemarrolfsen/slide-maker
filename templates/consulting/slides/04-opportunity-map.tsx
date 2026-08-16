@@ -2,7 +2,7 @@ import { Slide, Head, Eyebrow, Title, Columns, Column, BubbleMatrix, DataTable, 
 
 export default function OpportunityMap() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-opportunity" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>02 · Where to play</Eyebrow>
         <Title wide>A granular screen identifies three priority micro-markets that combine attractive economics with a credible right to win</Title>
@@ -37,6 +37,11 @@ export default function OpportunityMap() {
             ]}
           />
           <div className="consulting-insight" style={{ marginTop: 16 }}><b>Focus the portfolio around two platforms:</b> performance-led adult occasions and healthier family convenience; treat office as an activation channel, not a third platform.</div>
+          <div className="consulting-screen-logic">
+            <div><b>Attractiveness</b><span>Pool size, structural growth, margin, and competitive intensity</span></div>
+            <div><b>Right to win</b><span>Brand permission, channel access, capabilities, and supply fit</span></div>
+            <div><b>Threshold</b><span>Top-right quadrant plus contribution margin above 38%</span></div>
+          </div>
         </Column>
       </Columns>
       <Note>Euromonitor; retailer scan; 2,400-consumer concept survey; brand-demand model; team analysis. Bubble size represents estimated 2028 revenue pool.</Note>

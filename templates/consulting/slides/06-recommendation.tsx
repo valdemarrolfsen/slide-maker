@@ -2,12 +2,12 @@ import { Slide, Head, Eyebrow, Title, Columns, Column, StackedBarChart, Note } f
 
 export default function Recommendation() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-recommendation" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>04 · What to do</Eyebrow>
         <Title wide>Two growth plays—and three enabling moves—concentrate resources where Northstar has evidence-backed advantage</Title>
       </Head>
-      <Columns ratio=".93fr 1.07fr" gap={32} style={{ flex: 1 }}>
+      <Columns ratio=".93fr 1.07fr" gap={32} style={{ height: 390 }}>
         <Column>
           <div className="consulting-play"><div className="consulting-play-n">01</div><div><h3>Win premium specialty occasions</h3><p>Build two modular platforms around sustained energy and healthier family convenience; tailor pack-price architecture by occasion.</p><small>VALUE: +$72m REVENUE · +$13m EBITDA</small></div></div>
           <div className="consulting-play"><div className="consulting-play-n">02</div><div><h3>Build a scaled direct channel</h3><p>Lead with replenishment, bundles, and first-party learning—not single-item e-commerce economics.</p><small>VALUE: +$48m REVENUE · +$10m EBITDA</small></div></div>

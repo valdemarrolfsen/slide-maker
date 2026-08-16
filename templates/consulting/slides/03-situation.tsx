@@ -2,7 +2,7 @@ import { Slide, Head, Eyebrow, Title, Columns, Column, StackedBarChart, LineChar
 
 export default function MarketContext() {
   return (
-    <Slide label="Northstar Foods · Growth strategy">
+    <Slide className="consulting-market" label="Northstar Foods · Growth strategy">
       <Head>
         <Eyebrow>01 · Where the market is moving</Eyebrow>
         <Title wide>Category growth is healthy—but 73% of the value pool sits outside the channels where Northstar currently wins</Title>

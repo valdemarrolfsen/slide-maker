@@ -63,8 +63,8 @@ export function Studio() {
   const active = slides[Math.min(activeIndex, slides.length - 1)];
   const openCount = comments.filter((c) => c.status === 'open').length;
 
-  const slideComments = useMemo(
-    () => comments.filter((c) => c.slideId === active?.id),
+  const openSlideComments = useMemo(
+    () => comments.filter((c) => c.slideId === active?.id && c.status === 'open'),
     [comments, active?.id],
   );
 
@@ -416,7 +416,7 @@ export function Studio() {
               overlay={
                 <>
                   <Pins
-                    comments={presenting ? [] : slideComments}
+                    comments={presenting ? [] : openSlideComments}
                     selectedId={selectedId}
                     onSelect={setSelectedId}
                   />

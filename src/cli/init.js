@@ -5,11 +5,10 @@ import { resolveDeckDir } from '../core/paths.js';
 import { CONFIG_FILE } from '../core/deck.js';
 import { listStyles } from '../core/styles.js';
 import { listTemplates } from '../core/templates.js';
+import { readUserConfig } from '../core/user-config.js';
 import { color, fail, ok, info } from '../core/log.js';
 import { canPrompt, select } from './prompt.js';
 import { GITIGNORE, deckClaudeMd, deckConfig, deckTsconfig, mcpEntry } from './scaffold.js';
-
-const DEFAULT_TEMPLATE = 'blank';
 
 async function writeIfAbsent(file, contents, written, skipped) {
   if (fs.existsSync(file)) {
@@ -68,7 +67,8 @@ async function writeMcpConfig(deckDir, written, skipped) {
   written.push(file);
 }
 
-async function chooseTemplate(templates, given, interactive) {
+/** Resolves the template, defaulting to the user's `config defaultTemplate`. */
+async function chooseTemplate(templates, given, interactive, preferred) {
   if (given) {
     const match = templates.find((template) => template.name === given);
     if (!match) {
@@ -76,13 +76,15 @@ async function chooseTemplate(templates, given, interactive) {
     }
     return match;
   }
-  if (!interactive) return templates.find((template) => template.name === DEFAULT_TEMPLATE) || templates[0];
+  if (!interactive) {
+    return templates.find((template) => template.name === preferred) || templates[0];
+  }
 
   console.log('');
   const name = await select({
     message: 'Template',
     hint: 'a complete starting deck, or blank',
-    initial: Math.max(0, templates.findIndex((template) => template.name === DEFAULT_TEMPLATE)),
+    initial: Math.max(0, templates.findIndex((template) => template.name === preferred)),
     choices: templates.map((template) => ({
       value: template.name,
       label: template.label,
@@ -138,13 +140,29 @@ export async function initCommand(target, options) {
     );
   }
 
-  const [styles, templates] = await Promise.all([listStyles(deckDir), listTemplates()]);
+  const [styles, templates, user] = await Promise.all([
+    listStyles(deckDir),
+    listTemplates(),
+    readUserConfig(),
+  ]);
   if (!styles.length) fail('No styles are installed.', 'The package looks incomplete.');
   if (!templates.length) fail('No templates are installed.', 'The package looks incomplete.');
 
   const interactive = canPrompt() && !options.yes;
-  const template = await chooseTemplate(templates, options.template, interactive);
-  const style = await chooseStyle(styles, options.style, interactive, template.defaultStyle);
+  const template = await chooseTemplate(
+    templates,
+    options.template,
+    interactive,
+    user.defaultTemplate,
+  );
+  // A style the user configured is a deliberate machine-wide choice, so it
+  // outranks the template's own recommendation but never an explicit --style.
+  const style = await chooseStyle(
+    styles,
+    options.style,
+    interactive,
+    user.defaultStyle || template.defaultStyle,
+  );
 
   const title = options.title || toTitle(name);
   const written = [];
@@ -156,7 +174,7 @@ export async function initCommand(target, options) {
     title,
     template: template.name,
     style: style.name,
-    author: options.author || '',
+    author: options.author || user.author || '',
   });
   await writeIfAbsent(
     path.join(deckDir, CONFIG_FILE),

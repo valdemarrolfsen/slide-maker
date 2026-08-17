@@ -77,6 +77,11 @@ the studio is open or not.
 - A **default slide** is a reusable layout offered by this template. Default
   slides are starting points, carry no colour, and render in any style.
 
+If the user wants the deck to look like something they already have, a product,
+a brand site, a \`dist\` directory, call \`create_custom_template\`. It scaffolds a
+template and style into their slide-maker home, where every future deck can
+reach it, and returns the brief for filling it in from the source.
+
 ## Working loop
 
 1. Call \`deck_overview\` to see the template, style, running order, and comments.

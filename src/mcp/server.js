@@ -9,7 +9,10 @@ import {
   listDefaultSlides,
   readDefaultSlideSource,
 } from '../core/default-slides.js';
-import { resolveTemplate } from '../core/templates.js';
+import { listTemplates, resolveTemplate } from '../core/templates.js';
+import { craftingBrief, createCustomTemplate } from '../core/custom-template.js';
+import { readUserConfig, setUserSetting } from '../core/user-config.js';
+import { userDir } from '../core/paths.js';
 import { listComments, readState, resolveComment, reopenComment } from '../core/comments.js';
 import { renderSlides, closeRenderer } from '../render/renderer.js';
 
@@ -60,6 +63,10 @@ export async function startMcpServer(deckDir) {
         '- Compose slides from the components exported by "slide-maker/runtime"',
         '  rather than raw HTML, otherwise switching style will not restyle them.',
         '- Call render_slide to see your own work before claiming a slide is done.',
+        '- When the user wants their own look, or points you at a product, brand site or',
+        '  dist directory and asks for a template, call create_custom_template. It',
+        '  scaffolds the template into their slide-maker home, where every future deck',
+        '  can reach it, and returns the brief for filling it in.',
       ].join('\n'),
     },
   );
@@ -243,6 +250,151 @@ export async function startMcpServer(deckDir) {
       const config = await readConfig(deckDir);
       await writeConfig(deckDir, { ...config, style: name });
       return text(`Style set to ${name}. The studio has reloaded.\n\n${style.guidance}`);
+    },
+  );
+
+  /* ── Templates ── */
+
+  server.registerTool(
+    'list_templates',
+    {
+      title: 'List templates',
+      description:
+        'Complete starter decks available on this machine: the built-in ones and any ' +
+        'the user has crafted and stored. Read this before creating another template, ' +
+        'since the user may already have the one they are describing.',
+      inputSchema: {},
+    },
+    async () => {
+      const [templates, user] = await Promise.all([listTemplates(), readUserConfig()]);
+      return json({
+        home: userDir(),
+        defaultTemplate: user.defaultTemplate,
+        defaultStyle: user.defaultStyle,
+        templates: templates.map((t) => ({
+          name: t.name,
+          label: t.label,
+          description: t.description,
+          tags: t.tags,
+          defaultStyle: t.defaultStyle,
+          guidance: t.guidance,
+          source: t.source,
+          craftedFrom: t.craftedFrom || undefined,
+          dir: t.source === 'user' ? t.dir : undefined,
+        })),
+      });
+    },
+  );
+
+  server.registerTool(
+    'create_custom_template',
+    {
+      title: 'Create a custom template',
+      description:
+        'Scaffolds a template of the user\'s own and returns the brief for crafting it. ' +
+        'Reach for this when the user points at a product, brand site or dist directory ' +
+        'and asks for a deck that looks like it. The skeleton lands in the user\'s ' +
+        'slide-maker home rather than in this deck, so every future deck on the machine ' +
+        'can start from it. It writes a forked style with every design token in place and ' +
+        'a template with starter slides and a layout stylesheet; you then read the source ' +
+        'project and fill those files in with your own file tools. Follow the returned ' +
+        'brief, then verify by starting a scratch deck from the template and rendering it.',
+      inputSchema: {
+        name: z
+          .string()
+          .describe('Lowercase name, such as "acme-brand". Becomes the template and style name.'),
+        label: z.string().optional().describe('Human name, such as "Acme brand"'),
+        description: z.string().optional().describe('One line on what the template is for'),
+        guidance: z
+          .string()
+          .optional()
+          .describe('Notes for a future session on how to use this template well'),
+        source: z
+          .string()
+          .optional()
+          .describe('Path or URL the design comes from, recorded in the manifest'),
+        basedOn: z
+          .string()
+          .optional()
+          .describe('Template to take the starting slides and layout from. Defaults to blank.'),
+        style: z
+          .string()
+          .optional()
+          .describe('Use an existing style instead of creating one for this template'),
+        baseStyle: z
+          .string()
+          .optional()
+          .describe('Style to fork the new one from. Pick the closest built-in.'),
+        force: z.boolean().optional().describe('Overwrite a template of the same name'),
+      },
+    },
+    async ({ name, label, description, guidance, source, basedOn, style, baseStyle, force }) => {
+      try {
+        const result = await createCustomTemplate({
+          name,
+          label,
+          description,
+          guidance,
+          basedOn: basedOn || 'blank',
+          style,
+          baseStyle,
+          craftedFrom: source || '',
+          force: Boolean(force),
+        });
+        return text(
+          `Scaffolded "${name}" in ${userDir()}, forked from the ${result.basedOn} template.\n\n` +
+            craftingBrief({
+              template: result.template,
+              styleName: result.styleName,
+              styleDir: result.styleDir,
+              craftedFrom: source || '',
+            }),
+        );
+      } catch (err) {
+        // A name that is already taken is the common failure, and the useful
+        // next step is reading the brief rather than retrying with force.
+        return text(
+          `${err.message}\n\nRun \`slide-maker config brief ${name}\` to see what an existing ` +
+            'template still needs filled in.',
+        );
+      }
+    },
+  );
+
+  server.registerTool(
+    'set_default_template',
+    {
+      title: 'Set the default template',
+      description:
+        'Changes what `slide-maker init` starts from on this machine, for every future ' +
+        'deck. Use it only when the user asks for a default; it does not affect this deck.',
+      inputSchema: {
+        template: z.string().describe('Template name from list_templates'),
+        style: z
+          .string()
+          .optional()
+          .describe('Also pin the style, overriding what each template recommends'),
+      },
+    },
+    async ({ template, style }) => {
+      if (!(await resolveTemplate(template))) {
+        const available = (await listTemplates()).map((t) => t.name).join(', ');
+        return text(`No template named "${template}". Available: ${available}`);
+      }
+      await setUserSetting('defaultTemplate', template);
+      if (style) {
+        if (!(await resolveStyle(null, style))) {
+          const available = (await listStyles(null)).map((s) => s.name).join(', ');
+          return text(
+            `Default template set to ${template}, but there is no style named "${style}". ` +
+              `Available: ${available}`,
+          );
+        }
+        await setUserSetting('defaultStyle', style);
+      }
+      return text(
+        `New decks will start from ${template}${style ? ` in the ${style} style` : ''}.`,
+      );
     },
   );
 

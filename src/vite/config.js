@@ -3,7 +3,7 @@ import path from 'node:path';
 import react from '@vitejs/plugin-react';
 import { deckPlugin } from './plugin-deck.js';
 import { singleFilePlugin } from './plugin-singlefile.js';
-import { packageRoot, viewerDir } from '../core/paths.js';
+import { packageRoot, userDir, viewerDir } from '../core/paths.js';
 
 /**
  * Builds the Vite configuration for a deck.
@@ -40,9 +40,10 @@ export function createViteConfig({ deckDir, config, mode = 'studio', outDir, bas
     },
     server: {
       fs: {
-        // The viewer lives in the package, the slides live in the deck, and
-        // Vite must be allowed to read both.
-        allow: [packageRoot, deckDir],
+        // The viewer lives in the package, the slides live in the deck, and a
+        // style or default slide the user authored lives in the slide-maker
+        // home. Vite must be allowed to read all three.
+        allow: [packageRoot, deckDir, userDir()],
       },
     },
     optimizeDeps: {

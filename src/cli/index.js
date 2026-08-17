@@ -9,6 +9,18 @@ import { templatesCommand } from './templates.js';
 import { defaultSlidesCommand } from './default-slides.js';
 import { browseCommand } from './browse.js';
 import { clearCommentsCommand, commentsCommand, resolveCommentCommand } from './comments.js';
+import {
+  configBriefCommand,
+  configGetCommand,
+  configListCommand,
+  configNewTemplateCommand,
+  configPathCommand,
+  configRemoveTemplateCommand,
+  configSaveTemplateCommand,
+  configSetCommand,
+  configTemplatesCommand,
+  configUnsetCommand,
+} from './config.js';
 import { resolveDeckDir } from '../core/paths.js';
 import { error } from '../core/log.js';
 
@@ -94,6 +106,77 @@ export function createCli() {
     .option('--host [host]', 'expose the server on the network')
     .option('--no-open', 'do not open a browser on start')
     .action(browseCommand);
+
+  const config = program
+    .command('config')
+    .description('your machine-wide settings and your own templates');
+
+  config
+    .command('list', { isDefault: true })
+    .description('show the settings and the templates you have stored')
+    .action(configListCommand);
+
+  config.command('path').description('print the slide-maker home directory').action(configPathCommand);
+
+  config
+    .command('get')
+    .argument('[key]', 'setting name')
+    .description('read a setting')
+    .action(configGetCommand);
+
+  config
+    .command('set')
+    .argument('<key>', 'defaultTemplate, defaultStyle or author')
+    .argument('<value>')
+    .description('change a setting, such as the template init starts from')
+    .action(configSetCommand);
+
+  config
+    .command('unset')
+    .argument('<key>', 'setting name')
+    .description('go back to the built-in default')
+    .action(configUnsetCommand);
+
+  config
+    .command('templates')
+    .description('list the templates stored on this machine')
+    .action(configTemplatesCommand);
+
+  config
+    .command('new-template')
+    .argument('<name>', 'name for the template, such as acme-brand')
+    .description('scaffold a template of your own for Claude to craft')
+    .option('--from <template>', 'template to take the starting slides and layout from', 'blank')
+    .option('-s, --style <name>', 'use an existing style instead of creating one')
+    .option('--base-style <name>', 'style to fork the new one from')
+    .option('--source <dir>', 'project or dist directory the design comes from')
+    .option('--label <label>', 'human name')
+    .option('--description <text>', 'one line on what it is for')
+    .option('-f, --force', 'overwrite an existing template of the same name')
+    .action(configNewTemplateCommand);
+
+  config
+    .command('save-template')
+    .argument('<name>', 'name to store it under')
+    .argument('[deck]', 'deck to save', '.')
+    .description('store an existing deck as a reusable template')
+    .option('--label <label>', 'human name')
+    .option('--description <text>', 'one line on what it is for')
+    .option('-f, --force', 'overwrite an existing template of the same name')
+    .action(configSaveTemplateCommand);
+
+  config
+    .command('remove-template')
+    .argument('<name>', 'template name')
+    .description('delete one of your templates')
+    .option('-s, --style', 'delete its style as well')
+    .action(configRemoveTemplateCommand);
+
+  config
+    .command('brief')
+    .argument('<name>', 'template name')
+    .description('print what to fill in when crafting a template')
+    .action(configBriefCommand);
 
   const comments = program.command('comments').description('read and clear deck feedback');
 

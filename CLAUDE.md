@@ -73,6 +73,25 @@ cannot drift out of date with what a slide would actually look like.
 Styles and default slides are shadowed by deck-local copies in `styles/` and
 `default_slides/`, so a project can fork a built-in by keeping its name.
 
+## The user's slide-maker home
+
+`~/.slide-maker/` (moveable with `SLIDE_MAKER_HOME`) holds `config.json` plus
+`templates/`, `styles/` and `default_slides/` the user owns. It is the middle
+tier of resolution everywhere: built-in, then home, then deck-local. That tier
+is the whole point of a custom template. A brand belongs to the person, not to
+the deck that happened to prompt it, so `create_custom_template` scaffolds into
+the home directory and never into the current deck.
+
+`src/core/custom-template.js` scaffolds and returns a brief; it does not
+generate a design. Crafting a template means reading a source project and
+writing CSS, which Claude does with its own file tools, and a generator here
+would be a second, worse way to edit a file. The scaffold forks a built-in style
+so every `--sm-*` token is present to overwrite rather than remembered.
+
+Because a style can now live outside both the package and the deck, Vite's
+`server.fs.allow` includes the home directory. Without it the studio 403s on a
+stylesheet the deck legitimately wears.
+
 ## Invariants
 
 **The runtime owns shared structure, templates own bespoke composition, and
@@ -118,6 +137,10 @@ What MCP provides is the review state Claude cannot otherwise reach: open
 comments and the text they point at, the style and default-slide registries,
 and `render_slide` so Claude can look at what it built. `read_default_slide` returns JSX
 for Claude to copy rather than writing a file, for the same reason.
+
+`create_custom_template` is the one tool that writes outside the deck, because
+the directory it writes to is not something Claude can be expected to guess.
+It returns the crafting brief and stops there.
 
 ## Conventions
 

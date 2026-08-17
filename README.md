@@ -135,6 +135,60 @@ copied into the new deck, while its colours and typefaces continue to come from
 the selected style. `slide-maker browse <template>` opens a disposable Studio
 preview, so browsing never modifies the bundled source deck.
 
+### Templates of your own
+
+The built-in templates are a starting point, not the list. Point Claude at a
+product you already have and ask for a template that looks like it:
+
+```
+craft a slide-maker template from ./dist and call it acme-brand
+```
+
+Claude calls `create_custom_template`, which scaffolds the template and a style
+of its own into your slide-maker home, then reads the source for its palette,
+typefaces, spacing and logo and fills them in. Nothing lands in the deck you
+happen to be standing in: the point of a brand template is the next deck, and
+the one after that.
+
+```bash
+slide-maker config new-template acme-brand --source ../acme/dist
+slide-maker config templates              # what you have stored
+slide-maker browse acme-brand             # look at it
+slide-maker config brief acme-brand       # what still needs filling in
+slide-maker config save-template acme     # store the current deck as a template
+slide-maker config remove-template acme --style
+```
+
+A stored template lives beside the built-ins from then on, so
+`slide-maker init --template acme-brand` and the template picker both offer it.
+A template or style in your home that shares a name with a built-in shadows it,
+and a deck-local one still wins over both.
+
+### Defaults for new decks
+
+`slide-maker config` also holds the settings `init` starts from, so you stop
+answering the same two questions:
+
+```bash
+slide-maker config                                    # everything, and where it lives
+slide-maker config set defaultTemplate acme-brand
+slide-maker config set defaultStyle noir
+slide-maker config set author "Your Name"
+slide-maker config unset defaultStyle
+```
+
+`--template` and `--style` on `init` still win, and a configured style outranks
+the one a template recommends. Everything lives in `~/.slide-maker`, which
+`SLIDE_MAKER_HOME` can point elsewhere:
+
+```
+~/.slide-maker/
+  config.json          defaults for init
+  templates/<name>/    templates you or Claude made
+  styles/<name>/       styles to go with them
+  default_slides/      reusable layouts of your own
+```
+
 ### The default-slide library
 
 Add one to a deck from the studio. The **Add slide** button next to the style
@@ -269,6 +323,9 @@ The server exposes:
 | `list_comments` | Your feedback, with file paths and quoted text |
 | `resolve_comment` | Clear a note once it is addressed |
 | `list_styles` / `set_style` | Pick and switch the design system |
+| `list_templates` | Starter decks available, built-in and your own |
+| `create_custom_template` | Scaffold a template from a product or brand, stored for every deck |
+| `set_default_template` | Change what `init` starts from on this machine |
 | `list_default_slides` / `read_default_slide` | Find a reusable layout and read its JSX to copy |
 | `render_slide` | Render to PNG, so Claude can check its own work |
 | `deck_files` | Where things live, and what to name the next slide |
@@ -300,6 +357,10 @@ slide-maker default-slides     list reusable slide layouts
 slide-maker browse [template]  preview a template deck
 slide-maker comments           read feedback from the terminal
 slide-maker comments resolve <id>
+slide-maker config             your settings and your own templates
+slide-maker config set <key> <value>
+slide-maker config new-template <name>
+slide-maker config save-template <name> [deck]
 slide-maker mcp [dir]          run the MCP server over stdio
 ```
 

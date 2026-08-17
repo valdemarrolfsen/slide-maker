@@ -6,7 +6,8 @@ export async function templatesCommand() {
   console.log('');
   for (const template of templates) {
     const tags = template.tags.length ? color.dim(` [${template.tags.join(' ')}]`) : '';
-    console.log(`  ${color.bold(template.name)}${tags}`);
+    const mine = template.source === 'user' ? color.dim(' (yours)') : '';
+    console.log(`  ${color.bold(template.name)}${mine}${tags}`);
     if (template.description) console.log(`    ${color.dim(template.description)}`);
     const slideCount = template.defaultSlides.includes('*')
       ? 'all default slides'
@@ -16,5 +17,6 @@ export async function templatesCommand() {
   console.log('');
   console.log(color.dim('  Preview one with `slide-maker browse <template>`.'));
   console.log(color.dim('  Start from one with `slide-maker init --template <template>`.'));
+  console.log(color.dim('  Make your own with `slide-maker config new-template <name>`.'));
   console.log('');
 }

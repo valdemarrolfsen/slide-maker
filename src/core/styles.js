@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { builtinStylesDir } from './paths.js';
+import { builtinStylesDir, userStylesDir } from './paths.js';
 
 export const STYLE_MANIFEST = 'style.json';
 export const STYLE_STYLESHEET = 'style.css';
@@ -52,11 +52,13 @@ async function scanDir(dir, source) {
 /**
  * Every style available to a deck.
  *
- * Deck-local styles come last and win, so a project can fork a built-in by
- * copying it into ./styles and keeping the name.
+ * Three tiers, each shadowing the one before: built-ins, the styles in the
+ * user's slide-maker home, then the deck's own. That is what lets a project
+ * fork a built-in by copying it into ./styles and keeping the name.
  */
 export async function listStyles(deckDir) {
   const builtin = await scanDir(builtinStylesDir, 'builtin');
+  const user = await scanDir(userStylesDir(), 'user');
   const localDir = deckDir ? path.join(deckDir, LOCAL_STYLES_DIR) : null;
   // Working inside the slide-maker repo itself, the two directories are the
   // same one. Scanning it twice would label every built-in as local.
@@ -65,7 +67,7 @@ export async function listStyles(deckDir) {
       ? await scanDir(localDir, 'local')
       : [];
   const byName = new Map();
-  for (const s of [...builtin, ...local]) byName.set(s.name, s);
+  for (const s of [...builtin, ...user, ...local]) byName.set(s.name, s);
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name));
 }
 

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
-import { builtinDefaultSlidesDir } from './paths.js';
+import { builtinDefaultSlidesDir, userDefaultSlidesDir } from './paths.js';
 
 /**
  * The reusable slide-layout library.
@@ -62,6 +62,7 @@ async function scanDir(dir, source) {
 
 export async function listDefaultSlides(deckDir, names) {
   const builtin = await scanDir(builtinDefaultSlidesDir, 'builtin');
+  const user = await scanDir(userDefaultSlidesDir(), 'user');
   const localDir = deckDir ? path.join(deckDir, LOCAL_DEFAULT_SLIDES_DIR) : null;
   const legacyDir = deckDir ? path.join(deckDir, LEGACY_LOCAL_DEFAULT_SLIDES_DIR) : null;
   const legacy = legacyDir ? await scanDir(legacyDir, 'local') : [];
@@ -71,7 +72,7 @@ export async function listDefaultSlides(deckDir, names) {
       : [];
   const byName = new Map();
   // The new directory wins if a deck happens to keep both during migration.
-  for (const slide of [...builtin, ...legacy, ...local]) byName.set(slide.name, slide);
+  for (const slide of [...builtin, ...user, ...legacy, ...local]) byName.set(slide.name, slide);
   const allowed = Array.isArray(names) && names.length && !names.includes('*') ? new Set(names) : null;
   return [...byName.values()]
     .filter((slide) => !allowed || allowed.has(slide.name))

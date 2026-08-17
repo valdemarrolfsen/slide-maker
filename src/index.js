@@ -14,6 +14,13 @@ export {
   resolveDefaultSlide,
   readDefaultSlideSource,
 } from './core/default-slides.js';
+export { readUserConfig, writeUserConfig, setUserSetting } from './core/user-config.js';
+export {
+  createCustomTemplate,
+  saveDeckAsTemplate,
+  removeCustomTemplate,
+  craftingBrief,
+} from './core/custom-template.js';
 export {
   listComments,
   addComment,

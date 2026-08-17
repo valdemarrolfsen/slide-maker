@@ -1,0 +1,8 @@
+{
+  "label": "Blank",
+  "description": "An empty frame with a heading block and nothing else. Start from here when the deck does not resemble anything in the library.",
+  "tags": ["empty", "start"],
+  "order": 10,
+  "file": "slide",
+  "guidance": "The default when no layout fits. Keep the Head and replace everything under it. If you find yourself rebuilding the same arrangement twice from blank, that arrangement wants to be a template."
+}

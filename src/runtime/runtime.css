@@ -413,6 +413,149 @@
   color: var(--sm-muted);
 }
 
+.sm-chart-title {
+  margin-bottom: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--sm-fg);
+}
+.sm-bar-chart,
+.sm-line-chart {
+  min-width: 0;
+}
+.sm-bar-chart-body {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.sm-bar-row {
+  display: grid;
+  grid-template-columns: 112px 1fr 44px;
+  align-items: center;
+  gap: 10px;
+  font-size: 11px;
+}
+.sm-bar-label { color: var(--sm-muted); }
+.sm-bar-track {
+  height: 12px;
+  background: var(--sm-panel);
+}
+.sm-bar-fill { height: 100%; background: var(--sm-accent); }
+.sm-bar-fill.sm-tone-strong { background: var(--sm-fg-2); }
+.sm-bar-fill.sm-tone-muted { background: var(--sm-muted-2); }
+.sm-bar-value {
+  font-family: var(--sm-mono);
+  font-size: 10px;
+  text-align: right;
+  color: var(--sm-fg-2);
+}
+.sm-line-chart svg {
+  display: block;
+  width: 100%;
+  overflow: visible;
+}
+.sm-chart-gridline {
+  stroke: var(--sm-border);
+  stroke-width: 1;
+}
+.sm-line-series {
+  fill: none;
+  stroke: var(--sm-accent);
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+.sm-line-series.sm-tone-strong { stroke: var(--sm-fg-2); }
+.sm-line-series.sm-tone-muted { stroke: var(--sm-muted-2); }
+.sm-line-chart text {
+  fill: var(--sm-muted-2);
+  font-family: var(--sm-mono);
+  font-size: 8px;
+}
+.sm-chart-legend {
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+  font-family: var(--sm-mono);
+  font-size: 9px;
+  color: var(--sm-muted);
+}
+.sm-chart-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sm-chart-legend i { width: 12px; height: 2px; background: currentColor; }
+.sm-data-table {
+  border-top: var(--sm-hairline) solid var(--sm-fg-2);
+  border-bottom: var(--sm-hairline) solid var(--sm-fg-2);
+}
+.sm-data-table-head,
+.sm-data-table-row {
+  display: grid;
+}
+.sm-data-table-head {
+  background: var(--sm-panel);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--sm-fg);
+}
+.sm-data-table-row {
+  border-top: var(--sm-hairline) solid var(--sm-border);
+  font-size: 10.5px;
+  color: var(--sm-muted);
+}
+.sm-data-table-head > div,
+.sm-data-table-row > div {
+  padding: 7px 9px;
+  border-right: var(--sm-hairline) solid var(--sm-border);
+}
+.sm-data-table-head > div:last-child,
+.sm-data-table-row > div:last-child { border-right: none; }
+.sm-data-table-row > div:first-child { font-weight: 600; color: var(--sm-fg-2); }
+
+.sm-stacked-body { display: flex; flex-direction: column; gap: 12px; }
+.sm-stacked-row { display: grid; grid-template-columns: 94px 1fr 38px; align-items: center; gap: 10px; }
+.sm-stacked-label { font-size: 10px; color: var(--sm-muted); }
+.sm-stacked-bar { display: flex; height: 28px; overflow: hidden; }
+.sm-stacked-segment { display: flex; align-items: center; justify-content: center; min-width: 1px; background: var(--sm-muted-2); color: var(--sm-bg); }
+.sm-stacked-segment.sm-tone-accent { background: var(--sm-accent); color: var(--sm-bg); }
+.sm-stacked-segment.sm-tone-strong { background: var(--sm-fg-2); color: var(--sm-bg); }
+.sm-stacked-segment.sm-tone-muted { color: var(--sm-bg); }
+.sm-stacked-segment.sm-tone-light { background: var(--sm-border-2); color: var(--sm-fg-2); }
+.sm-stacked-segment span { font-family: var(--sm-mono); font-size: 8px; }
+.sm-stacked-total { font-family: var(--sm-mono); font-size: 9px; text-align: right; color: var(--sm-fg-2); }
+.sm-stacked-legend { display: flex; justify-content: flex-end; gap: 13px; margin-top: 13px; font-size: 8px; color: var(--sm-muted); }
+.sm-stacked-legend span { display: inline-flex; align-items: center; gap: 5px; }
+.sm-stacked-legend i { width: 9px; height: 9px; background: var(--sm-muted-2); }
+.sm-stacked-legend .sm-tone-accent i { background: var(--sm-accent); }
+.sm-stacked-legend .sm-tone-strong i { background: var(--sm-fg-2); }
+.sm-stacked-legend .sm-tone-light i { background: var(--sm-border-2); }
+
+.sm-waterfall svg { display: block; width: 100%; overflow: visible; }
+.sm-waterfall-axis { stroke: var(--sm-border-2); stroke-width: 1; }
+.sm-waterfall-connector { stroke: var(--sm-border-2); stroke-width: 1; stroke-dasharray: 2 2; }
+.sm-waterfall-bar { fill: var(--sm-accent); }
+.sm-waterfall-bar.sm-tone-strong { fill: var(--sm-fg-2); }
+.sm-waterfall-bar.sm-tone-muted { fill: var(--sm-muted-2); }
+.sm-waterfall-bar.sm-tone-light { fill: var(--sm-border-2); }
+.sm-waterfall text { font-family: var(--sm-mono); }
+.sm-waterfall-value { fill: var(--sm-fg-2); font-size: 9px; font-weight: 600; }
+.sm-waterfall-label { fill: var(--sm-muted); font-size: 8px; }
+
+.sm-bubble-matrix { position: relative; padding-left: 28px; }
+.sm-matrix-plot { position: relative; height: 250px; border-left: 1px solid var(--sm-border-2); border-bottom: 1px solid var(--sm-border-2); }
+.sm-matrix-v, .sm-matrix-h { position: absolute; display: block; background: var(--sm-border); }
+.sm-matrix-v { top: 0; bottom: 0; left: 50%; width: 1px; }
+.sm-matrix-h { left: 0; right: 0; top: 50%; height: 1px; }
+.sm-matrix-bubble { position: absolute; display: flex; align-items: center; justify-content: center; transform: translate(-50%, 50%); border-radius: 50%; padding: 5px; background: var(--sm-muted-2); color: var(--sm-bg); font-size: 7px; line-height: 1.05; text-align: center; box-shadow: 0 0 0 1px var(--sm-bg); }
+.sm-matrix-bubble.sm-tone-accent { background: var(--sm-accent); color: var(--sm-bg); }
+.sm-matrix-bubble.sm-tone-strong { background: var(--sm-fg-2); color: var(--sm-bg); }
+.sm-matrix-bubble.sm-tone-muted { color: var(--sm-bg); }
+.sm-matrix-bubble.sm-tone-light { background: var(--sm-border-2); color: var(--sm-fg-2); }
+.sm-matrix-x { margin-top: 8px; font-size: 8px; text-align: center; color: var(--sm-muted); }
+.sm-matrix-y { position: absolute; left: -3px; top: 50%; font-size: 8px; color: var(--sm-muted); writing-mode: vertical-rl; transform: rotate(180deg) translateY(50%); }
+.sm-matrix-high, .sm-matrix-low { position: absolute; left: 5px; font-size: 6px; color: var(--sm-muted-2); }
+.sm-matrix-high { top: 4px; }
+.sm-matrix-low { bottom: 4px; }
+
 .sm-rows {
   border: var(--sm-hairline) solid var(--sm-border);
   border-radius: var(--sm-radius);

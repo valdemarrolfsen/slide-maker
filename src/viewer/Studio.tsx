@@ -6,7 +6,7 @@ import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
 import { ChevronLeft, ChevronRight, Close, Deck, Download, Message, Pin, Play } from './Icons';
-import { TemplateMenu } from './TemplateMenu';
+import { DefaultSlideMenu } from './DefaultSlideMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
@@ -118,12 +118,12 @@ export function Studio() {
     }
   };
 
-  /** Appends a slide built from a template, for the user to brief Claude on. */
-  const addSlide = async (template: string) => {
+  /** Appends one of the current template deck's default slides. */
+  const addSlide = async (defaultSlide: string) => {
     setAddPending(true);
     setAddError(null);
     try {
-      const { file } = await api.addSlide(template);
+      const { file } = await api.addSlide(defaultSlide);
       sessionStorage.setItem(LANDING_KEY, file);
       // The file watcher reloads the viewer, so there is nothing to do here.
     } catch (err) {
@@ -342,7 +342,7 @@ export function Studio() {
               ))}
             </select>
           </label>
-          <TemplateMenu
+          <DefaultSlideMenu
             config={config}
             pending={addPending}
             error={addError}

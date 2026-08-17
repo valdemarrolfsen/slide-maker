@@ -1,0 +1,57 @@
+/* Portfolio studio. A restrained monograph built around images and scale. */
+.sm-slide {
+  --sm-bg: #f8f7f3;
+  --sm-bg-0: rgba(248, 247, 243, 0);
+  --sm-panel: #ebe7df;
+  --sm-fg: #10100f;
+  --sm-fg-2: #2a2926;
+  --sm-muted: #66625b;
+  --sm-muted-2: #918b81;
+  --sm-border: #d8d3c9;
+  --sm-border-2: #bdb6aa;
+  --sm-accent: #a3553e;
+  --sm-accent-dim: #c68068;
+  --sm-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sm-mono: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --sm-title-size: 42px;
+  --sm-title-big: 62px;
+  --sm-title-huge: 88px;
+  --sm-title-weight: 400;
+  --sm-title-leading: 0.96;
+  --sm-title-tracking: -0.045em;
+  --sm-body-size: 13px;
+  --sm-lede-size: 16px;
+  --sm-radius: 0;
+}
+.sm-slide.sm-dark {
+  --sm-bg: #171715;
+  --sm-bg-0: rgba(23, 23, 21, 0);
+  --sm-panel: #262522;
+  --sm-fg: #f7f5ef;
+  --sm-fg-2: #e7e2d8;
+  --sm-muted: #aaa398;
+  --sm-muted-2: #777168;
+  --sm-border: #36342f;
+  --sm-border-2: #504c45;
+  --sm-accent: #d3977e;
+}
+.sm-eyebrow,
+.sm-kicker {
+  font-size: 8px;
+  font-weight: 500;
+  letter-spacing: 0.26em;
+}
+.sm-head { border: 0; }
+.sm-chrome {
+  font-size: 8px;
+  letter-spacing: 0.22em;
+}
+.sm-figure img { filter: saturate(0.8) contrast(0.98); }
+.sm-figcaption { font-size: 8px; letter-spacing: 0.2em; }
+.sm-grid { border: 0; background: transparent; }
+.sm-cell { background: transparent; }
+.sm-card-title { font-size: 24px; font-weight: 400; }
+.sm-line { font-size: 12px; }
+.sm-stat-v { font-size: 48px; font-weight: 300; }
+.sm-stat-l { font-size: 11px; }
+.sm-cover-lede { font-size: 13px; }

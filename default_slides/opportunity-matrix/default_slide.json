@@ -1,0 +1,7 @@
+{
+  "label": "Opportunity matrix",
+  "description": "A bubble matrix and evidence table for prioritizing markets, customers, products, or initiatives.",
+  "tags": ["consulting", "strategy", "matrix", "prioritization", "data"],
+  "order": 93,
+  "guidance": "Define both axes precisely, size bubbles by a decision-relevant measure, and highlight only the opportunities the title recommends. Pair the matrix with the shortlist and the reason each item can win."
+}

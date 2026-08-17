@@ -6,9 +6,9 @@ declare module 'virtual:slide-maker/deck' {
   export const slides: SlideEntry[];
 }
 
-declare module 'virtual:slide-maker/templates' {
-  import type { TemplateEntry } from './types';
-  export const templates: TemplateEntry[];
+declare module 'virtual:slide-maker/default-slides' {
+  import type { DefaultSlideEntry } from './types';
+  export const defaultSlides: DefaultSlideEntry[];
 }
 
 declare module 'virtual:slide-maker/style' {

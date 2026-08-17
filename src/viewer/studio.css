@@ -121,7 +121,7 @@
 
 /* ── Add slide gallery ─────────────────────────────────────────── */
 
-/* A popover, unlike the style picker beside it, because what makes a template
+/* A popover, unlike the style picker beside it, because what makes a default slide
    worth choosing is the shape of it, and a select cannot draw one. */
 .sm-tmpl {
   position: relative;

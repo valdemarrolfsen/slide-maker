@@ -4,7 +4,8 @@ import { createRequire } from 'node:module';
 import { normalizePath } from 'vite';
 import { listSlides, readConfig, writeConfig, CONFIG_FILE } from '../core/deck.js';
 import { resolveStyle, listStyles } from '../core/styles.js';
-import { listTemplates, resolveTemplate } from '../core/templates.js';
+import { resolveTemplate } from '../core/templates.js';
+import { listDefaultSlides, resolveDefaultSlide } from '../core/default-slides.js';
 import { runtimeCss, runtimeEntry } from '../core/paths.js';
 import {
   addComment,
@@ -24,7 +25,7 @@ export const DECK_MODULE = 'virtual:slide-maker/deck';
 export const STYLE_MODULE = 'virtual:slide-maker/style';
 /* Only the studio imports this one. The exported deck has no use for fifteen
    layouts it did not ask for, and index.html is never part of a build. */
-export const TEMPLATES_MODULE = 'virtual:slide-maker/templates';
+export const DEFAULT_SLIDES_MODULE = 'virtual:slide-maker/default-slides';
 
 const RESOLVED = (id) => `\0${id}`;
 const API_PREFIX = '/__slide-maker/api';
@@ -73,7 +74,7 @@ function readBody(req) {
     let size = 0;
     req.on('data', (chunk) => {
       size += chunk.length;
-      // A request here is a comment or a template name, not a payload. Cap it
+      // A request here is a comment or a default-slide name, not a payload. Cap it
       // so a stray request cannot buffer the process out of memory.
       if (size > 1_000_000) {
         reject(new Error('Request body too large'));
@@ -157,7 +158,7 @@ export function deckPlugin({ deckDir, config }) {
     if (!server) return;
     invalidate(DECK_MODULE);
     invalidate(STYLE_MODULE);
-    invalidate(TEMPLATES_MODULE);
+    invalidate(DEFAULT_SLIDES_MODULE);
     server.ws.send({ type: 'full-reload' });
   };
 
@@ -175,7 +176,7 @@ export function deckPlugin({ deckDir, config }) {
     },
 
     resolveId(id) {
-      if (id === DECK_MODULE || id === STYLE_MODULE || id === TEMPLATES_MODULE) {
+      if (id === DECK_MODULE || id === STYLE_MODULE || id === DEFAULT_SLIDES_MODULE) {
         return RESOLVED(id);
       }
       return null;
@@ -204,19 +205,21 @@ ${entries}
 `;
       }
 
-      if (id === RESOLVED(TEMPLATES_MODULE)) {
-        const templates = await listTemplates(deckDir);
-        const imports = templates
+      if (id === RESOLVED(DEFAULT_SLIDES_MODULE)) {
+        current = await readConfig(deckDir);
+        const template = await resolveTemplate(current.template);
+        const defaultSlides = await listDefaultSlides(deckDir, template?.defaultSlides);
+        const imports = defaultSlides
           .map((t, i) => `import * as tpl${i} from ${JSON.stringify(toImportPath(t.slide))};`)
           .join('\n');
-        // Shaped like a slide entry so the studio can hand a template straight
+        // Shaped like a slide entry so the studio can hand a default slide straight
         // to SlideFrame and get the same error boundary a real slide gets.
-        const entries = templates
+        const entries = defaultSlides
           .map(
             (t, i) =>
               `  { id: ${JSON.stringify(t.name)}, index: 0, number: 1, ` +
               `name: ${JSON.stringify(t.name)}, ` +
-              `file: ${JSON.stringify(path.posix.join('templates', t.name, 'slide.tsx'))}, ` +
+              `file: ${JSON.stringify(path.posix.join('default_slides', t.name, 'slide.tsx'))}, ` +
               `label: ${JSON.stringify(t.label)}, description: ${JSON.stringify(t.description)}, ` +
               `stem: ${JSON.stringify(t.stem)}, source: ${JSON.stringify(t.source)}, ` +
               `module: tpl${i} }`,
@@ -224,7 +227,7 @@ ${entries}
           .join(',\n');
         return `${imports}
 
-export const templates = [
+export const defaultSlides = [
 ${entries}
 ];
 `;
@@ -232,7 +235,10 @@ ${entries}
 
       if (id === RESOLVED(STYLE_MODULE)) {
         current = await readConfig(deckDir);
-        const style = await resolveStyle(deckDir, current.style);
+        const [style, template] = await Promise.all([
+          resolveStyle(deckDir, current.style),
+          resolveTemplate(current.template),
+        ]);
         const lines = [`import ${JSON.stringify(toImportPath(runtimeCss))};`];
         if (style) {
           lines.push(`import ${JSON.stringify(toImportPath(style.stylesheet))};`);
@@ -240,6 +246,17 @@ ${entries}
           const available = (await listStyles(deckDir)).map((s) => s.name).join(', ');
           warn(`Style "${current.style}" not found. Available: ${available || 'none'}`);
         }
+        // Layout belongs to the template/deck, not the active visual theme. New
+        // decks receive a local copy so they can evolve it; the bundled copy is
+        // a compatibility fallback for decks created before this separation.
+        const localLayout = path.resolve(deckDir, current.layout);
+        let layout = null;
+        try {
+          if ((await fsp.stat(localLayout)).isFile()) layout = localLayout;
+        } catch {
+          layout = template?.stylesheet || null;
+        }
+        if (layout) lines.push(`import ${JSON.stringify(toImportPath(layout))};`);
         lines.push(`export const style = ${JSON.stringify(style?.name ?? null)};`);
         return lines.join('\n');
       }
@@ -253,6 +270,7 @@ ${entries}
       const commentsFile = commentsPath(deckDir);
       server.watcher.add(commentsFile);
       server.watcher.add(path.join(deckDir, CONFIG_FILE));
+      server.watcher.add(path.resolve(deckDir, current.layout));
       // The directory, not just the slide files inside it. Vite only watches
       // what the module graph already imports, and a slide that does not exist
       // yet is exactly the case that has to work: adding a file is how a deck
@@ -274,11 +292,19 @@ ${entries}
       };
       server.watcher.on('change', onChange);
       server.watcher.on('add', (file) => {
+        if (normalizePath(file) === normalizePath(path.resolve(deckDir, current.layout))) {
+          reload();
+          return;
+        }
         if (normalizePath(file).startsWith(normalizePath(path.join(deckDir, current.slides)))) {
           reload();
         }
       });
       server.watcher.on('unlink', (file) => {
+        if (normalizePath(file) === normalizePath(path.resolve(deckDir, current.layout))) {
+          reload();
+          return;
+        }
         if (normalizePath(file).startsWith(normalizePath(path.join(deckDir, current.slides)))) {
           reload();
         }
@@ -328,18 +354,28 @@ ${entries}
 
           if (route === '/slides' && req.method === 'POST') {
             const body = await readBody(req);
-            const template = await resolveTemplate(deckDir, body.template);
-            if (!template) {
-              const available = (await listTemplates(deckDir)).map((t) => t.name);
+            const defaultSlide = await resolveDefaultSlide(deckDir, body.defaultSlide);
+            if (!defaultSlide) {
+              const available = (await listDefaultSlides(deckDir)).map((item) => item.name);
               return sendJson(res, 400, {
-                error: `No template named "${body.template}". Available: ${available.join(', ')}`,
+                error: `No default slide named "${body.defaultSlide}". Available: ${available.join(', ')}`,
               });
             }
             const cfg = await readConfig(deckDir);
-            const file = await nextSlideFile(deckDir, cfg, template.stem);
+            const selectedTemplate = await resolveTemplate(cfg.template);
+            if (
+              selectedTemplate?.defaultSlides.length &&
+              !selectedTemplate.defaultSlides.includes('*') &&
+              !selectedTemplate.defaultSlides.includes(defaultSlide.name)
+            ) {
+              return sendJson(res, 400, {
+                error: `${defaultSlide.name} is not part of the ${selectedTemplate.label} template.`,
+              });
+            }
+            const file = await nextSlideFile(deckDir, cfg, defaultSlide.stem);
             const target = path.join(deckDir, file);
             await fsp.mkdir(path.dirname(target), { recursive: true });
-            await fsp.writeFile(target, await fsp.readFile(template.slide, 'utf8'), 'utf8');
+            await fsp.writeFile(target, await fsp.readFile(defaultSlide.slide, 'utf8'), 'utf8');
             // The watcher picks the new file up and reloads the viewer, so
             // there is nothing to push here beyond the name of what landed.
             return sendJson(res, 201, { file });

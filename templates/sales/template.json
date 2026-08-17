@@ -1,0 +1,9 @@
+{
+  "label": "Sales story",
+  "description": "A crisp product-led B2B sales story: buyer pain, quantified impact, product experience, proof, launch plan, investment, and next step.",
+  "tags": ["sales", "b2b", "proposal"],
+  "order": 30,
+  "defaultStyle": "sales",
+  "default_slides": ["cover", "agenda", "statement", "chart", "data-table", "three-up", "comparison", "metrics", "timeline", "spec", "quote", "closing"],
+  "guidance": "Make the buyer the protagonist. Use their language for the problem, quantify the cost of inaction, show the product experience instead of a feature list, prove the outcome, and make one next action unmistakable."
+}

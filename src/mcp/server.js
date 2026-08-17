@@ -5,7 +5,11 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { z } from 'zod';
 import { listSlides, readConfig, readSlide, writeConfig } from '../core/deck.js';
 import { listStyles, resolveStyle } from '../core/styles.js';
-import { listTemplates, readTemplateSource, resolveTemplate } from '../core/templates.js';
+import {
+  listDefaultSlides,
+  readDefaultSlideSource,
+} from '../core/default-slides.js';
+import { resolveTemplate } from '../core/templates.js';
 import { listComments, readState, resolveComment, reopenComment } from '../core/comments.js';
 import { renderSlides, closeRenderer } from '../render/renderer.js';
 
@@ -39,14 +43,14 @@ export async function startMcpServer(deckDir) {
         'inspect a dev server, and never fetch localhost. render_slide brings up its',
         'own renderer and works whether or not the studio is open.',
         '',
-        'A style is the design system the whole deck wears; a template is a',
-        'ready-made slide layout. A deck has one style and any number of templates.',
+        'A template is the full starter deck. A style is its design system. A default',
+        'slide is one reusable layout offered by that template in the studio.',
         '',
         'Working rules:',
         '- Call deck_overview first. It reports the style, the slide list and how',
         '  many comments are waiting.',
-        '- Call list_templates early and often. The library is the fastest way to',
-        '  decide what each slide should be, and read_template hands you the JSX to',
+        '- Call list_default_slides early and often. The library is the fastest way to',
+        '  decide what each slide should be, and read_default_slide hands you the JSX to',
         '  copy into a new slide file. Check it before building a layout by hand.',
         '- The user leaves feedback by selecting text in the studio. Call list_comments',
         '  to read it. Each comment names the file it belongs to and quotes the exact',
@@ -68,23 +72,26 @@ export async function startMcpServer(deckDir) {
       title: 'Deck overview',
       description:
         'The state of the deck: title, active style, every slide in running order, ' +
-        'how many comments are open, how many templates are available, and which ' +
+        'how many default slides are available, and which ' +
         'slide the user is currently looking at. Start here.',
       inputSchema: {},
     },
     async () => {
       const config = await readConfig(deckDir);
-      const [slides, comments, state, style, templates] = await Promise.all([
+      const template = await resolveTemplate(config.template);
+      const [slides, comments, state, style, defaultSlides] = await Promise.all([
         listSlides(deckDir, config),
         listComments(deckDir),
         readState(deckDir),
         resolveStyle(deckDir, config.style),
-        listTemplates(deckDir),
+        listDefaultSlides(deckDir, template?.defaultSlides),
       ]);
       const open = comments.filter((c) => c.status === 'open');
       return json({
         deckDir,
         title: config.title,
+        template: config.template,
+        templateGuidance: template?.guidance || null,
         style: config.style,
         styleFound: Boolean(style),
         styleGuidance: style?.guidance || null,
@@ -93,9 +100,9 @@ export async function startMcpServer(deckDir) {
         openComments: open.length,
         // Surfaced here so the library is visible from the first call, rather
         // than only to whoever thinks to go looking for it.
-        templatesAvailable: templates.length,
-        templateHint:
-          'Ready-made slide layouts. Call list_templates before building one by hand.',
+        defaultSlidesAvailable: defaultSlides.length,
+        defaultSlideHint:
+          'Reusable layouts for this template. Call list_default_slides before building one by hand.',
         viewing: state.slideId
           ? { slideId: state.slideId, slideNumber: (state.slideIndex ?? 0) + 1 }
           : null,
@@ -239,24 +246,26 @@ export async function startMcpServer(deckDir) {
     },
   );
 
-  /* ── Templates ── */
+  /* ── Default slides ── */
 
   server.registerTool(
-    'list_templates',
+    'list_default_slides',
     {
-      title: 'List templates',
+      title: 'List default slides',
       description:
-        'The template library: ready-made slide layouts, with guidance on when each ' +
-        'one is the right shape. Templates carry no colour of their own, so any of ' +
+        'The default-slide library: ready-made slide layouts, with guidance on when each ' +
+        'one is the right shape. Default slides carry no colour of their own, so any of ' +
         'them renders in the deck\'s style. Read this before building a layout by ' +
-        'hand, and again whenever you plan a run of slides: picking a template per ' +
+        'hand, and again whenever you plan a run of slides: picking a default slide per ' +
         'slide is most of what deck structure is.',
       inputSchema: {},
     },
     async () => {
-      const templates = await listTemplates(deckDir);
+      const config = await readConfig(deckDir);
+      const template = await resolveTemplate(config.template);
+      const defaultSlides = await listDefaultSlides(deckDir, template?.defaultSlides);
       return json(
-        templates.map((t) => ({
+        defaultSlides.map((t) => ({
           name: t.name,
           label: t.label,
           description: t.description,
@@ -269,24 +278,27 @@ export async function startMcpServer(deckDir) {
   );
 
   server.registerTool(
-    'read_template',
+    'read_default_slide',
     {
-      title: 'Read a template',
+      title: 'Read a default slide',
       description:
-        'The JSX behind one template. Copy it into a new file under the slides ' +
+        'The JSX behind one default slide. Copy it into a new file under the slides ' +
         'directory with your own content: the structure is the part worth keeping. ' +
-        'Faster and safer than composing a layout from scratch, since every template ' +
+        'Faster and safer than composing a layout from scratch, since every default slide ' +
         'has been checked in every style.',
-      inputSchema: { name: z.string().describe('Template name from list_templates') },
+      inputSchema: { name: z.string().describe('Default slide name from list_default_slides') },
     },
     async ({ name }) => {
-      const template = await resolveTemplate(deckDir, name);
-      if (!template) {
-        const available = (await listTemplates(deckDir)).map((t) => t.name).join(', ');
-        return text(`No template named "${name}". Available: ${available}`);
+      const config = await readConfig(deckDir);
+      const template = await resolveTemplate(config.template);
+      const allowed = await listDefaultSlides(deckDir, template?.defaultSlides);
+      const defaultSlide = allowed.find((item) => item.name === name) || null;
+      if (!defaultSlide) {
+        const available = allowed.map((item) => item.name).join(', ');
+        return text(`No default slide named "${name}". Available: ${available}`);
       }
-      const source = await readTemplateSource(template);
-      return text(`${template.label}\n\n${template.guidance}\n\n${source}`);
+      const source = await readDefaultSlideSource(defaultSlide);
+      return text(`${defaultSlide.label}\n\n${defaultSlide.guidance}\n\n${source}`);
     },
   );
 

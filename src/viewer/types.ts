@@ -3,8 +3,12 @@ import type { ComponentType } from 'react';
 export interface DeckConfig {
   title: string;
   author: string;
+  /** Full-deck template this presentation started from. */
+  template: string;
   /** Name of the design system the deck wears. */
   style: string;
+  /** Template-owned layout stylesheet, relative to the deck root. */
+  layout: string;
   width: number;
   height: number;
   slides: string;
@@ -62,15 +66,15 @@ export interface DeckState {
 }
 
 /**
- * A ready-made slide layout, offered in the studio's Add slide picker.
+ * A reusable default slide, offered in the studio's Add slide picker.
  *
- * Extends SlideEntry so a template can be handed straight to SlideFrame and
+ * Extends SlideEntry so a default slide can be handed straight to SlideFrame and
  * rendered as a preview, error boundary and all.
  */
-export interface TemplateEntry extends SlideEntry {
+export interface DefaultSlideEntry extends SlideEntry {
   label: string;
   description: string;
-  /** Filename stem to use when the template lands in a deck. */
+  /** Filename stem to use when the default slide lands in a deck. */
   stem: string;
   source: 'builtin' | 'local';
 }

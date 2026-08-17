@@ -1,0 +1,7 @@
+{
+  "label": "Consulting report",
+  "description": "Decision-ready strategy reports with answer-first storylines, direct-labeled exhibits, granular analysis, and restrained navy pages.",
+  "tags": ["light", "consulting", "charts", "dense"],
+  "dark": false,
+  "guidance": "Build the ghost deck first: titles alone must tell the argument. Every exhibit must prove its title, label data directly, state units and scope, and end with an attributed source. Use one cyan highlight for the decision-relevant series; keep the rest neutral. Never set presentation text below 14px."
+}

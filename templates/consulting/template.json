@@ -1,0 +1,9 @@
+{
+  "label": "Consulting recommendation",
+  "description": "A decision-ready strategy deck with an answer-first storyline, granular market exhibits, a value bridge, implementation plan, and explicit decisions.",
+  "tags": ["consulting", "strategy", "executive"],
+  "order": 10,
+  "defaultStyle": "consulting",
+  "default_slides": ["cover", "agenda", "section", "statement", "chart", "data-table", "opportunity-matrix", "value-bridge", "three-up", "comparison", "metrics", "timeline", "checklist", "spec", "closing"],
+  "guidance": "Write the ghost deck before the exhibits: the action titles must tell the complete argument on their own. Make every chart prove one title, label it directly, state units and perimeter, cite the source, and end with named decisions and owners."
+}

@@ -1,0 +1,7 @@
+{
+  "label": "Evidence table",
+  "description": "A compact multi-column table for segment economics, benchmarks, or an option screen.",
+  "tags": ["data", "table", "analysis", "consulting"],
+  "order": 94,
+  "guidance": "Use no more columns than the decision requires. Order rows by importance, make units explicit in headers, and reserve bold or accent treatment for the one conclusion the title already states."
+}

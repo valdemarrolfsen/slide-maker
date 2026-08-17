@@ -1,0 +1,109 @@
+/* Consulting report: high-density evidence with a restrained editorial hierarchy. */
+.sm-slide {
+  --sm-bg: #fff;
+  --sm-bg-0: rgba(255, 255, 255, 0);
+  --sm-panel: #f1f4f6;
+  --sm-fg: #101820;
+  --sm-fg-2: #1b2d3d;
+  --sm-muted: #495761;
+  --sm-muted-2: #7d8991;
+  --sm-border: #d9dee2;
+  --sm-border-2: #aeb8bf;
+  --sm-accent: #00a5df;
+  --sm-accent-dim: #73cae8;
+  --sm-sans: Arial, "Helvetica Neue", sans-serif;
+  --sm-mono: Arial, "Helvetica Neue", sans-serif;
+  --sm-title-size: 26px;
+  --sm-title-big: 34px;
+  --sm-title-huge: 49px;
+  --sm-title-weight: 600;
+  --sm-title-leading: 1.08;
+  --sm-title-tracking: -0.016em;
+  --sm-title-measure: 48ch;
+  --sm-body-size: 14px;
+  --sm-lede-size: 16px;
+  --sm-radius: 0;
+}
+.sm-slide.sm-dark {
+  --sm-bg: #071d2b;
+  --sm-bg-0: rgba(7, 29, 43, 0);
+  --sm-panel: #0e2b3d;
+  --sm-fg: #fff;
+  --sm-fg-2: #e9f1f4;
+  --sm-muted: #b5c3ca;
+  --sm-muted-2: #76909d;
+  --sm-border: #294655;
+  --sm-border-2: #476472;
+  --sm-accent: #31b9ec;
+  --sm-accent-dim: #79d1f0;
+}
+.sm-title,
+.sm-statement,
+.sm-cover-title { font-family: Georgia, "Times New Roman", serif; }
+.sm-eyebrow {
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--sm-accent);
+}
+.sm-head { border-bottom: 1.5px solid var(--sm-fg-2); }
+.sm-chrome {
+  border-top: 1px solid var(--sm-border-2);
+  font-size: 14px;
+  letter-spacing: .02em;
+  text-transform: none;
+}
+.sm-chrome-no { font-variant-numeric: tabular-nums; }
+.sm-grid { border-color: var(--sm-border-2); }
+.sm-card-title { font-size: 16px; }
+.sm-line, .sm-tick { font-size: 14px; line-height: 1.34; }
+.sm-kicker { font-size: 14px; letter-spacing: .08em; }
+.sm-note { font-size: 14px; line-height: 1.25; color: var(--sm-muted-2); }
+.sm-note::before { content: "SOURCE  "; font-weight: 700; color: var(--sm-fg-2); }
+.sm-stat-v { font-size: 28px; }
+.sm-stat-l { margin-top: 4px; font-size: 14px; line-height: 1.25; }
+.sm-chart-title { font-size: 14px; font-weight: 700; }
+.sm-bar-row { font-size: 14px; }
+.sm-bar-value,
+.sm-line-chart text,
+.sm-chart-legend { font-size: 14px; }
+.sm-bar-track { background: #e8ecef; }
+.sm-bar-fill.sm-tone-muted { background: #b8c0c6; }
+.sm-data-table { border-top: 1.5px solid var(--sm-fg-2); border-bottom: 1px solid var(--sm-fg-2); }
+.sm-data-table-head { background: #e7ecef; font-size: 14px; }
+.sm-data-table-row { font-size: 14px; }
+.sm-data-table-row:nth-child(odd) { background: #f7f8f9; }
+.sm-stacked-label { font-size: 14px; }
+.sm-stacked-total { font-size: 14px; }
+.sm-stacked-legend,
+.sm-stacked-segment span { font-size: 14px; }
+.sm-waterfall-value { font-family: Arial, sans-serif; font-size: 14px; }
+.sm-waterfall-label { font-family: Arial, sans-serif; font-size: 14px; }
+.sm-matrix-bubble,
+.sm-matrix-x,
+.sm-matrix-y,
+.sm-matrix-high,
+.sm-matrix-low { font-size: 14px; }
+.sm-matrix-bubble { font-weight: 700; }
+
+/* Covers are a themed runtime component, so their treatment changes with the style. */
+.sm-cover { overflow: hidden; background: #071d2b; }
+.sm-cover::before,
+.sm-cover::after {
+  content: "";
+  position: absolute;
+  width: 760px;
+  height: 760px;
+  border: 1px solid rgba(102, 202, 236, .48);
+  transform: rotate(31deg);
+}
+.sm-cover::before { right: -460px; top: -410px; }
+.sm-cover::after { right: -350px; top: -345px; border-color: rgba(255, 255, 255, .18); }
+.sm-cover-body { position: relative; z-index: 1; margin-top: 75px; }
+.sm-cover .sm-title { max-width: 16ch; color: #fff; }
+.sm-cover .sm-eyebrow { color: #31b9ec; }
+.sm-cover .sm-cover-lede { max-width: 54ch; font-size: 16px; line-height: 1.45; color: #c4d1d7; }
+.sm-cover-rule { width: 58px; height: 3px; }
+.sm-cover-footer { z-index: 1; }
+.sm-cover .sm-cover-footer-body { color: #a8bbc4; }

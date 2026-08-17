@@ -8,7 +8,12 @@ export { createViteConfig } from './vite/config.js';
 export { deckPlugin } from './vite/plugin-deck.js';
 export { readConfig, writeConfig, listSlides, readSlide, defaults } from './core/deck.js';
 export { listStyles, resolveStyle } from './core/styles.js';
-export { listTemplates, resolveTemplate, readTemplateSource } from './core/templates.js';
+export { listTemplates, resolveTemplate } from './core/templates.js';
+export {
+  listDefaultSlides,
+  resolveDefaultSlide,
+  readDefaultSlideSource,
+} from './core/default-slides.js';
 export {
   listComments,
   addComment,

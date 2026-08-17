@@ -18,6 +18,9 @@ export const defaults = {
   template: 'blank',
   /** Name of the design system the deck wears. See src/core/styles.js. */
   style: 'granite',
+  /** Template-owned composition rules, relative to the deck root. Styles can
+   *  change without replacing this layout contract. */
+  layout: 'template.css',
   /** Slide canvas in CSS pixels. 1280x720 is 16:9 and maps cleanly to a
    *  13.333in x 7.5in PDF page. */
   width: 1280,

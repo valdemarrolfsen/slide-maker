@@ -235,7 +235,10 @@ ${entries}
 
       if (id === RESOLVED(STYLE_MODULE)) {
         current = await readConfig(deckDir);
-        const style = await resolveStyle(deckDir, current.style);
+        const [style, template] = await Promise.all([
+          resolveStyle(deckDir, current.style),
+          resolveTemplate(current.template),
+        ]);
         const lines = [`import ${JSON.stringify(toImportPath(runtimeCss))};`];
         if (style) {
           lines.push(`import ${JSON.stringify(toImportPath(style.stylesheet))};`);
@@ -243,6 +246,17 @@ ${entries}
           const available = (await listStyles(deckDir)).map((s) => s.name).join(', ');
           warn(`Style "${current.style}" not found. Available: ${available || 'none'}`);
         }
+        // Layout belongs to the template/deck, not the active visual theme. New
+        // decks receive a local copy so they can evolve it; the bundled copy is
+        // a compatibility fallback for decks created before this separation.
+        const localLayout = path.resolve(deckDir, current.layout);
+        let layout = null;
+        try {
+          if ((await fsp.stat(localLayout)).isFile()) layout = localLayout;
+        } catch {
+          layout = template?.stylesheet || null;
+        }
+        if (layout) lines.push(`import ${JSON.stringify(toImportPath(layout))};`);
         lines.push(`export const style = ${JSON.stringify(style?.name ?? null)};`);
         return lines.join('\n');
       }
@@ -256,6 +270,7 @@ ${entries}
       const commentsFile = commentsPath(deckDir);
       server.watcher.add(commentsFile);
       server.watcher.add(path.join(deckDir, CONFIG_FILE));
+      server.watcher.add(path.resolve(deckDir, current.layout));
       // The directory, not just the slide files inside it. Vite only watches
       // what the module graph already imports, and a slide that does not exist
       // yet is exactly the case that has to work: adding a file is how a deck
@@ -277,11 +292,19 @@ ${entries}
       };
       server.watcher.on('change', onChange);
       server.watcher.on('add', (file) => {
+        if (normalizePath(file) === normalizePath(path.resolve(deckDir, current.layout))) {
+          reload();
+          return;
+        }
         if (normalizePath(file).startsWith(normalizePath(path.join(deckDir, current.slides)))) {
           reload();
         }
       });
       server.watcher.on('unlink', (file) => {
+        if (normalizePath(file) === normalizePath(path.resolve(deckDir, current.layout))) {
+          reload();
+          return;
+        }
         if (normalizePath(file).startsWith(normalizePath(path.join(deckDir, current.slides)))) {
           reload();
         }

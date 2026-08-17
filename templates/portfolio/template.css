@@ -1,0 +1,21 @@
+/* Portfolio template composition. The active style supplies colour and type. */
+.sm-slide {
+  --sm-title-measure: 20ch;
+  --sm-pad-x: 50px;
+  --sm-pad-top: 42px;
+  --sm-pad-bottom: 58px;
+  --sm-head-min: 80px;
+  --sm-head-gap: 24px;
+}
+.sm-title { margin-top: 12px; }
+.sm-head { padding: 0; }
+.sm-chrome { left: var(--sm-pad-x); right: var(--sm-pad-x); bottom: 16px; height: 24px; }
+.sm-grid { gap: 20px; }
+.sm-cell { padding: 0; }
+.sm-line { max-width: 30ch; }
+.sm-stat-l { max-width: 24ch; }
+.sm-cover { justify-content: flex-start; }
+.sm-cover-body { margin-top: 80px; }
+.sm-cover-title { max-width: 11ch; }
+.sm-cover-rule { width: 180px; height: 1px; margin-top: 24px; }
+.sm-cover-lede { max-width: 38ch; }

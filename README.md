@@ -78,12 +78,14 @@ comment on your clipboard as a markdown brief. Paste it into the terminal.
 The three concepts solve different parts of starting and extending a presentation.
 
 A **template** is a complete starter deck: a suggested storyline, real starter
-slides, a default style, and a curated set of layouts for adding more slides.
+slides, a deck-owned layout stylesheet, a default style, and a curated set of
+layouts for adding more slides.
 
-A **style** is a design system. Slides never state a colour or a font: they
-compose semantic components, and the style decides what those look like, so
-switching style restyles the whole deck without editing a single slide. A deck
-wears exactly one.
+A **style** is a visual design system: colour, typography, and the treatment of
+shared runtime components. Template-specific composition stays in
+`template.css`, so switching style restyles the deck without discarding its
+grids, timelines, dashboards, or other bespoke structures. A deck wears
+exactly one style and keeps exactly one layout stylesheet.
 
 A **default slide** is one reusable slide layout. It carries no colour of its
 own, renders in every style, and is a starting point rather than a constraint.
@@ -128,8 +130,10 @@ built-in of the same name.
 | `technical-presentation` | Problem, constraints, architecture, interface, evidence, rollout, decisions |
 
 Every template recommends a style, which you can override during initialization
-or later from the CLI or Studio. `slide-maker browse <template>` opens a
-disposable Studio preview, so browsing never modifies the bundled source deck.
+or later from the CLI or Studio. The selected template's `template.css` is
+copied into the new deck, while its colours and typefaces continue to come from
+the selected style. `slide-maker browse <template>` opens a disposable Studio
+preview, so browsing never modifies the bundled source deck.
 
 ### The default-slide library
 
@@ -303,7 +307,8 @@ slide-maker mcp [dir]          run the MCP server over stdio
 
 ```
 my-deck/
-  deck.json            title, template, style, canvas size
+  deck.json            title, template, style, layout, canvas size
+  template.css         template-specific composition rules
   slides/
     01-cover.tsx       order comes from the filename
     02-agenda.tsx

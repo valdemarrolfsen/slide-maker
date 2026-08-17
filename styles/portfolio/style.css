@@ -19,14 +19,8 @@
   --sm-title-weight: 400;
   --sm-title-leading: 0.96;
   --sm-title-tracking: -0.045em;
-  --sm-title-measure: 20ch;
   --sm-body-size: 13px;
   --sm-lede-size: 16px;
-  --sm-pad-x: 50px;
-  --sm-pad-top: 42px;
-  --sm-pad-bottom: 58px;
-  --sm-head-min: 80px;
-  --sm-head-gap: 24px;
   --sm-radius: 0;
 }
 .sm-slide.sm-dark {
@@ -47,26 +41,17 @@
   font-weight: 500;
   letter-spacing: 0.26em;
 }
-.sm-title { margin-top: 12px; }
-.sm-head { border: 0; padding: 0; }
+.sm-head { border: 0; }
 .sm-chrome {
-  left: var(--sm-pad-x);
-  right: var(--sm-pad-x);
-  bottom: 16px;
-  height: 24px;
   font-size: 8px;
   letter-spacing: 0.22em;
 }
 .sm-figure img { filter: saturate(0.8) contrast(0.98); }
 .sm-figcaption { font-size: 8px; letter-spacing: 0.2em; }
-.sm-grid { border: 0; background: transparent; gap: 20px; }
-.sm-cell { background: transparent; padding: 0; }
+.sm-grid { border: 0; background: transparent; }
+.sm-cell { background: transparent; }
 .sm-card-title { font-size: 24px; font-weight: 400; }
-.sm-line { font-size: 12px; max-width: 30ch; }
+.sm-line { font-size: 12px; }
 .sm-stat-v { font-size: 48px; font-weight: 300; }
-.sm-stat-l { font-size: 11px; max-width: 24ch; }
-.sm-cover { justify-content: flex-start; }
-.sm-cover-body { margin-top: 80px; }
-.sm-cover-title { max-width: 11ch; }
-.sm-cover-rule { width: 180px; height: 1px; margin-top: 24px; }
-.sm-cover-lede { font-size: 13px; max-width: 38ch; }
+.sm-stat-l { font-size: 11px; }
+.sm-cover-lede { font-size: 13px; }

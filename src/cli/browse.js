@@ -40,6 +40,9 @@ export async function browseCommand(name, options) {
   } else {
     await fsp.mkdir(path.join(previewDir, 'assets'));
   }
+  if (template.stylesheet) {
+    await fsp.copyFile(template.stylesheet, path.join(previewDir, 'template.css'));
+  }
   await fsp.writeFile(
     path.join(previewDir, 'deck.json'),
     `${JSON.stringify({
@@ -47,6 +50,7 @@ export async function browseCommand(name, options) {
       author: '',
       template: template.name,
       style: styleName,
+      layout: 'template.css',
       width: 1280,
       height: 720,
       slides: 'slides',

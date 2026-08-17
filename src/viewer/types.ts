@@ -7,6 +7,8 @@ export interface DeckConfig {
   template: string;
   /** Name of the design system the deck wears. */
   style: string;
+  /** Template-owned layout stylesheet, relative to the deck root. */
+  layout: string;
   width: number;
   height: number;
   slides: string;

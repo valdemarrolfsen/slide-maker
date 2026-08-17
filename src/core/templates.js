@@ -6,6 +6,7 @@ import { builtinTemplatesDir } from './paths.js';
 /** A template is a complete starter presentation with its own default style. */
 export const TEMPLATE_MANIFEST = 'template.json';
 export const TEMPLATE_SLIDES_DIR = 'slides';
+export const TEMPLATE_STYLESHEET = 'template.css';
 
 async function readTemplate(dir, name) {
   let meta;
@@ -32,6 +33,9 @@ async function readTemplate(dir, name) {
     dir,
     slidesDir: path.join(dir, TEMPLATE_SLIDES_DIR),
     assetsDir: path.join(dir, 'assets'),
+    stylesheet: fs.existsSync(path.join(dir, TEMPLATE_STYLESHEET))
+      ? path.join(dir, TEMPLATE_STYLESHEET)
+      : null,
   };
 }
 

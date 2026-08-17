@@ -167,6 +167,14 @@ export async function initCommand(target, options) {
 
   await copyTreeIfAbsent(template.slidesDir, path.join(deckDir, 'slides'), written, skipped);
   await copyTreeIfAbsent(template.assetsDir, path.join(deckDir, 'assets'), written, skipped);
+  if (template.stylesheet) {
+    await writeIfAbsent(
+      path.join(deckDir, config.layout),
+      await fsp.readFile(template.stylesheet),
+      written,
+      skipped,
+    );
+  }
 
   await writeIfAbsent(path.join(deckDir, 'assets', '.gitkeep'), '', written, skipped);
   await writeIfAbsent(path.join(deckDir, '.gitignore'), GITIGNORE, written, skipped);

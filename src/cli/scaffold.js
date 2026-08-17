@@ -8,6 +8,7 @@ export function deckConfig({ title, template, style, author }) {
     author,
     template,
     style,
+    layout: 'template.css',
     width: 1280,
     height: 720,
     slides: 'slides',
@@ -57,8 +58,9 @@ node_modules/
 export function deckClaudeMd({ title, template, style }) {
   return `# ${title}
 
-A slide-maker presentation. Work only on the slide sources under \`slides/\`,
-review the rendered result, and act on feedback from the studio.
+A slide-maker presentation. Work on the slide sources under \`slides/\` and,
+when bespoke composition rules are needed, the deck-owned \`template.css\`.
+Review the rendered result and act on feedback from the studio.
 
 The user runs the studio. Never start or stop it, inspect localhost, or edit the
 slide-maker package. \`render_slide\` starts its own renderer and works whether
@@ -67,9 +69,11 @@ the studio is open or not.
 ## The three concepts
 
 - A **template** is the complete starter deck and its suggested storyline. This
-  presentation started from \`${template}\`.
+  presentation started from \`${template}\`; its composition rules were copied
+  into \`template.css\`.
 - A **style** is the design system worn by every slide. This presentation uses
-  \`${style}\`; call \`list_styles\` and \`set_style\` to change it.
+  \`${style}\`; call \`list_styles\` and \`set_style\` to change it. Styles own
+  colour and typography, while \`template.css\` keeps the deck's structure stable.
 - A **default slide** is a reusable layout offered by this template. Default
   slides are starting points, carry no colour, and render in any style.
 
@@ -94,8 +98,10 @@ structure unless the surrounding story requires otherwise.
 Every slide is a \`.tsx\` file with a default export. The numeric filename prefix
 sets presentation order. Prefix a filename with \`_\` to park it.
 
-Compose with components from \`slide-maker/runtime\`, not raw HTML. The style
-targets their semantic classes, so bespoke markup is what breaks style switches.
+Compose with components from \`slide-maker/runtime\`. For bespoke markup, use a
+deck-specific class and place its geometry in \`template.css\`. Consume the
+active style's \`--sm-*\` variables and inherited fonts there; never hard-code a
+palette or typeface. That separation is what makes style switches safe.
 
 \`\`\`tsx
 import { Slide, Head, Eyebrow, Title, Grid, Cell, CardTitle, Line } from 'slide-maker/runtime';

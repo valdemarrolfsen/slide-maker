@@ -18,6 +18,7 @@ import {
   writeState,
 } from '../core/comments.js';
 import { warn } from '../core/log.js';
+import { replaceSlideText } from '../core/text-edit.js';
 
 /* Virtual modules. The viewer imports these; the plugin generates them from
    whatever is on disk, so adding a slide file is all it takes to add a slide. */
@@ -379,6 +380,30 @@ ${entries}
             // The watcher picks the new file up and reloads the viewer, so
             // there is nothing to push here beyond the name of what landed.
             return sendJson(res, 201, { file });
+          }
+
+          if (route === '/text' && req.method === 'POST') {
+            const body = await readBody(req);
+            const cfg = await readConfig(deckDir);
+            const slides = await listSlides(deckDir, cfg);
+            // Resolve only through the configured slide list. Besides producing
+            // a useful not-found error, this makes path traversal impossible.
+            const slide = slides.find((item) => item.file === body.file);
+            if (!slide) return sendJson(res, 404, { error: 'Slide file not found' });
+            if (typeof body.oldText !== 'string' || typeof body.newText !== 'string') {
+              return sendJson(res, 400, { error: 'Both oldText and newText are required' });
+            }
+            const occurrence = Number.isSafeInteger(body.occurrence) && body.occurrence >= 0
+              ? body.occurrence
+              : 0;
+            const source = await fsp.readFile(slide.absolute, 'utf8');
+            const updated = replaceSlideText(source, {
+              oldText: body.oldText,
+              newText: body.newText,
+              occurrence,
+            });
+            await fsp.writeFile(slide.absolute, updated, 'utf8');
+            return sendJson(res, 200, { ok: true });
           }
 
           if (route === '/export/pdf' && req.method === 'POST') {

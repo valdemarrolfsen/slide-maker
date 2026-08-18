@@ -56,7 +56,7 @@ export async function startCommand(target, options) {
   console.log('');
   console.log(`  ${color.green('▸')} ${color.cyan(url)}`);
   console.log('');
-  console.log(color.dim('  Select text on a slide to comment. Press C for a note on the slide.'));
+  console.log(color.dim('  Click text to edit. Select text to comment. Press C for a slide note.'));
   console.log(color.dim('  Ctrl+C to stop.'));
   console.log('');
 

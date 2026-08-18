@@ -42,6 +42,11 @@ raw HTML.
 rail, the current slide, and a comment panel. Files reload the moment they are
 saved.
 
+**You edit the words directly.** Click any text on the active slide, type the
+replacement, then press <kbd>Enter</kbd> or click away. The studio writes the
+change back to the slide's `.tsx` file automatically. Press <kbd>Escape</kbd> to
+cancel; use <kbd>Shift</kbd>+<kbd>Enter</kbd> for a line break.
+
 **You export from the same view.** Click **Export PDF** in the studio to download
 the current deck with selectable vector text. PDF export requires Playwright and
 Chromium, just like the export command.

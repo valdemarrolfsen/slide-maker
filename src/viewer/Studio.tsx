@@ -10,6 +10,7 @@ import { DefaultSlideMenu } from './DefaultSlideMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
 import { Stage } from './Stage';
+import { createTextEditor } from './text-edit';
 import {
   captureSelection,
   capturePoint,
@@ -58,7 +59,9 @@ export function Studio() {
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [selectionRange, setSelectionRange] = useState<Range | null>(null);
+  const [textEditError, setTextEditError] = useState<string | null>(null);
   const frameRef = useRef<HTMLDivElement>(null);
+  const cancelTextEditRef = useRef<(() => void) | null>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
   const openCount = comments.filter((c) => c.status === 'open').length;
@@ -232,6 +235,14 @@ export function Studio() {
 
   useEffect(() => () => clearSelectionHighlight(), []);
 
+  // Inline editors mutate one text node temporarily. Always put it back before
+  // changing slides or entering presentation mode, where editing is disabled.
+  useEffect(() => {
+    cancelTextEditRef.current?.();
+    cancelTextEditRef.current = null;
+    setTextEditError(null);
+  }, [active?.id, presenting]);
+
   // A selection is only meaningful once the drag ends, so this listens for the
   // release rather than for selectionchange, which would fire continuously.
   useEffect(() => {
@@ -259,17 +270,35 @@ export function Studio() {
   }, [active, presenting]);
 
   const onStageClick = (e: React.MouseEvent) => {
-    if (!pinMode || !active) return;
-    const point = capturePoint(frameRef.current, e, config.width, config.height);
-    if (!point) return;
-    setDraft({
-      kind: 'pin',
-      slideId: active.id,
-      slideFile: active.file,
-      slideNumber: active.number,
-      anchor: point.anchor,
-    });
-    setPinMode(false);
+    if (!active) return;
+    if (pinMode) {
+      const point = capturePoint(frameRef.current, e, config.width, config.height);
+      if (!point) return;
+      setDraft({
+        kind: 'pin',
+        slideId: active.id,
+        slideFile: active.file,
+        slideNumber: active.number,
+        anchor: point.anchor,
+      });
+      setPinMode(false);
+      return;
+    }
+
+    if (presenting || (e.target as HTMLElement).closest?.('.sm-text-editor')) return;
+    // A drag selection starts a comment; only a plain click starts editing.
+    const selection = window.getSelection();
+    if (selection && !selection.isCollapsed) return;
+    const frame = frameRef.current;
+    if (!frame) return;
+
+    cancelTextEditRef.current?.();
+    cancelTextEditRef.current = createTextEditor(
+      frame,
+      e,
+      (input) => api.updateText(active.file, input),
+      setTextEditError,
+    );
   };
 
   const submitDraft = async (body: string) => {
@@ -457,7 +486,9 @@ export function Studio() {
               {String(activeIndex + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}
             </span>
             <span className="sm-stagebar-file">{active?.file}</span>
-            <span className="sm-stagebar-notes">{notes || ''}</span>
+            <span className={`sm-stagebar-notes${textEditError ? ' sm-stagebar-error' : ''}`}>
+              {textEditError || notes || ''}
+            </span>
             <span className="sm-zoom" title="Slide scale">
               {Math.round(scale * 100)}%
             </span>

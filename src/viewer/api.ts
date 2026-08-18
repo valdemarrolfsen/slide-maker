@@ -35,6 +35,17 @@ export function addSlide(defaultSlide: string) {
   });
 }
 
+/** Saves one piece of rendered copy back to its literal in the slide source. */
+export function updateText(
+  file: string,
+  input: { oldText: string; newText: string; occurrence: number },
+) {
+  return request<{ ok: boolean }>(`${BASE}/text`, {
+    method: 'POST',
+    body: JSON.stringify({ file, ...input }),
+  });
+}
+
 /** Renders the current deck and lets the browser save it as a PDF. */
 export async function exportPdf(): Promise<void> {
   const res = await fetch(`${BASE}/export/pdf`, { method: 'POST' });

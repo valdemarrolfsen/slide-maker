@@ -434,6 +434,29 @@
   pointer-events: none;
 }
 
+/* Slide copy is edited in place. The underline is visible only while typing,
+   so the deck itself remains visually faithful at rest. */
+.sm-stage-host:not(.sm-pinning) .sm-slide {
+  cursor: text;
+}
+.sm-text-editor {
+  min-width: 0.5ch;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--ui-focus) 12%, transparent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-focus) 50%, transparent);
+  outline: none;
+  cursor: text;
+  white-space: pre-wrap;
+}
+.sm-text-editor-overlay {
+  position: fixed;
+  z-index: 100;
+  padding: 3px 8px;
+  border: 0;
+  background: var(--ui-panel);
+  line-height: 1.2;
+}
+
 /* ── Filmstrip ─────────────────────────────────────────────────── */
 
 .sm-filmstrip {
@@ -565,6 +588,9 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+.sm-stagebar-error {
+  color: var(--ui-danger);
 }
 .sm-zoom {
   flex: 0 0 auto;

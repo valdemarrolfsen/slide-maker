@@ -3,6 +3,9 @@
 declare module 'virtual:slide-maker/deck' {
   import type { DeckConfig, SlideEntry } from './types';
   export const config: DeckConfig;
+  /** Every source slide, including slides hidden from presentation and export. */
+  export const allSlides: SlideEntry[];
+  /** Slides that participate in presentation and export. */
   export const slides: SlideEntry[];
 }
 

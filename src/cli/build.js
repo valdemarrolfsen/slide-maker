@@ -20,7 +20,7 @@ export async function buildCommand(target, options) {
   }
 
   const slides = await listSlides(deckDir, config);
-  if (!slides.length) fail(`No slides found in ${config.slides}/.`);
+  if (!slides.length) fail(`No visible slides found in ${config.slides}/.`);
 
   const outDir = path.resolve(deckDir, options.out || 'dist');
   step(`Building ${slides.length} slides to ${color.cyan(path.relative(process.cwd(), outDir))}`);

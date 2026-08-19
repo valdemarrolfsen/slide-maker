@@ -229,8 +229,14 @@ slide-maker init my-deck --yes            # blank template, granite style
 ## Writing slides
 
 Every slide is a file with a default export. Running order comes from the number
-at the start of the filename, so reordering a deck is a rename. Prefix a file
-with `_` to park it.
+at the start of the filename, so reordering a deck is a rename. Hide a slide
+without deleting it through Studio or the CLI; hidden slides remain editable in
+Studio but are skipped in presentation, static builds, PDF, and PNG export.
+
+```bash
+slide-maker hide 3             # accepts a number, id, filename, or slide path
+slide-maker show 03-appendix   # `unhide` is also accepted
+```
 
 ```tsx
 // slides/02-approach.tsx
@@ -355,6 +361,8 @@ slide-maker init [dir]         scaffold a deck and wire up Claude Code
 slide-maker start [dir]        open the studio
 slide-maker build [dir]        export a static site
 slide-maker export [dir]       render to PDF or PNG
+slide-maker hide <slide>       omit a slide from presentation and export
+slide-maker show <slide>       include a hidden slide again
 slide-maker styles             list the design systems
 slide-maker use <style>        switch style
 slide-maker templates          list complete starter decks

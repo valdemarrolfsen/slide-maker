@@ -13,6 +13,7 @@ export interface DeckConfig {
   height: number;
   slides: string;
   assets: string;
+  hiddenSlides: string[];
 }
 
 export interface SlideEntry {
@@ -22,6 +23,7 @@ export interface SlideEntry {
   /** Deck-relative source path, which is what a comment points Claude at. */
   file: string;
   name: string;
+  hidden: boolean;
   module: { default?: ComponentType };
 }
 

@@ -522,6 +522,24 @@
   left: 0;
   display: block;
 }
+.sm-thumb-hidden .sm-thumb-frame {
+  opacity: 0.38;
+  filter: grayscale(0.8);
+}
+.sm-thumb-hidden-label {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  background: rgba(24, 27, 35, 0.82);
+  color: #fff;
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
 .sm-thumb-badge {
   position: absolute;
   top: 1px;

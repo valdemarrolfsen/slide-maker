@@ -29,6 +29,8 @@ export const defaults = {
   slides: 'slides',
   /** Static assets directory, served at /assets. */
   assets: 'assets',
+  /** Slide ids omitted from presentation and export, but still shown in Studio. */
+  hiddenSlides: [],
 };
 
 export class DeckError extends Error {}
@@ -102,7 +104,7 @@ function compareSlideNames(a, b) {
  * deck is a rename rather than an edit to a manifest. Underscore-prefixed
  * files are skipped, which is how you park a slide without deleting it.
  */
-export async function listSlides(deckDir, config) {
+export async function listSlides(deckDir, config, options = {}) {
   const dir = path.join(deckDir, config.slides);
   let entries;
   try {
@@ -116,23 +118,56 @@ export async function listSlides(deckDir, config) {
     .filter((n) => SLIDE_EXTENSIONS.has(path.extname(n)))
     .sort(compareSlideNames);
 
-  return names.map((name, index) => {
+  const hidden = new Set(Array.isArray(config.hiddenSlides) ? config.hiddenSlides : []);
+  const slides = names.map((name) => {
     const id = name.replace(/\.[jt]sx$/, '');
     return {
       id,
-      index,
-      number: index + 1,
       name,
+      hidden: hidden.has(id),
       /** Deck-relative path, which is what Claude needs to open the file. */
       file: path.posix.join(config.slides, name),
       absolute: path.join(dir, name),
     };
   });
+
+  return slides
+    .filter((slide) => options.includeHidden || !slide.hidden)
+    .map((slide, index) => ({ ...slide, index, number: index + 1 }));
+}
+
+/** Finds a slide by id, filename, deck-relative file, or its Studio number. */
+export async function findSlide(deckDir, config, reference) {
+  const slides = await listSlides(deckDir, config, { includeHidden: true });
+  const wanted = String(reference);
+  return (
+    slides.find(
+      (slide) =>
+        slide.id === wanted ||
+        slide.name === wanted ||
+        slide.file === wanted ||
+        String(slide.number) === wanted,
+    ) || null
+  );
+}
+
+/** Changes whether a slide participates in presentation and export. */
+export async function setSlideHidden(deckDir, reference, hidden) {
+  const config = await readConfig(deckDir);
+  const slide = await findSlide(deckDir, config, reference);
+  if (!slide) return null;
+
+  const hiddenSlides = new Set(Array.isArray(config.hiddenSlides) ? config.hiddenSlides : []);
+  if (hidden) hiddenSlides.add(slide.id);
+  else hiddenSlides.delete(slide.id);
+
+  await writeConfig(deckDir, { ...config, hiddenSlides: [...hiddenSlides] });
+  return { ...slide, hidden: Boolean(hidden) };
 }
 
 /** Reads a single slide's source. */
 export async function readSlide(deckDir, config, id) {
-  const slides = await listSlides(deckDir, config);
+  const slides = await listSlides(deckDir, config, { includeHidden: true });
   const slide = slides.find((s) => s.id === id || String(s.number) === String(id));
   if (!slide) return null;
   const source = await fsp.readFile(slide.absolute, 'utf8');

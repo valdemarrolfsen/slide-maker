@@ -9,6 +9,7 @@ import { templatesCommand } from './templates.js';
 import { defaultSlidesCommand } from './default-slides.js';
 import { browseCommand } from './browse.js';
 import { clearCommentsCommand, commentsCommand, resolveCommentCommand } from './comments.js';
+import { hideSlideCommand, showSlideCommand } from './slides.js';
 import {
   configBriefCommand,
   configGetCommand,
@@ -71,6 +72,21 @@ export function createCli() {
     .option('-f, --format <format>', 'pdf or png', 'pdf')
     .option('-o, --out <path>', 'output file or directory')
     .action(exportCommand);
+
+  program
+    .command('hide')
+    .argument('<slide>', 'slide number, id, filename, or deck-relative path')
+    .description('hide a slide from presentation and export')
+    .option('-d, --deck <dir>', 'deck directory', '.')
+    .action(hideSlideCommand);
+
+  program
+    .command('show')
+    .alias('unhide')
+    .argument('<slide>', 'slide number, id, filename, or deck-relative path')
+    .description('show a hidden slide in presentation and export')
+    .option('-d, --deck <dir>', 'deck directory', '.')
+    .action(showSlideCommand);
 
   program
     .command('styles')

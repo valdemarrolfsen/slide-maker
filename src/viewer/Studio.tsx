@@ -1,11 +1,22 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { config, slides } from 'virtual:slide-maker/deck';
+import { allSlides as slides, config } from 'virtual:slide-maker/deck';
 import { style } from 'virtual:slide-maker/style';
 import * as api from './api';
 import { CommentPanel } from './CommentPanel';
 import { Composer } from './Composer';
 import { Filmstrip } from './Filmstrip';
-import { ChevronLeft, ChevronRight, Close, Deck, Download, Message, Pin, Play } from './Icons';
+import {
+  ChevronLeft,
+  ChevronRight,
+  Close,
+  Deck,
+  Download,
+  Eye,
+  EyeOff,
+  Message,
+  Pin,
+  Play,
+} from './Icons';
 import { DefaultSlideMenu } from './DefaultSlideMenu';
 import { Pins } from './Pins';
 import { SlideFrame } from './SlideFrame';
@@ -56,6 +67,8 @@ export function Studio() {
   const [styleError, setStyleError] = useState<string | null>(null);
   const [addPending, setAddPending] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
+  const [visibilityPending, setVisibilityPending] = useState(false);
+  const [visibilityError, setVisibilityError] = useState<string | null>(null);
   const [exportPending, setExportPending] = useState(false);
   const [exportError, setExportError] = useState<string | null>(null);
   const [selectionRange, setSelectionRange] = useState<Range | null>(null);
@@ -64,6 +77,15 @@ export function Studio() {
   const cancelTextEditRef = useRef<(() => void) | null>(null);
 
   const active = slides[Math.min(activeIndex, slides.length - 1)];
+  const visibleSlides = useMemo(() => slides.filter((slide) => !slide.hidden), []);
+  const visibleIndex = visibleSlides.findIndex((slide) => slide.id === active?.id);
+  const activeFrame = useMemo(
+    () =>
+      presenting && active && visibleIndex >= 0
+        ? { ...active, index: visibleIndex, number: visibleIndex + 1 }
+        : active,
+    [active, presenting, visibleIndex],
+  );
   const openCount = comments.filter((c) => c.status === 'open').length;
 
   const openSlideComments = useMemo(
@@ -147,18 +169,56 @@ export function Studio() {
     }
   };
 
+  const toggleActiveHidden = async () => {
+    if (!active) return;
+    setVisibilityPending(true);
+    setVisibilityError(null);
+    try {
+      sessionStorage.setItem(LANDING_KEY, active.file);
+      await api.setSlideHidden(active.file, !active.hidden);
+      // Updating deck.json reloads the viewer and lands back on this slide.
+    } catch (err) {
+      sessionStorage.removeItem(LANDING_KEY);
+      setVisibilityPending(false);
+      setVisibilityError(err instanceof Error ? err.message : 'Could not change slide visibility');
+    }
+  };
+
+  const startPresenting = () => {
+    if (!visibleSlides.length) return;
+    if (active?.hidden) {
+      const next = slides.findIndex((slide, index) => index > activeIndex && !slide.hidden);
+      let previous = -1;
+      for (let index = activeIndex - 1; index >= 0; index -= 1) {
+        if (!slides[index].hidden) {
+          previous = index;
+          break;
+        }
+      }
+      setActiveIndex(next >= 0 ? next : previous);
+    }
+    setPresenting(true);
+  };
+
   /* ── Navigation ── */
 
   const go = useCallback((next: number) => {
     setActiveIndex((current) => {
-      const target = Math.max(0, Math.min(slides.length - 1, next));
+      let target = Math.max(0, Math.min(slides.length - 1, next));
+      if (presenting && slides[target]?.hidden) {
+        const direction = next < current ? -1 : 1;
+        while (target >= 0 && target < slides.length && slides[target]?.hidden) {
+          target += direction;
+        }
+        if (target < 0 || target >= slides.length) return current;
+      }
       if (target !== current) {
         setDraft(null);
         setSelectedId(null);
       }
       return target;
     });
-  }, []);
+  }, [presenting]);
 
   /** Leaves a note about the slide as a whole, with no anchor to a phrase. */
   const commentOnSlide = useCallback(() => {
@@ -188,10 +248,16 @@ export function Studio() {
           go(activeIndex - 1);
           break;
         case 'Home':
-          go(0);
+          go(presenting ? slides.findIndex((slide) => !slide.hidden) : 0);
           break;
         case 'End':
-          go(slides.length - 1);
+          if (presenting) {
+            let last = slides.length - 1;
+            while (last >= 0 && slides[last].hidden) last -= 1;
+            go(last);
+          } else {
+            go(slides.length - 1);
+          }
           break;
         case 'c':
         case 'C':
@@ -200,7 +266,8 @@ export function Studio() {
           break;
         case 'p':
         case 'P':
-          setPresenting((v) => !v);
+          if (presenting) setPresenting(false);
+          else startPresenting();
           break;
         case 'f':
         case 'F':
@@ -217,7 +284,7 @@ export function Studio() {
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [activeIndex, draft, pinMode, presenting, go, commentOnSlide]);
+  }, [activeIndex, draft, pinMode, presenting, go, commentOnSlide, visibleSlides.length]);
 
   /* ── Capturing feedback ── */
 
@@ -398,8 +465,20 @@ export function Studio() {
           </button>
           <button
             type="button"
+            className={`sm-btn${visibilityError ? ' sm-btn-error' : ''}`}
+            onClick={toggleActiveHidden}
+            disabled={visibilityPending}
+            title={visibilityError || (active?.hidden ? 'Include this slide' : 'Skip this slide')}
+            aria-label={active?.hidden ? 'Show slide' : 'Hide slide'}
+          >
+            {active?.hidden ? <Eye /> : <EyeOff />}
+            {visibilityPending ? 'Saving…' : active?.hidden ? 'Show slide' : 'Hide slide'}
+          </button>
+          <button
+            type="button"
             className="sm-btn"
-            onClick={() => setPresenting(true)}
+            onClick={startPresenting}
+            disabled={!visibleSlides.length}
             title="Present (P)"
           >
             <Play />
@@ -455,7 +534,13 @@ export function Studio() {
                 </>
               }
             >
-              {active && <SlideFrame slide={active} total={slides.length} config={config} />}
+              {activeFrame && (
+                <SlideFrame
+                  slide={activeFrame}
+                  total={presenting ? visibleSlides.length : slides.length}
+                  config={config}
+                />
+              )}
             </Stage>
           </div>
 

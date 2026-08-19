@@ -43,9 +43,9 @@ export function Filmstrip({ slides, config, activeIndex, comments, onSelect }: F
             key={slide.id}
             type="button"
             data-active={slide.index === activeIndex}
-            className={`sm-thumb${slide.index === activeIndex ? ' sm-thumb-on' : ''}`}
+            className={`sm-thumb${slide.index === activeIndex ? ' sm-thumb-on' : ''}${slide.hidden ? ' sm-thumb-hidden' : ''}`}
             onClick={() => onSelect(slide.index)}
-            title={slide.file}
+            title={`${slide.file}${slide.hidden ? ' (hidden)' : ''}`}
           >
             <span className="sm-thumb-no">{String(slide.number).padStart(2, '0')}</span>
             <span
@@ -65,6 +65,7 @@ export function Filmstrip({ slides, config, activeIndex, comments, onSelect }: F
               >
                 <SlideFrame slide={slide} total={slides.length} config={config} />
               </span>
+              {slide.hidden && <span className="sm-thumb-hidden-label">Hidden</span>}
             </span>
             {open > 0 && <span className="sm-thumb-badge">{open}</span>}
           </button>

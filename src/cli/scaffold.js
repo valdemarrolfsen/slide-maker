@@ -101,7 +101,9 @@ structure unless the surrounding story requires otherwise.
 ## Writing slides
 
 Every slide is a \`.tsx\` file with a default export. The numeric filename prefix
-sets presentation order. Prefix a filename with \`_\` to park it.
+sets presentation order. Use \`slide-maker hide <number>\` to keep a slide in the
+Studio while omitting it from presentation and export, and \`slide-maker show
+<number>\` to include it again.
 
 Compose with components from \`slide-maker/runtime\`. For bespoke markup, use a
 deck-specific class and place its geometry in \`template.css\`. Consume the

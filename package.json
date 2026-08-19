@@ -35,6 +35,7 @@
     "bin",
     "src",
     "types",
+    "assets",
     "styles",
     "default_slides",
     "templates",

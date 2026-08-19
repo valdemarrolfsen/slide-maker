@@ -69,7 +69,8 @@ surrounding deck does not already tell you.
 
 Every slide is a `.tsx` file in `slides/` with a default export. Order comes from
 the number at the start of the filename, so reordering the deck is a rename.
-Prefix a file with `_` to park it without deleting it.
+Use `slide-maker hide <number>` to keep a slide editable in Studio while omitting
+it from presentation and export. Use `slide-maker show <number>` to include it again.
 
 Compose from the components exported by `slide-maker/runtime`. Do not write raw
 HTML for layout: the style targets the runtime classes, so bespoke markup is

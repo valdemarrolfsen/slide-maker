@@ -87,7 +87,7 @@ export async function startMcpServer(deckDir) {
       const config = await readConfig(deckDir);
       const template = await resolveTemplate(config.template);
       const [slides, comments, state, style, defaultSlides] = await Promise.all([
-        listSlides(deckDir, config),
+        listSlides(deckDir, config, { includeHidden: true }),
         listComments(deckDir),
         readState(deckDir),
         resolveStyle(deckDir, config.style),
@@ -103,7 +103,8 @@ export async function startMcpServer(deckDir) {
         styleFound: Boolean(style),
         styleGuidance: style?.guidance || null,
         canvas: `${config.width}x${config.height}`,
-        slideCount: slides.length,
+        slideCount: slides.filter((slide) => !slide.hidden).length,
+        hiddenSlideCount: slides.filter((slide) => slide.hidden).length,
         openComments: open.length,
         // Surfaced here so the library is visible from the first call, rather
         // than only to whoever thinks to go looking for it.
@@ -113,7 +114,12 @@ export async function startMcpServer(deckDir) {
         viewing: state.slideId
           ? { slideId: state.slideId, slideNumber: (state.slideIndex ?? 0) + 1 }
           : null,
-        slides: slides.map((s) => ({ number: s.number, id: s.id, file: s.file })),
+        slides: slides.map((s) => ({
+          number: s.number,
+          id: s.id,
+          file: s.file,
+          hidden: s.hidden,
+        })),
       });
     },
   );
@@ -514,7 +520,7 @@ export async function startMcpServer(deckDir) {
     },
     async () => {
       const config = await readConfig(deckDir);
-      const slides = await listSlides(deckDir, config);
+      const slides = await listSlides(deckDir, config, { includeHidden: true });
       const next = slides.length + 1;
       return json({
         deckDir,

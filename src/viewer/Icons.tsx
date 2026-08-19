@@ -81,6 +81,25 @@ export function Download(props: IconProps) {
   );
 }
 
+export function Eye(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M1.8 8s2.2-3.5 6.2-3.5S14.2 8 14.2 8s-2.2 3.5-6.2 3.5S1.8 8 1.8 8Z" />
+      <circle cx="8" cy="8" r="1.7" />
+    </Icon>
+  );
+}
+
+export function EyeOff(props: IconProps) {
+  return (
+    <Icon {...props}>
+      <path d="M3.1 4.2C2.2 5 1.8 5.8 1.8 5.8S4 9.3 8 9.3c.8 0 1.5-.1 2.1-.4" />
+      <path d="M5.6 2.7c.7-.2 1.5-.4 2.4-.4 4 0 6.2 3.5 6.2 3.5s-.5.9-1.5 1.8" />
+      <path d="m2.5 1.8 11 11" />
+    </Icon>
+  );
+}
+
 export function Check(props: IconProps) {
   return (
     <Icon {...props}>

@@ -2,7 +2,13 @@ import path from 'node:path';
 import fsp from 'node:fs/promises';
 import { createRequire } from 'node:module';
 import { normalizePath } from 'vite';
-import { listSlides, readConfig, writeConfig, CONFIG_FILE } from '../core/deck.js';
+import {
+  listSlides,
+  readConfig,
+  setSlideHidden,
+  writeConfig,
+  CONFIG_FILE,
+} from '../core/deck.js';
 import { resolveStyle, listStyles } from '../core/styles.js';
 import { resolveTemplate } from '../core/templates.js';
 import { listDefaultSlides, resolveDefaultSlide } from '../core/default-slides.js';
@@ -125,7 +131,7 @@ function sendPdf(res, pdf, filename) {
 
 /** The next free `NN-name.tsx` in a deck's slides directory. */
 async function nextSlideFile(deckDir, config, stem) {
-  const slides = await listSlides(deckDir, config);
+  const slides = await listSlides(deckDir, config, { includeHidden: true });
   const taken = new Set(slides.map((s) => s.name));
   const number = String(slides.length + 1).padStart(2, '0');
   let name = `${number}-${stem}.tsx`;
@@ -186,22 +192,36 @@ export function deckPlugin({ deckDir, config }) {
     async load(id) {
       if (id === RESOLVED(DECK_MODULE)) {
         current = await readConfig(deckDir);
-        const slides = await listSlides(deckDir, current);
-        const imports = slides
+        const allSlides = await listSlides(deckDir, current, { includeHidden: true });
+        const imports = allSlides
           .map((s, i) => `import * as slide${i} from ${JSON.stringify(toImportPath(s.absolute))};`)
           .join('\n');
-        const entries = slides
+        const allEntries = allSlides
           .map(
             (s, i) =>
               `  { id: ${JSON.stringify(s.id)}, index: ${s.index}, number: ${s.number}, ` +
-              `file: ${JSON.stringify(s.file)}, name: ${JSON.stringify(s.name)}, module: slide${i} }`,
+              `file: ${JSON.stringify(s.file)}, name: ${JSON.stringify(s.name)}, ` +
+              `hidden: ${s.hidden}, module: slide${i} }`,
+          )
+          .join(',\n');
+        const visibleEntries = allSlides
+          .map((slide, importIndex) => ({ slide, importIndex }))
+          .filter(({ slide }) => !slide.hidden)
+          .map(
+            ({ slide, importIndex }, index) =>
+              `  { id: ${JSON.stringify(slide.id)}, index: ${index}, number: ${index + 1}, ` +
+              `file: ${JSON.stringify(slide.file)}, name: ${JSON.stringify(slide.name)}, ` +
+              `hidden: false, module: slide${importIndex} }`,
           )
           .join(',\n');
         return `${imports}
 
 export const config = ${JSON.stringify(current, null, 2)};
+export const allSlides = [
+${allEntries}
+];
 export const slides = [
-${entries}
+${visibleEntries}
 ];
 `;
       }
@@ -321,7 +341,7 @@ ${entries}
           if (route === '/state' && req.method === 'GET') {
             const cfg = await readConfig(deckDir);
             const [slides, comments, styles] = await Promise.all([
-              listSlides(deckDir, cfg),
+              listSlides(deckDir, cfg, { includeHidden: true }),
               listComments(deckDir),
               listStyles(deckDir),
             ]);
@@ -382,10 +402,20 @@ ${entries}
             return sendJson(res, 201, { file });
           }
 
+          if (route === '/slides/visibility' && req.method === 'POST') {
+            const body = await readBody(req);
+            if (typeof body.file !== 'string' || typeof body.hidden !== 'boolean') {
+              return sendJson(res, 400, { error: 'Both file and hidden are required' });
+            }
+            const slide = await setSlideHidden(deckDir, body.file, body.hidden);
+            if (!slide) return sendJson(res, 404, { error: 'Slide file not found' });
+            return sendJson(res, 200, { file: slide.file, hidden: slide.hidden });
+          }
+
           if (route === '/text' && req.method === 'POST') {
             const body = await readBody(req);
             const cfg = await readConfig(deckDir);
-            const slides = await listSlides(deckDir, cfg);
+            const slides = await listSlides(deckDir, cfg, { includeHidden: true });
             // Resolve only through the configured slide list. Besides producing
             // a useful not-found error, this makes path traversal impossible.
             const slide = slides.find((item) => item.file === body.file);
@@ -410,7 +440,7 @@ ${entries}
             const cfg = await readConfig(deckDir);
             const slides = await listSlides(deckDir, cfg);
             if (!slides.length) {
-              return sendJson(res, 400, { error: 'Add at least one slide before exporting' });
+              return sendJson(res, 400, { error: 'Show at least one slide before exporting' });
             }
             // Import lazily to keep the normal studio startup light and avoid a
             // cycle through renderer -> Vite config -> this plugin.

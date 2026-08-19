@@ -35,6 +35,14 @@ export function addSlide(defaultSlide: string) {
   });
 }
 
+/** Includes or omits a slide from presentation and export. */
+export function setSlideHidden(file: string, hidden: boolean) {
+  return request<{ file: string; hidden: boolean }>(`${BASE}/slides/visibility`, {
+    method: 'POST',
+    body: JSON.stringify({ file, hidden }),
+  });
+}
+
 /** Saves one piece of rendered copy back to its literal in the slide source. */
 export function updateText(
   file: string,

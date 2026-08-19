@@ -27,7 +27,7 @@ export async function exportCommand(target, options) {
   }
 
   const slides = await listSlides(deckDir, config);
-  if (!slides.length) fail(`No slides found in ${config.slides}/.`);
+  if (!slides.length) fail(`No visible slides found in ${config.slides}/.`);
 
   const format = (options.format || 'pdf').toLowerCase();
 

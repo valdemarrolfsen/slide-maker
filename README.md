@@ -1,4 +1,13 @@
-# slide-maker
+<p align="center">
+  <img src="./assets/slidemaker-logo.png" alt="slide-maker" width="466" />
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/slide-maker"><img src="https://img.shields.io/npm/v/slide-maker?style=flat-square" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/slide-maker"><img src="https://img.shields.io/npm/dm/slide-maker?style=flat-square" alt="npm downloads" /></a>
+  <a href="./LICENSE"><img src="https://img.shields.io/github/license/valdemarrolfsen/slide-maker?style=flat-square" alt="MIT license" /></a>
+  <a href="./package.json"><img src="https://img.shields.io/node/v/slide-maker?style=flat-square" alt="Node.js version" /></a>
+</p>
 
 A local slide deck studio you drive from Claude Code.
 
